@@ -2,32 +2,26 @@
  * @fileOverview Firestore Security Rules for AquaLink App
  *
  * Core Philosophy:
- * This ruleset enforces a strict user-ownership model for seller and customer profiles,
- * and a resource-ownership model for fish listings, where sellers own their listings.
+ * This ruleset enforces a strict user-ownership model for seller and customer profiles.
+ * It uses a top-level `fishListings` collection for public reads and owner-only writes.
  * It leverages Firebase Authentication to verify user identity and authorize access to data.
  *
  * Data Structure:
  * - /sellers/{sellerId}: Stores seller profiles, where {sellerId} is the Firebase auth UID.
  * - /customers/{customerId}: Stores customer profiles, where {customerId} is the Firebase auth UID.
- * - /sellers/{sellerId}/fishListings/{fishListingId}: Stores fish listings created by sellers.
+ * - /fishListings/{fishListingId}: Stores all fish listings. Publicly readable.
  *
  * Key Security Decisions:
  * - Only authenticated users can create seller or customer profiles.
  * - Users can only read, update, or delete their own profiles.
- * - Sellers can only create, read, update, or delete their own fish listings.
- * - The rules are designed to be authorization-independent, avoiding complex hierarchical
- *   authorization dependencies by denormalizing the 'sellerId' into the `FishListing` documents.
+ * - Sellers can only create, update, or delete their own fish listings.
+ * - The `fishListings` collection is publicly readable to allow anonymous users to browse.
  * - All write operations require authentication.
  *
  * Denormalization for Authorization:
  * The `FishListing` documents contain a `sellerId` field, which is a denormalized copy of the
- * seller's UID. This allows for simple and efficient ownership checks without needing to
- * perform additional `get()` operations to verify the seller's identity.
+ * seller's UID. This allows for simple and efficient ownership checks on writes.
  *
- * Structural Segregation:
- * Seller and customer profiles are stored in separate collections (`/sellers` and `/customers`)
- * to simplify the security rules and prevent accidental data leaks. This segregation
- * facilitates secure `list` operations, as rules don't have to act as filters.
  */
 rules_version = '2';
 service cloud.firestore {
@@ -59,23 +53,20 @@ service cloud.firestore {
     function isExistingOwner(userId) {
       return isOwner(userId) && resource != null;
     }
+    
+    /**
+     * @description Checks if the incoming data for a fish listing has the correct seller ID.
+     */
+    function isCorrectSeller(sellerId) {
+      return request.resource.data.sellerId == sellerId;
+    }
 
     /**
      * @description Rules for the /sellers/{sellerId} collection.
-     * @path /sellers/{sellerId}
-     * @allow (create) User with UID 'user_abc' can create their own seller profile.
-     *        request.auth.uid == 'user_abc' and request.resource.data.id == 'user_abc'
-     * @allow (get, update, delete) User with UID 'user_abc' can read, update, and delete their own seller profile.
-     *        request.auth.uid == 'user_abc'
-     * @deny (create) User with UID 'user_abc' cannot create a seller profile for another user.
-     *       request.auth.uid == 'user_abc' but request.resource.data.id == 'user_xyz'
-     * @deny (get, update, delete) User with UID 'user_xyz' cannot read, update, or delete the seller profile of user 'user_abc'.
-     *        request.auth.uid == 'user_xyz'
-     * @principle Enforces document ownership for writes.
      */
     match /sellers/{sellerId} {
       allow get: if isOwner(sellerId);
-      allow list: if true;
+      allow list: if false; // Sellers list is not public
 
       allow create: if isSignedIn() && request.auth.uid == sellerId && request.resource.data.id == sellerId;
       allow update: if isExistingOwner(sellerId) && request.resource.data.id == resource.data.id;
@@ -84,16 +75,6 @@ service cloud.firestore {
 
     /**
      * @description Rules for the /customers/{customerId} collection.
-     * @path /customers/{customerId}
-     * @allow (create) User with UID 'user_def' can create their own customer profile.
-     *        request.auth.uid == 'user_def' and request.resource.data.id == 'user_def'
-     * @allow (get, update, delete) User with UID 'user_def' can read, update, and delete their own customer profile.
-     *        request.auth.uid == 'user_def'
-     * @deny (create) User with UID 'user_def' cannot create a customer profile for another user.
-     *       request.auth.uid == 'user_def' but request.resource.data.id == 'user_ghi'
-     * @deny (get, update, delete) User with UID 'user_ghi' cannot read, update, or delete the customer profile of user 'user_def'.
-     *        request.auth.uid == 'user_ghi'
-     * @principle Enforces document ownership for writes.
      */
     match /customers/{customerId} {
       allow get: if isOwner(customerId);
@@ -105,25 +86,15 @@ service cloud.firestore {
     }
 
     /**
-     * @description Rules for the /sellers/{sellerId}/fishListings/{fishListingId} collection.
-     * @path /sellers/{sellerId}/fishListings/{fishListingId}
-     * @allow (create) User with UID 'user_abc' can create a fish listing under their seller profile, and sellerId matches.
-     *        request.auth.uid == 'user_abc' && request.resource.data.sellerId == 'user_abc'
-     * @allow (get, update, delete) User with UID 'user_abc' can read, update, and delete their own fish listing.
-     *        resource.data.sellerId == 'user_abc' && request.auth.uid == 'user_abc'
-     * @deny (create) User with UID 'user_abc' cannot create a fish listing for another seller.
-     *       request.auth.uid == 'user_abc' but request.resource.data.sellerId == 'user_xyz'
-     * @deny (get, update, delete) User with UID 'user_xyz' cannot read, update, or delete the fish listing of seller 'user_abc'.
-     *        resource.data.sellerId == 'user_abc' and request.auth.uid == 'user_xyz'
-     * @principle Enforces document ownership for writes.
+     * @description Rules for the /fishListings/{fishListingId} collection.
      */
-    match /sellers/{sellerId}/fishListings/{fishListingId} {
+    match /fishListings/{fishListingId} {
       allow get: if true;
       allow list: if true;
 
-      allow create: if isOwner(sellerId) && request.resource.data.sellerId == sellerId;
-      allow update: if isExistingOwner(sellerId) && resource.data.sellerId == sellerId;
-      allow delete: if isExistingOwner(sellerId) && resource.data.sellerId == sellerId;
+      allow create: if isOwner(request.resource.data.sellerId);
+      allow update: if isOwner(resource.data.sellerId) && isCorrectSeller(resource.data.sellerId);
+      allow delete: if isOwner(resource.data.sellerId);
     }
   }
 }

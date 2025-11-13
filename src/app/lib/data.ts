@@ -1,60 +1,55 @@
 'use client';
 
 import type { FishListing } from '@/app/types';
-import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
-import type { Seller } from '@/app/types';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
-
 export async function getFishListings(): Promise<FishListing[]> {
   const { firestore } = initializeFirebase();
-  const listings: FishListing[] = [];
-  
-  try {
-    const sellersSnapshot = await getDocs(collection(firestore, 'sellers'));
-    for (const sellerDoc of sellersSnapshot.docs) {
-      const sellerId = sellerDoc.id;
-      const fishListingsRef = collection(firestore, `sellers/${sellerId}/fishListings`);
-      const fishListingsSnapshot = await getDocs(fishListingsRef);
-      
-      const sellerData = sellerDoc.data() as Seller;
+  const listingsCol = collection(firestore, 'fishListings');
+  const q = query(listingsCol, orderBy('listedDate', 'desc'));
 
-      fishListingsSnapshot.forEach((doc) => {
-        const listingData = doc.data();
-        listings.push({
-          id: doc.id,
-          description: listingData.description,
-          photoUrl: listingData.photoUrl,
-          sellerId: listingData.sellerId,
-          listedDate: listingData.listedDate,
-          sellerName: sellerData.name, 
-          sellerPhone: sellerData.phoneNumber,
-        });
-      });
-    }
+  try {
+    const querySnapshot = await getDocs(q);
+    const listings = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    } as FishListing));
+    return listings;
   } catch (e: any) {
-    if (e.code === 'permission-denied') {
+     if (e.code === 'permission-denied') {
         const contextualError = new FirestorePermissionError({
-            path: 'sellers', // This is a best guess for the initial failing query
+            path: 'fishListings',
             operation: 'list',
         });
         errorEmitter.emit('permission-error', contextualError);
     } else {
         console.error("Error fetching fish listings: ", e);
     }
+    return [];
   }
-
-  return listings;
 }
 
-export function addFishListing(listing: Omit<FishListing, 'id' | 'sellerName' | 'sellerPhone' | 'listedDate'> & { sellerId: string; photoUrl: string }) {
+export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDate'>) {
   const { firestore } = initializeFirebase();
-  const fishListingsRef = collection(firestore, `sellers/${listing.sellerId}/fishListings`);
+  
+  // Get seller info to denormalize
+  const sellerRef = doc(firestore, 'sellers', listing.sellerId);
+  const sellerSnap = await getDoc(sellerRef);
+
+  if (!sellerSnap.exists()) {
+    throw new Error("Seller profile not found!");
+  }
+  const sellerData = sellerSnap.data();
+
+  const fishListingsRef = collection(firestore, `fishListings`);
   
   const data = {
     ...listing,
+    sellerName: sellerData.name,
+    sellerPhone: sellerData.phoneNumber,
     listedDate: new Date().toISOString(),
   };
 

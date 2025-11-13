@@ -64,6 +64,14 @@
           "type": "string",
           "description": "Reference to Seller. (Relationship: Seller 1:N FishListing)"
         },
+        "sellerName": {
+            "type": "string",
+            "description": "Denormalized seller name for display."
+        },
+        "sellerPhone": {
+            "type": "string",
+            "description": "Denormalized seller phone for display."
+        },
         "photoUrl": {
           "type": "string",
           "description": "URL of the fish photo."
@@ -81,6 +89,8 @@
       "required": [
         "id",
         "sellerId",
+        "sellerName",
+        "sellerPhone",
         "photoUrl",
         "description",
         "listedDate"
@@ -128,18 +138,14 @@
         }
       },
       {
-        "path": "/sellers/{sellerId}/fishListings/{fishListingId}",
+        "path": "/fishListings/{fishListingId}",
         "definition": {
           "entityName": "FishListing",
           "schema": {
             "$ref": "#/backend/entities/FishListing"
           },
-          "description": "Stores fish listings created by sellers. Includes denormalized 'sellerId' for authorization independence.",
+          "description": "Top-level collection for all fish listings for public browsing. Contains denormalized seller info.",
           "params": [
-            {
-              "name": "sellerId",
-              "description": "The Firebase auth UID of the seller who created the listing."
-            },
             {
               "name": "fishListingId",
               "description": "The unique ID of the fish listing."
@@ -148,6 +154,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to support separate login pages for customers and sellers in the AquaLink app. It provides secure and scalable storage for customer and seller profiles, as well as fish listings. To ensure authorization independence and prevent reliance on hierarchical authorization dependencies, key authorization data, such as the `sellerId`, is denormalized into the `FishListing` documents.\n\nThe structure is segregated to provide a homogeneous security posture. Seller and Customer profiles are stored in separate collections to avoid accidental data leaks and simplify the security rules.\n\nThe structure facilitates QAPs. The segregation of sellers and customers into different collections enables secure `list` operations, because rules don't have to act as filters.\n\nThe design uses path-based ownership for fish listings, which are owned by sellers, to simplify and secure access control. The `FishListing` documents are stored under the `/sellers/{sellerId}/fishListings/{fishListingId}` path. The seller ID is also stored directly within the `FishListing` document (`sellerId` field) to ensure authorization independence."
+    "reasoning": "The Firestore structure is designed to support separate login pages for customers and sellers. It provides secure and scalable storage for customer and seller profiles, as well as fish listings. A top-level `fishListings` collection is used to allow for public, unauthenticated listing queries, which is a common pattern for marketplace apps. FishListing documents contain denormalized seller information (name, phone) to avoid costly and complex joins in client-side code and security rules."
   }
 }
