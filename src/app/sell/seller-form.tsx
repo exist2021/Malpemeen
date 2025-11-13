@@ -1,14 +1,14 @@
 
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState, useTransition, useRef } from 'react';
 import Image from 'next/image';
 import { addFishListing, updateFishListing } from '@/app/lib/data';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Camera, Loader2, X } from 'lucide-react';
+import { Camera, Loader2, X, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import placeholderImagesData from '@/lib/placeholder-images.json';
 import { useUser } from '@/firebase';
@@ -29,6 +29,7 @@ export function SellerForm({ listing }: SellerFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const isEditMode = !!listing;
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -77,6 +78,26 @@ export function SellerForm({ listing }: SellerFormProps) {
         toast({ variant: 'destructive', title: 'Duplicate Image', description: 'This image URL has already been added.' });
     }
   }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        if (!imageUrls.includes(result)) {
+            setImageUrls(prev => [...prev, result]);
+        } else {
+            toast({ variant: 'destructive', title: 'Duplicate Image', description: 'You have already uploaded this image.' });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+    // Reset file input to allow uploading the same file again
+    if(fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
+  };
 
   const removeImage = (urlToRemove: string) => {
     setImageUrls(prev => prev.filter(url => url !== urlToRemove));
@@ -174,7 +195,7 @@ export function SellerForm({ listing }: SellerFormProps) {
             ))}
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Input id="photoUrl" name="photoUrl" value={newImageUrl} onChange={(e) => setNewImageUrl(e.target.value)} placeholder="Add image URL" aria-describedby="photoUrl-error" />
           <Button type="button" variant="outline" onClick={addImageFromUrl}>
             Add URL
@@ -182,6 +203,17 @@ export function SellerForm({ listing }: SellerFormProps) {
           <Button type="button" variant="outline" onClick={addRandomPhoto}>
             <Camera className="mr-2 h-4 w-4" />
             Random
+          </Button>
+           <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
+            accept="image/*"
+          />
+          <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+            <Upload className="mr-2 h-4 w-4" />
+            Upload
           </Button>
         </div>
         <div id="photoUrl-error" aria-live="polite" aria-atomic="true">
