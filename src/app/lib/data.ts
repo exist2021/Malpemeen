@@ -1,9 +1,11 @@
 'use client';
 
 import type { FishListing } from '@/app/types';
-import { collection, addDoc, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import type { Seller } from '@/app/types';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 
 export async function getFishListings(): Promise<FishListing[]> {
@@ -41,17 +43,21 @@ export async function getFishListings(): Promise<FishListing[]> {
   return listings;
 }
 
-export async function addFishListing(listing: Omit<FishListing, 'id' | 'sellerName' | 'sellerPhone' | 'listedDate'> & { sellerId: string; photoUrl: string }) {
+export function addFishListing(listing: Omit<FishListing, 'id' | 'sellerName' | 'sellerPhone' | 'listedDate'> & { sellerId: string; photoUrl: string }) {
   const { firestore } = initializeFirebase();
+  const fishListingsRef = collection(firestore, `sellers/${listing.sellerId}/fishListings`);
+  
+  const data = {
+    ...listing,
+    listedDate: new Date().toISOString(),
+  };
 
-  try {
-    const fishListingsRef = collection(firestore, `sellers/${listing.sellerId}/fishListings`);
-    await addDoc(fishListingsRef, {
-      ...listing,
-      listedDate: new Date().toISOString(),
+  addDoc(fishListingsRef, data).catch(error => {
+    const contextualError = new FirestorePermissionError({
+      path: fishListingsRef.path,
+      operation: 'create',
+      requestResourceData: data,
     });
-  } catch (e) {
-    console.error("Error adding document: ", e);
-    throw new Error('Failed to add fish listing.');
-  }
+    errorEmitter.emit('permission-error', contextualError);
+  });
 }

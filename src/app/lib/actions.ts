@@ -33,13 +33,9 @@ export async function createFishListing(prevState: State, formData: FormData) {
     };
   }
 
-  try {
-    await dbAddFishListing(validatedFields.data);
-  } catch (error) {
-    return {
-      message: 'Database Error: Failed to Create Listing.',
-    };
-  }
+  // The error handling will now be managed by the non-blocking data function,
+  // which emits a detailed error for the FirebaseErrorListener to catch.
+  await dbAddFishListing(validatedFields.data);
 
   revalidatePath('/');
   redirect('/');
