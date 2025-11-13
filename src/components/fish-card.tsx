@@ -21,7 +21,7 @@ export function FishCard({ listing }: FishCardProps) {
     <Card className="flex h-full flex-col overflow-hidden transition-shadow duration-300 hover:shadow-xl">
       <div className="relative h-48 w-full">
         <Image
-          src={listing.imageUrl}
+          src={listing.photoUrl}
           alt={listing.description}
           fill
           className="object-cover"
@@ -30,16 +30,16 @@ export function FishCard({ listing }: FishCardProps) {
         />
       </div>
       <CardHeader>
-        <CardTitle className="font-headline text-lg">{listing.sellerName}</CardTitle>
+        <CardTitle className="font-headline text-lg">{listing.sellerName || 'A Seller'}</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow">
         <CardDescription className="text-foreground/80">{listing.description}</CardDescription>
       </CardContent>
       <CardFooter>
         <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-          <a href={`tel:${listing.phone}`}>
+          <a href={`tel:${listing.sellerPhone}`}>
             <Phone className="mr-2 h-4 w-4" />
-            {listing.phone}
+            Call Seller
           </a>
         </Button>
       </CardFooter>

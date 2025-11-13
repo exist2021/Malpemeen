@@ -1,7 +1,21 @@
+export type Seller = {
+    id: string;
+    phoneNumber: string;
+    name: string;
+};
+
+export type Customer = {
+    id: string;
+    phoneNumber: string;
+    name: string;
+};
+
 export type FishListing = {
-  id: string;
-  sellerName: string;
-  phone: string;
-  description: string;
-  imageUrl: string;
+    id: string;
+    sellerId: string;
+    photoUrl: string;
+    description: string;
+    listedDate: string;
+    sellerName?: string;
+    sellerPhone?: string;
 };

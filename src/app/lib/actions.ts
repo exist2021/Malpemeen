@@ -4,22 +4,18 @@ import { z } from 'zod';
 import { addFishListing as dbAddFishListing } from '@/app/lib/data';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { auth } from 'firebase-admin';
+import { getAuth } from 'firebase/auth';
+import { initializeFirebase } from '@/firebase';
 
-const phoneRegex = new RegExp(
-  /^([+]?[\s0-9]+)?(\d{3}|[(]\d{3}[)])?([-]?[\s]?)(\d{3})([-]?[\s]?)(\d{4})$/
-);
 
 const FormSchema = z.object({
-  sellerName: z.string().min(2, { message: 'Seller name must be at least 2 characters.' }),
-  phone: z.string().regex(phoneRegex, 'Invalid phone number.'),
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
   imageUrl: z.string().url({ message: 'Please enter a valid image URL.' }),
 });
 
 export type State = {
   errors?: {
-    sellerName?: string[];
-    phone?: string[];
     description?: string[];
     imageUrl?: string[];
   };
@@ -27,9 +23,16 @@ export type State = {
 };
 
 export async function createFishListing(prevState: State, formData: FormData) {
+  const { auth } = initializeFirebase();
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    return {
+      message: 'Authentication Error: You must be logged in to create a listing.',
+    };
+  }
+
   const validatedFields = FormSchema.safeParse({
-    sellerName: formData.get('sellerName'),
-    phone: formData.get('phone'),
     description: formData.get('description'),
     imageUrl: formData.get('imageUrl'),
   });
@@ -42,7 +45,12 @@ export async function createFishListing(prevState: State, formData: FormData) {
   }
 
   try {
-    await dbAddFishListing(validatedFields.data);
+    // We need seller name and phone from the seller's profile in firestore
+    // But for now, we'll just pass the sellerId
+    await dbAddFishListing({
+      ...validatedFields.data,
+      sellerId: currentUser.uid,
+    });
   } catch (error) {
     return {
       message: 'Database Error: Failed to Create Listing.',
