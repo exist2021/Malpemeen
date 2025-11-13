@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User as UserIcon, Settings, LogOut } from 'lucide-react';
+import { User as UserIcon, Settings, LogOut, Home } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import {
   Dialog,
@@ -137,7 +137,7 @@ export function Header() {
         </div>
         <div className="flex items-center gap-4">
           <Button variant="ghost" asChild>
-            <Link href="/">Home</Link>
+            <Link href="/"><Home className="mr-2 h-4 w-4" />Home</Link>
           </Button>
           {renderUserActions()}
         </div>
