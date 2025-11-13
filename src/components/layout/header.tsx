@@ -130,6 +130,9 @@ export function Header() {
           <MainNav />
         </div>
         <div className="flex items-center gap-4">
+          <Button variant="ghost" asChild>
+            <Link href="/">Home</Link>
+          </Button>
           {renderUserActions()}
         </div>
       </div>
