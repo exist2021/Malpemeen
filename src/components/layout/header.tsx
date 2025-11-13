@@ -25,6 +25,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { CustomerAccountForm } from '@/app/customer/dashboard/customer-account-form';
+import { useMemo } from 'react';
 
 
 export function Header() {
@@ -40,6 +41,12 @@ export function Header() {
       router.push('/');
     }
   };
+
+  const homeHref = useMemo(() => {
+    if (role === 'customer') return '/customer/dashboard';
+    if (role === 'seller') return '/seller/dashboard';
+    return '/';
+  }, [role]);
   
   const isLoginPage = pathname.includes('/login');
   if (isLoginPage) {
@@ -129,7 +136,7 @@ export function Header() {
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex gap-6 md:gap-10">
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href={homeHref} className="flex items-center space-x-2">
             <FishLogo className="h-6 w-6 text-primary" />
             <span className="inline-block font-bold whitespace-nowrap">Malpe Meen Pvt Ltd</span>
           </Link>
@@ -137,7 +144,7 @@ export function Header() {
         </div>
         <div className="flex items-center gap-4">
           <Button variant="outline" asChild>
-            <Link href="/"><Home className="mr-2 h-4 w-4" />Home</Link>
+            <Link href={homeHref}><Home className="mr-2 h-4 w-4" />Home</Link>
           </Button>
           {renderUserActions()}
         </div>
@@ -145,4 +152,3 @@ export function Header() {
     </header>
   );
 }
-
