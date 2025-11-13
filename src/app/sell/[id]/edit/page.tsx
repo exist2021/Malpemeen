@@ -1,16 +1,19 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { SellerForm } from '@/app/sell/seller-form';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { getFishListingById } from '@/app/lib/data';
 import type { FishListing } from '@/app/types';
 import { useUser } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 export default function EditSellPage() {
   const params = useParams();
+  const router = useRouter();
   const { user, isUserLoading } = useUser();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const [listing, setListing] = useState<FishListing | null>(null);
@@ -35,6 +38,9 @@ export default function EditSellPage() {
   if (loading || isUserLoading) {
     return (
         <div className="container mx-auto max-w-2xl py-12">
+             <div className="mb-4">
+                <Skeleton className="h-10 w-24" />
+            </div>
             <Card>
                 <CardHeader>
                     <Skeleton className="h-8 w-3/4 mx-auto" />
@@ -75,6 +81,12 @@ export default function EditSellPage() {
 
   return (
     <div className="container mx-auto max-w-2xl py-12">
+        <div className="mb-4">
+          <Button variant="outline" onClick={() => router.back()}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+        </div>
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold tracking-tight font-headline">Edit Your Listing</CardTitle>

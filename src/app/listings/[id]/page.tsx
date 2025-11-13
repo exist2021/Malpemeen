@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { getFishListingById } from '@/app/lib/data';
 import type { FishListing } from '@/app/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Button } from '@/components/ui/button';
-import { Phone, Calendar, User } from 'lucide-react';
+import { Phone, Calendar, User, ArrowLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/layout/header';
 import { format } from 'date-fns';
@@ -16,6 +16,9 @@ import { format } from 'date-fns';
 function ListingDetailSkeleton() {
   return (
     <div className="container mx-auto max-w-4xl py-12">
+       <div className="mb-4">
+        <Skeleton className="h-10 w-24" />
+      </div>
       <Card>
         <CardContent className="grid md:grid-cols-2 gap-8 p-8">
           <div className="space-y-4">
@@ -54,6 +57,7 @@ function ListingDetailSkeleton() {
 
 export default function ListingDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const [listing, setListing] = useState<FishListing | null>(null);
   const [loading, setLoading] = useState(true);
@@ -97,6 +101,12 @@ export default function ListingDetailPage() {
     <>
     <Header />
     <div className="container mx-auto max-w-4xl py-12">
+        <div className="mb-4">
+          <Button variant="outline" onClick={() => router.back()}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+        </div>
       <Card className="overflow-hidden">
         <CardContent className="p-0">
           <div className="grid md:grid-cols-2">
