@@ -72,9 +72,12 @@
             "type": "string",
             "description": "Denormalized seller phone for display."
         },
-        "photoUrl": {
-          "type": "string",
-          "description": "URL of the fish photo."
+        "photoUrls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "URLs of the fish photos."
         },
         "description": {
           "type": "string",
@@ -91,7 +94,7 @@
         "sellerId",
         "sellerName",
         "sellerPhone",
-        "photoUrl",
+        "photoUrls",
         "description",
         "listedDate"
       ]

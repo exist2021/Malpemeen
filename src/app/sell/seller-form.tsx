@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
+import Image from 'next/image';
 import { addFishListing } from '@/app/lib/data';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Camera, Loader2 } from 'lucide-react';
+import { Camera, Loader2, Trash2, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import placeholderImagesData from '@/lib/placeholder-images.json';
 import { useUser } from '@/firebase';
@@ -14,9 +15,10 @@ import { useRouter } from 'next/navigation';
 
 export function SellerForm() {
   const { toast } = useToast();
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [newImageUrl, setNewImageUrl] = useState('');
   const [description, setDescription] = useState('');
-  const [errors, setErrors] = useState<{ description?: string[]; photoUrl?: string[] }>({});
+  const [errors, setErrors] = useState<{ description?: string[]; photoUrls?: string[] }>({});
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -27,16 +29,31 @@ export function SellerForm() {
     }
   }, [user, isUserLoading, router]);
 
-  const capturePhoto = () => {
+  const addRandomPhoto = () => {
     const { placeholderImages } = placeholderImagesData;
     const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
-    setImageUrl(randomImage.imageUrl);
+    if (randomImage.imageUrl && !imageUrls.includes(randomImage.imageUrl)) {
+        setImageUrls(prev => [...prev, randomImage.imageUrl]);
+    }
   };
   
   useEffect(() => {
-    // Set an initial photo on component mount
-    capturePhoto();
+    if(imageUrls.length === 0) {
+        addRandomPhoto();
+    }
   }, []);
+
+  const addImageFromUrl = () => {
+    if (newImageUrl && !imageUrls.includes(newImageUrl)) {
+      setImageUrls(prev => [...prev, newImageUrl]);
+      setNewImageUrl('');
+    }
+  }
+
+  const removeImage = (urlToRemove: string) => {
+    setImageUrls(prev => prev.filter(url => url !== urlToRemove));
+  }
+
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,12 +62,12 @@ export function SellerForm() {
       return;
     }
 
-    const newErrors: { description?: string[]; photoUrl?: string[] } = {};
+    const newErrors: { description?: string[]; photoUrls?: string[] } = {};
     if (description.length < 10) {
         newErrors.description = ['Description must be at least 10 characters.'];
     }
-    if (!imageUrl) {
-        newErrors.photoUrl = ['Please enter a valid image URL.'];
+    if (imageUrls.length === 0) {
+        newErrors.photoUrls = ['Please add at least one photo.'];
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -69,7 +86,7 @@ export function SellerForm() {
       try {
         await addFishListing({
           description,
-          photoUrl: imageUrl,
+          photoUrls: imageUrls,
           sellerId: user.uid,
         });
 
@@ -99,7 +116,7 @@ export function SellerForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-2 space-y-6">
+    <form onSubmit={handleSubmit} className="mt-2 space-y-8">
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
         <Textarea id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the fish, its size, price, etc." required aria-describedby="description-error" />
@@ -108,18 +125,32 @@ export function SellerForm() {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="photoUrl">Fish Photo</Label>
+      <div className="space-y-4">
+        <Label>Fish Photos</Label>
+        
+        <div className="grid grid-cols-3 gap-4">
+            {imageUrls.map(url => (
+                <div key={url} className="relative aspect-square">
+                    <Image src={url} alt="Fish photo" layout="fill" className="rounded-md object-cover" />
+                    <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeImage(url)}>
+                        <X className="h-4 w-4" />
+                    </Button>
+                </div>
+            ))}
+        </div>
+        
         <div className="flex items-center gap-2">
-          <Input id="photoUrl" name="photoUrl" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Image URL" required aria-describedby="photoUrl-error" />
-          <Button type="button" variant="outline" onClick={capturePhoto}>
+          <Input id="photoUrl" name="photoUrl" value={newImageUrl} onChange={(e) => setNewImageUrl(e.target.value)} placeholder="Add image URL" aria-describedby="photoUrl-error" />
+          <Button type="button" variant="outline" onClick={addImageFromUrl}>
+            Add URL
+          </Button>
+          <Button type="button" variant="outline" onClick={addRandomPhoto}>
             <Camera className="mr-2 h-4 w-4" />
-            New Photo
+            Random
           </Button>
         </div>
-        <p className="text-sm text-muted-foreground">Click "New Photo" to simulate capturing a new photo.</p>
         <div id="photoUrl-error" aria-live="polite" aria-atomic="true">
-          {errors?.photoUrl && <p className="text-sm font-medium text-destructive">{errors.photoUrl}</p>}
+          {errors?.photoUrls && <p className="text-sm font-medium text-destructive">{errors.photoUrls}</p>}
         </div>
       </div>
 

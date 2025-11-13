@@ -13,7 +13,7 @@ export type Customer = {
 export type FishListing = {
     id: string;
     sellerId: string;
-    photoUrl: string;
+    photoUrls: string[];
     description: string;
     listedDate: string;
     sellerName?: string;
