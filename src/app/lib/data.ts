@@ -13,7 +13,6 @@ export async function getFishListings(): Promise<FishListing[]> {
   const listings: FishListing[] = [];
   
   try {
-    // We need to get all sellers, then all their listings.
     const sellersSnapshot = await getDocs(collection(firestore, 'sellers'));
     for (const sellerDoc of sellersSnapshot.docs) {
       const sellerId = sellerDoc.id;
@@ -35,9 +34,16 @@ export async function getFishListings(): Promise<FishListing[]> {
         });
       });
     }
-  } catch (e) {
-    console.error("Error fetching fish listings: ", e);
-    // In a real app, handle this error more gracefully
+  } catch (e: any) {
+    if (e.code === 'permission-denied') {
+        const contextualError = new FirestorePermissionError({
+            path: 'sellers', // This is a best guess for the initial failing query
+            operation: 'list',
+        });
+        errorEmitter.emit('permission-error', contextualError);
+    } else {
+        console.error("Error fetching fish listings: ", e);
+    }
   }
 
   return listings;
