@@ -10,6 +10,7 @@ import { useUser } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { Header } from '@/components/layout/header';
 
 export default function EditSellPage() {
   const params = useParams();
@@ -37,6 +38,8 @@ export default function EditSellPage() {
 
   if (loading || isUserLoading) {
     return (
+      <>
+      <Header />
         <div className="container mx-auto max-w-2xl py-12">
              <div className="mb-4">
                 <Skeleton className="h-10 w-24" />
@@ -63,23 +66,41 @@ export default function EditSellPage() {
                 </CardContent>
             </Card>
         </div>
+      </>
     );
   }
 
   if (error) {
-    return <div className="container text-center py-12">{error}</div>;
+    return (
+        <>
+            <Header />
+            <div className="container text-center py-12">{error}</div>
+        </>
+    );
   }
   
   if (!listing) {
-    return <div className="container text-center py-12">Listing not found.</div>;
+    return (
+        <>
+            <Header />
+            <div className="container text-center py-12">Listing not found.</div>
+        </>
+    );
   }
   
   if(listing.sellerId !== user?.uid){
-    return <div className="container text-center py-12">You are not authorized to edit this listing.</div>;
+    return (
+        <>
+            <Header />
+            <div className="container text-center py-12">You are not authorized to edit this listing.</div>
+        </>
+    );
   }
 
 
   return (
+    <>
+    <Header />
     <div className="container mx-auto max-w-2xl py-12">
         <div className="mb-4">
           <Button variant="outline" onClick={() => router.back()}>
@@ -99,5 +120,6 @@ export default function EditSellPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

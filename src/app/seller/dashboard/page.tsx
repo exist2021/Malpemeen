@@ -11,6 +11,7 @@ import type { FishListing } from '@/app/types';
 import Image from 'next/image';
 import { Pencil } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Header } from '@/components/layout/header';
 
 function SellerListings() {
     const { user } = useUser();
@@ -83,9 +84,12 @@ export default function SellerDashboard() {
 
   if (isUserLoading || !user) {
     return (
-      <div className="container py-8">
-        <p>Loading...</p>
-      </div>
+      <>
+        <Header />
+        <div className="container py-8">
+          <p>Loading...</p>
+        </div>
+      </>
     );
   }
   
@@ -98,6 +102,8 @@ export default function SellerDashboard() {
 
 
   return (
+    <>
+    <Header />
     <div className="container py-8">
       <div className="grid gap-8">
         <Card>
@@ -124,5 +130,6 @@ export default function SellerDashboard() {
         </Card>
       </div>
     </div>
+    </>
   );
 }

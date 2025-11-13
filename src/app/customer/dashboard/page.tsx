@@ -10,6 +10,7 @@ import type { FishListing } from '@/app/types';
 import { getFishListings } from '@/app/lib/data';
 import { FishCard } from '@/components/fish-card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Header } from '@/components/layout/header';
 
 function ListingsSkeleton() {
   return (
@@ -76,9 +77,12 @@ export default function CustomerDashboard() {
 
   if (isUserLoading) {
     return (
-      <div className="container py-8">
-        <p>Loading...</p>
-      </div>
+      <>
+        <Header />
+        <div className="container py-8">
+          <p>Loading...</p>
+        </div>
+      </>
     );
   }
 
@@ -95,6 +99,8 @@ export default function CustomerDashboard() {
 
 
   return (
+    <>
+    <Header />
     <div className="container py-8">
       <Card className="mb-8">
         <CardHeader>
@@ -113,5 +119,6 @@ export default function CustomerDashboard() {
       </h2>
       <FishListings />
     </div>
+    </>
   );
 }
