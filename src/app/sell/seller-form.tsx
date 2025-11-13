@@ -1,7 +1,6 @@
 'use client';
 
-import { useFormState } from 'react-dom';
-import { useEffect, useRef, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { createFishListing, type State } from '@/app/lib/actions';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,7 +13,7 @@ import placeholderImagesData from '@/lib/placeholder-images.json';
 
 export function SellerForm() {
   const initialState: State = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(createFishListing, initialState);
+  const [state, dispatch] = useActionState(createFishListing, initialState);
   const { toast } = useToast();
   const [imageUrl, setImageUrl] = useState('');
 
