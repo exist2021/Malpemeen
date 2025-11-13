@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useUser, useAuth } from '@/firebase';
@@ -72,7 +73,7 @@ function SellerListings() {
 }
 
 export default function SellerDashboard() {
-  const { user, isUserLoading } = useUser();
+  const { user, isUserLoading }_ = useUser();
   const router = useRouter();
   const auth = useAuth();
 
@@ -96,7 +97,7 @@ export default function SellerDashboard() {
   const handleLogout = () => {
     if(auth) {
       auth.signOut();
-      router.push('/seller/login');
+      router.push('/');
     }
   };
 

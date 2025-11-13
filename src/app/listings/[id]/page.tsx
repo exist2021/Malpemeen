@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -17,7 +18,10 @@ function ListingDetailSkeleton() {
   return (
     <div className="container mx-auto max-w-4xl py-12">
        <div className="mb-4">
-        <Skeleton className="h-10 w-24" />
+        <Button variant="outline" disabled>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
       </div>
       <Card>
         <CardContent className="grid md:grid-cols-2 gap-8 p-8">
@@ -88,11 +92,21 @@ export default function ListingDetailPage() {
   }
 
   if (error) {
-    return <div className="container text-center py-12">{error}</div>;
+    return (
+        <>
+            <Header />
+            <div className="container text-center py-12">{error}</div>
+        </>
+    );
   }
   
   if (!listing) {
-    return <div className="container text-center py-12">Listing not found.</div>;
+    return (
+        <>
+            <Header />
+            <div className="container text-center py-12">Listing not found.</div>
+        </>
+    );
   }
   
   const hasPhotos = listing.photoUrls && Array.isArray(listing.photoUrls) && listing.photoUrls.length > 0;

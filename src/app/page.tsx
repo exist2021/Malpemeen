@@ -6,15 +6,13 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FishLogo } from '@/components/fish-logo';
-import { Header } from '@/components/layout/header';
 
 export default function RoleSelectionPage() {
   const router = useRouter();
 
   return (
     <>
-    <Header />
-    <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-background px-4">
+    <div className="flex h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
             <div className="mx-auto h-24 w-24">

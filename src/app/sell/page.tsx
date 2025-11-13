@@ -1,3 +1,6 @@
+
+'use client';
+
 import { SellerForm } from './seller-form';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Header } from '@/components/layout/header';

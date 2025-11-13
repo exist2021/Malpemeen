@@ -14,7 +14,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { User as UserIcon } from 'lucide-react';
-import { usePathname } from 'next/navigation';
 import { FishLogo } from '../fish-logo';
 
 
@@ -22,13 +21,6 @@ export function Header() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
-
-  // Hide header on login pages
-  if (pathname.includes('/login')) {
-    return null;
-  }
-
 
   const handleLogout = () => {
     if (auth) {

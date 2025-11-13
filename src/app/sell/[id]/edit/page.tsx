@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useEffect, useState } from 'react';
@@ -42,7 +43,10 @@ export default function EditSellPage() {
       <Header />
         <div className="container mx-auto max-w-2xl py-12">
              <div className="mb-4">
-                <Skeleton className="h-10 w-24" />
+                <Button variant="outline" onClick={() => router.back()} disabled>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back
+                </Button>
             </div>
             <Card>
                 <CardHeader>
