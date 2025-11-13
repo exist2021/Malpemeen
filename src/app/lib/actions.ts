@@ -1,3 +1,4 @@
+
 'use server';
 
 import { z } from 'zod';
@@ -37,6 +38,6 @@ export async function createFishListing(prevState: State, formData: FormData) {
   // which emits a detailed error for the FirebaseErrorListener to catch.
   await dbAddFishListing(validatedFields.data);
 
-  revalidatePath('/');
-  redirect('/');
+  revalidatePath('/listings');
+  redirect('/listings');
 }

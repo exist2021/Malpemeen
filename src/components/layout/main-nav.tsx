@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -5,7 +6,8 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const routes = [
-  { href: '/', label: 'For Sale' },
+  { href: '/listings', label: 'For Sale' },
+  { href: '/sell', label: 'Sell Fish' },
 ];
 
 export function MainNav() {

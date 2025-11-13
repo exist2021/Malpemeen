@@ -1,3 +1,4 @@
+
 'use client';
 import Link from 'next/link';
 import { Fish } from 'lucide-react';
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { User as UserIcon } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { FishLogo } from '../fish-logo';
 
 
 export function Header() {
@@ -23,8 +25,8 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Hide header on login pages
-  if (pathname.includes('/login')) {
+  // Hide header on login pages and the root role selection page
+  if (pathname.includes('/login') || pathname === '/') {
     return null;
   }
 
@@ -41,7 +43,7 @@ export function Header() {
       <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
         <div className="flex gap-6 md:gap-10">
           <Link href="/" className="flex items-center space-x-2">
-            <Fish className="h-6 w-6 text-primary" />
+            <FishLogo className="h-6 w-6 text-primary" />
             <span className="inline-block font-bold">Malpe Meen Pvt Ltd</span>
           </Link>
           <MainNav />
