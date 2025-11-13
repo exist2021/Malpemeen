@@ -13,22 +13,21 @@ import { FishCard } from '@/components/fish-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/layout/header';
 import { CustomerAccountForm } from './customer-account-form';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Settings } from 'lucide-react';
 
 function ListingsSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="flex flex-col space-y-3 rounded-lg border bg-card p-4">
-          <Skeleton className="h-[192px] w-full rounded-xl" />
-          <div className="space-y-2 pt-2">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-1/2" />
-          </div>
-          <div className="pt-4">
-            <Skeleton className="h-10 w-full" />
-          </div>
-        </div>
+        <Skeleton key={i} className="h-64 w-full rounded-xl" />
       ))}
     </div>
   );
@@ -104,38 +103,36 @@ export default function CustomerDashboard() {
     <>
     <Header />
     <div className="container py-8">
-        <div className="grid md:grid-cols-3 gap-8">
-            <div className="md:col-span-1 space-y-8">
-                 <Card>
-                    <CardHeader>
-                      <CardTitle>Welcome!</CardTitle>
-                       <CardDescription>
-                        This is your customer dashboard.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="font-semibold truncate">{user.displayName || user.email}</p>
-                      <Button onClick={handleLogout} className="mt-4 w-full">Logout</Button>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>My Account</CardTitle>
-                        <CardDescription>View and update your personal information.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
+        <div className="flex justify-between items-center mb-8">
+            <h2 className="font-headline text-3xl font-bold tracking-tight">
+                Today's Fresh Catch
+            </h2>
+            <div className="flex items-center gap-4">
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="outline">
+                            <Settings className="mr-2 h-4 w-4" />
+                            My Account
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                        <DialogTitle>My Account</DialogTitle>
+                        <DialogDescription>
+                            View and update your personal information.
+                        </DialogDescription>
+                        </DialogHeader>
                         <CustomerAccountForm />
-                    </CardContent>
-                </Card>
+                    </DialogContent>
+                </Dialog>
+                 <Button onClick={handleLogout} variant="outline">Logout</Button>
             </div>
-            <main className="md:col-span-2">
-                 <h2 className="mb-8 text-center font-headline text-3xl font-bold tracking-tight">
-                    Today's Fresh Catch
-                </h2>
-                <FishListings />
-            </main>
         </div>
+        <main>
+            <FishListings />
+        </main>
     </div>
     </>
   );
 }
+

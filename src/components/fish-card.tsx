@@ -1,86 +1,54 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Phone } from 'lucide-react';
-
+import { ArrowRight } from 'lucide-react';
 import type { FishListing } from '@/app/types';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
+import { cn } from '@/lib/utils';
 
 interface FishCardProps {
   listing: FishListing;
 }
 
+const cardColors = [
+    'from-blue-500 to-blue-700',
+    'from-sky-500 to-sky-700',
+    'from-cyan-500 to-cyan-700',
+    'from-teal-500 to-teal-700',
+];
+
 export function FishCard({ listing }: FishCardProps) {
   const hasPhotos = listing.photoUrls && Array.isArray(listing.photoUrls) && listing.photoUrls.length > 0;
+  const cardColor = cardColors[Math.floor(Math.random() * cardColors.length)];
 
   return (
-    <div className="h-full relative">
-      <Card className="flex h-full flex-col overflow-hidden transition-shadow duration-300 hover:shadow-xl">
-        <Link href={`/listings/${listing.id}`} className="block">
-            <Carousel className="w-full" opts={{ loop: true }}>
-            <CarouselContent>
-                {hasPhotos ? (
-                listing.photoUrls.map((url, index) => (
-                    <CarouselItem key={index}>
-                    <div className="relative h-48 w-full">
-                        <Image
-                        src={url}
-                        alt={listing.description}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        data-ai-hint="fish"
-                        />
-                    </div>
-                    </CarouselItem>
-                ))
-                ) : (
-                <CarouselItem>
-                    <div className="relative h-48 w-full bg-muted flex items-center justify-center">
-                    <span className="text-sm text-muted-foreground">No Photo</span>
-                    </div>
-                </CarouselItem>
-                )}
-            </CarouselContent>
-            {hasPhotos && listing.photoUrls.length > 1 && (
-                <>
-                    <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100" />
-                    <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100" />
-                </>
-            )}
-            </Carousel>
+    <Link href={`/listings/${listing.id}`} className="block group">
+      <div className={cn(
+          "relative h-64 w-full rounded-xl overflow-hidden text-white transition-transform duration-300 group-hover:scale-105 group-hover:shadow-xl",
+          !hasPhotos && cardColor
+        )}>
+        {hasPhotos ? (
+          <Image
+            src={listing.photoUrls[0]}
+            alt={listing.description}
+            fill
+            className="object-cover"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            data-ai-hint="fish"
+          />
+        ) : null}
 
-            <CardHeader>
-            <CardTitle className="font-headline text-lg truncate">{listing.sellerName || 'A Seller'}</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-grow">
-            <CardDescription className="text-foreground/80 line-clamp-2">{listing.description}</CardDescription>
-            </CardContent>
-        </Link>
-        <CardFooter>
-          <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-            <a href={`tel:${listing.sellerPhone}`}>
-              <Phone className="mr-2 h-4 w-4" />
-              Call Seller
-            </a>
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+        <div className={cn(
+          "absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4 flex flex-col justify-end",
+           hasPhotos ? "" : `bg-gradient-to-br ${cardColor}`
+        )}>
+          <div className="space-y-1">
+            <h3 className="font-bold text-xl uppercase tracking-wide">{listing.sellerName || 'Fresh Fish'}</h3>
+            <p className="text-base font-light line-clamp-2">{listing.description}</p>
+          </div>
+          <ArrowRight className="absolute bottom-4 right-4 h-6 w-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        </div>
+      </div>
+    </Link>
   );
 }
+
