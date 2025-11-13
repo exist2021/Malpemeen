@@ -8,12 +8,12 @@ import { cn } from '@/lib/utils';
 export function MainNav() {
   const pathname = usePathname();
 
-  // Hide the 'Sell Fish' link on the customer dashboard
-  const isCustomerDashboard = pathname.startsWith('/customer');
+  // Hide the 'Sell Fish' link on customer-facing pages
+  const isCustomerPage = pathname.startsWith('/customer') || pathname.startsWith('/listings');
 
   const routes = [
     { href: '/', label: 'Home' },
-    ...(!isCustomerDashboard ? [{ href: '/sell', label: 'Sell Fish' }] : [])
+    ...(!isCustomerPage ? [{ href: '/sell', label: 'Sell Fish' }] : [])
   ];
 
   return (
