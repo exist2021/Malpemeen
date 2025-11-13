@@ -30,6 +30,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  devIndicators: {
+    buildActivity: false,
+  },
+  experimental: {
+    // This is the origin of the Studio iframe.
+    // In a future version of Next.js, this will be required.
+    allowedDevOrigins: [
+      '6000-firebase-studio-1763005978405.cluster-fdkw7vjj7bgguspe3fbbc25tra.cloudworkstations.dev',
+    ],
+  },
 };
 
 export default nextConfig;
