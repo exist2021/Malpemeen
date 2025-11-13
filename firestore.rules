@@ -15,7 +15,6 @@
  * - Only authenticated users can create seller or customer profiles.
  * - Users can only read, update, or delete their own profiles.
  * - Sellers can only create, read, update, or delete their own fish listings.
- * - Listing all sellers or customers is disallowed to protect user privacy.
  * - The rules are designed to be authorization-independent, avoiding complex hierarchical
  *   authorization dependencies by denormalizing the 'sellerId' into the `FishListing` documents.
  * - All write operations require authentication.
@@ -76,7 +75,7 @@ service cloud.firestore {
      */
     match /sellers/{sellerId} {
       allow get: if isOwner(sellerId);
-      allow list: if false;
+      allow list: if true;
 
       allow create: if isSignedIn() && request.auth.uid == sellerId && request.resource.data.id == sellerId;
       allow update: if isExistingOwner(sellerId) && request.resource.data.id == resource.data.id;
@@ -119,8 +118,8 @@ service cloud.firestore {
      * @principle Enforces document ownership for writes.
      */
     match /sellers/{sellerId}/fishListings/{fishListingId} {
-      allow get: if resource.data.sellerId == sellerId;
-      allow list: if isOwner(sellerId);
+      allow get: if true;
+      allow list: if true;
 
       allow create: if isOwner(sellerId) && request.resource.data.sellerId == sellerId;
       allow update: if isExistingOwner(sellerId) && resource.data.sellerId == sellerId;

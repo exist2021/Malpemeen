@@ -1,7 +1,7 @@
 'use client';
 
 import type { FishListing } from '@/app/types';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import type { Seller } from '@/app/types';
 import { errorEmitter } from '@/firebase/error-emitter';
