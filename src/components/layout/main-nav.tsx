@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const routes = [
-  { href: '/listings', label: 'For Sale' },
+  { href: '/', label: 'Home' },
   { href: '/sell', label: 'Sell Fish' },
 ];
 

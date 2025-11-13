@@ -1,7 +1,6 @@
 
 'use client';
 import Link from 'next/link';
-import { Fish } from 'lucide-react';
 import { MainNav } from '@/components/layout/main-nav';
 import { Button } from '@/components/ui/button';
 import { useUser, useAuth } from '@/firebase';
@@ -25,8 +24,8 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Hide header on login pages and the root role selection page
-  if (pathname.includes('/login') || pathname === '/') {
+  // Hide header on login pages
+  if (pathname.includes('/login')) {
     return null;
   }
 

@@ -1,62 +1,76 @@
 
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Fish, User, Building } from 'lucide-react';
-import { FishLogo } from '@/components/fish-logo';
+import { FishCard } from '@/components/fish-card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Suspense, useEffect, useState } from 'react';
+import type { FishListing } from '@/app/types';
+import { getFishListings } from '@/app/lib/data';
+import { Header } from '@/components/layout/header';
 
-export default function RoleSelectionPage() {
-  const router = useRouter();
+function FishListings() {
+  const [listings, setListings] = useState<FishListing[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchListings() {
+      const listings = await getFishListings();
+      setListings(listings);
+      setLoading(false);
+    }
+    fetchListings();
+  }, []);
+
+
+  if (loading) {
+    return <ListingsSkeleton />;
+  }
+
+  if (!listings || listings.length === 0) {
+    return <p className="mt-8 text-center text-muted-foreground">No fish available right now. Check back later!</p>;
+  }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
-      <div className="text-center mb-12">
-        <div className="inline-block p-4 bg-primary rounded-full mb-4">
-          <FishLogo className="w-16 h-16 text-primary-foreground" />
-        </div>
-        <h1 className="text-4xl md:text-5xl font-bold font-headline text-primary">
-          Welcome to Malpe Meen Pvt Ltd
-        </h1>
-        <p className="mt-4 text-lg text-muted-foreground">
-          Connecting local fisheries with valued customers.
-        </p>
-         <Button variant="link" className="mt-4 text-accent" onClick={() => router.push('/listings')}>
-            Browse Fish Listings
-        </Button>
-      </div>
-
-      <div className="w-full max-w-4xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl">Choose Your Role</CardTitle>
-            <CardDescription>Are you here to buy or sell?</CardDescription>
-          </CardHeader>
-          <CardContent className="grid md:grid-cols-2 gap-8">
-            <div
-              className="p-8 border rounded-lg text-center hover:shadow-xl hover:border-primary transition-all duration-300 cursor-pointer flex flex-col items-center"
-              onClick={() => router.push('/customer/login')}
-            >
-              <User className="w-16 h-16 text-accent mb-4" />
-              <h3 className="text-2xl font-bold mb-2">I'm a Customer</h3>
-              <p className="text-muted-foreground mb-6">Browse and purchase the freshest catch from local sellers.</p>
-              <Button className="w-full" variant="outline">
-                Customer Login
-              </Button>
-            </div>
-            <div
-              className="p-8 border rounded-lg text-center hover:shadow-xl hover:border-primary transition-all duration-300 cursor-pointer flex flex-col items-center"
-              onClick={() => router.push('/seller/login')}
-            >
-              <Building className="w-16 h-16 text-accent mb-4" />
-              <h3 className="text-2xl font-bold mb-2">I'm a Seller</h3>
-              <p className="text-muted-foreground mb-6">List your products, manage sales, and grow your business.</p>
-              <Button className="w-full" variant="outline">
-                Seller Login
-              </Button>
-            </div>
-          </CardContent>
-      </div>
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {listings.map((listing) => (
+        <FishCard key={listing.id} listing={listing} />
+      ))}
     </div>
+  );
+}
+
+function ListingsSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="flex flex-col space-y-3 rounded-lg border bg-card p-4">
+          <Skeleton className="h-[192px] w-full rounded-xl" />
+          <div className="space-y-2 pt-2">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+          <div className="pt-4">
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <>
+      <Header />
+      <div className="container py-8">
+        <h1 className="mb-8 text-center font-headline text-3xl font-bold tracking-tight">
+          Today's Fresh Catch
+        </h1>
+        <Suspense fallback={<ListingsSkeleton />}>
+          <FishListings />
+        </Suspense>
+      </div>
+    </>
   );
 }
