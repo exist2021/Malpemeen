@@ -4,7 +4,6 @@
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/firebase';
 import type { FishListing } from '@/app/types';
@@ -12,16 +11,7 @@ import { getFishListings } from '@/app/lib/data';
 import { FishCard } from '@/components/fish-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/layout/header';
-import { CustomerAccountForm } from './customer-account-form';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Settings } from 'lucide-react';
+
 
 function ListingsSkeleton() {
   return (
@@ -107,26 +97,6 @@ export default function CustomerDashboard() {
             <h2 className="font-headline text-3xl font-bold tracking-tight">
                 Today's Fresh Catch
             </h2>
-            <div className="flex items-center gap-4">
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline">
-                            <Settings className="mr-2 h-4 w-4" />
-                            My Account
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                        <DialogTitle>My Account</DialogTitle>
-                        <DialogDescription>
-                            View and update your personal information.
-                        </DialogDescription>
-                        </DialogHeader>
-                        <CustomerAccountForm />
-                    </DialogContent>
-                </Dialog>
-                 <Button onClick={handleLogout} variant="outline">Logout</Button>
-            </div>
         </div>
         <main>
             <FishListings />
