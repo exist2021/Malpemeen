@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { getSellerFishListings } from '@/app/lib/data';
 import type { FishListing } from '@/app/types';
 import Image from 'next/image';
-import { Pencil } from 'lucide-react';
+import { Pencil, LogOut } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/layout/header';
 
@@ -116,7 +116,10 @@ export default function SellerDashboard() {
             <Button asChild>
               <Link href="/sell">Create a new listing</Link>
             </Button>
-            <Button onClick={handleLogout} variant="outline">Logout</Button>
+            <Button onClick={handleLogout} variant="outline">
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+            </Button>
           </CardContent>
         </Card>
 
