@@ -42,8 +42,8 @@ export function FishCard({ listing }: FishCardProps) {
            hasPhotos ? "" : `bg-gradient-to-br ${cardColor}`
         )}>
           <div className="space-y-1">
-            <h3 className="font-bold text-xl uppercase tracking-wide">{listing.sellerName || 'Fresh Fish'}</h3>
-            <p className="text-base line-clamp-2 font-normal">{listing.description}</p>
+            <h3 className="font-bold text-xl uppercase tracking-wide font-headline">{listing.sellerName || 'Fresh Fish'}</h3>
+            <p className="text-base line-clamp-2 font-normal font-body">{listing.description}</p>
           </div>
           <ArrowRight className="absolute bottom-4 right-4 h-6 w-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         </div>
