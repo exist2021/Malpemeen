@@ -89,7 +89,7 @@ export default function CustomerDashboard() {
   const handleLogout = () => {
     if(auth) {
       auth.signOut();
-      router.push('/');
+      router.push('/customer/login');
     }
   };
 

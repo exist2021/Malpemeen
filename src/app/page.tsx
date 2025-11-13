@@ -1,76 +1,54 @@
 
 'use client';
 
-import { FishCard } from '@/components/fish-card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Suspense, useEffect, useState } from 'react';
-import type { FishListing } from '@/app/types';
-import { getFishListings } from '@/app/lib/data';
+import { Suspense } from 'react';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { FishLogo } from '@/components/fish-logo';
 import { Header } from '@/components/layout/header';
 
-function FishListings() {
-  const [listings, setListings] = useState<FishListing[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function RoleSelectionPage() {
+  const router = useRouter();
 
-  useEffect(() => {
-    async function fetchListings() {
-      const listings = await getFishListings();
-      setListings(listings);
-      setLoading(false);
-    }
-    fetchListings();
-  }, []);
-
-
-  if (loading) {
-    return <ListingsSkeleton />;
-  }
-
-  if (!listings || listings.length === 0) {
-    return <p className="mt-8 text-center text-muted-foreground">No fish available right now. Check back later!</p>;
-  }
-
-  return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {listings.map((listing) => (
-        <FishCard key={listing.id} listing={listing} />
-      ))}
-    </div>
-  );
-}
-
-function ListingsSkeleton() {
-  return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="flex flex-col space-y-3 rounded-lg border bg-card p-4">
-          <Skeleton className="h-[192px] w-full rounded-xl" />
-          <div className="space-y-2 pt-2">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-1/2" />
-          </div>
-          <div className="pt-4">
-            <Skeleton className="h-10 w-full" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-export default function HomePage() {
   return (
     <>
-      <Header />
-      <div className="container py-8">
-        <h1 className="mb-8 text-center font-headline text-3xl font-bold tracking-tight">
-          Today's Fresh Catch
-        </h1>
-        <Suspense fallback={<ListingsSkeleton />}>
-          <FishListings />
-        </Suspense>
+    <Header />
+    <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center">
+            <div className="mx-auto h-24 w-24">
+                <FishLogo className="text-primary"/>
+            </div>
+          <h1 className="mt-6 text-3xl font-bold tracking-tight">Welcome to Malpe Meen Pvt Ltd</h1>
+          <p className="mt-2 text-lg text-muted-foreground">Connecting local sellers with fresh seafood lovers.</p>
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Choose Your Role</CardTitle>
+            <CardDescription>Are you here to buy or sell?</CardDescription>
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-4">
+            <Button
+              variant="outline"
+              className="h-24 flex-col gap-2 text-lg"
+              onClick={() => router.push('/customer/login')}
+            >
+              <span>I'm a</span>
+              <span className="font-bold">Customer</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-24 flex-col gap-2 text-lg"
+              onClick={() => router.push('/seller/login')}
+            >
+              <span>I'm a</span>
+              <span className="font-bold">Seller</span>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
+    </div>
     </>
   );
 }

@@ -33,6 +33,7 @@ export function Header() {
   const handleLogout = () => {
     if (auth) {
       auth.signOut();
+      // We don't know if they were a customer or seller, so redirect to the generic role selection page.
       router.push('/');
     }
   };

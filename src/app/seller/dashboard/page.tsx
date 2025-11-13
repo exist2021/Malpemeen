@@ -92,7 +92,7 @@ export default function SellerDashboard() {
   const handleLogout = () => {
     if(auth) {
       auth.signOut();
-      router.push('/');
+      router.push('/seller/login');
     }
   };
 
