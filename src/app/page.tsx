@@ -1,10 +1,28 @@
-import { getFishListings } from '@/app/lib/data';
+'use client';
+
 import { FishCard } from '@/components/fish-card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import type { FishListing } from '@/app/types';
+import { getFishListings } from '@/app/lib/data';
 
-async function FishListings() {
-  const listings = await getFishListings();
+function FishListings() {
+  const [listings, setListings] = useState<FishListing[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchListings() {
+      const listings = await getFishListings();
+      setListings(listings);
+      setLoading(false);
+    }
+    fetchListings();
+  }, []);
+
+
+  if (loading) {
+    return <ListingsSkeleton />;
+  }
 
   if (!listings || listings.length === 0) {
     return <p className="mt-8 text-center text-muted-foreground">No fish available right now. Check back later!</p>;

@@ -1,12 +1,12 @@
+'use client';
+
 import type { FishListing } from '@/app/types';
-import { unstable_noStore as noStore } from 'next/cache';
 import { collection, addDoc, getDocs, doc, getDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import type { Seller } from '@/app/types';
 
 
 export async function getFishListings(): Promise<FishListing[]> {
-  noStore();
   const { firestore } = initializeFirebase();
   const listings: FishListing[] = [];
   
@@ -41,8 +41,7 @@ export async function getFishListings(): Promise<FishListing[]> {
   return listings;
 }
 
-export async function addFishListing(listing: Omit<FishListing, 'id' | 'sellerName' | 'sellerPhone' | 'listedDate'> & { sellerId: string }) {
-  noStore();
+export async function addFishListing(listing: Omit<FishListing, 'id' | 'sellerName' | 'sellerPhone' | 'listedDate'> & { sellerId: string; photoUrl: string }) {
   const { firestore } = initializeFirebase();
 
   try {
@@ -50,7 +49,6 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'sellerNa
     await addDoc(fishListingsRef, {
       ...listing,
       listedDate: new Date().toISOString(),
-      photoUrl: listing.photoUrl, // Make sure this is correct from the form
     });
   } catch (e) {
     console.error("Error adding document: ", e);

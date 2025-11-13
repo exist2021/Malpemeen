@@ -54,6 +54,7 @@ export function SellerForm() {
 
   return (
     <form action={dispatch} className="mt-2 space-y-6">
+      <input type="hidden" name="sellerId" value={user.uid} />
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
         <Textarea id="description" name="description" placeholder="Describe the fish, its size, price, etc." required aria-describedby="description-error" />
@@ -63,18 +64,17 @@ export function SellerForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="imageUrl">Fish Photo</Label>
+        <Label htmlFor="photoUrl">Fish Photo</Label>
         <div className="flex items-center gap-2">
-          <Input id="imageUrl" name="imageUrl" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Image URL" required aria-describedby="imageUrl-error" />
+          <Input id="photoUrl" name="photoUrl" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Image URL" required aria-describedby="photoUrl-error" />
           <Button type="button" variant="outline" onClick={capturePhoto}>
             <Camera className="mr-2 h-4 w-4" />
             New Photo
           </Button>
         </div>
         <p className="text-sm text-muted-foreground">Click "New Photo" to simulate capturing a new photo.</p>
-        <input type="hidden" name="photoUrl" value={imageUrl} />
-        <div id="imageUrl-error" aria-live="polite" aria-atomic="true">
-          {state.errors?.imageUrl && <p className="text-sm font-medium text-destructive">{state.errors.imageUrl}</p>}
+        <div id="photoUrl-error" aria-live="polite" aria-atomic="true">
+          {state.errors?.photoUrl && <p className="text-sm font-medium text-destructive">{state.errors.photoUrl}</p>}
         </div>
       </div>
 
