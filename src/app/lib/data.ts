@@ -1,7 +1,7 @@
 'use client';
 
 import type { FishListing } from '@/app/types';
-import { collection, addDoc, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, doc, getDoc, where, updateDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -32,6 +32,54 @@ export async function getFishListings(): Promise<FishListing[]> {
   }
 }
 
+export async function getSellerFishListings(sellerId: string): Promise<FishListing[]> {
+  const { firestore } = initializeFirebase();
+  const listingsCol = collection(firestore, 'fishListings');
+  const q = query(listingsCol, where("sellerId", "==", sellerId), orderBy('listedDate', 'desc'));
+
+  try {
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FishListing));
+  } catch (e: any) {
+    if (e.code === 'permission-denied') {
+      const contextualError = new FirestorePermissionError({
+        path: `fishListings`,
+        operation: 'list',
+      });
+      errorEmitter.emit('permission-error', contextualError);
+    } else {
+      console.error("Error fetching seller fish listings: ", e);
+    }
+    return [];
+  }
+}
+
+
+export async function getFishListingById(id: string): Promise<FishListing | null> {
+    const { firestore } = initializeFirebase();
+    const docRef = doc(firestore, 'fishListings', id);
+    try {
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() } as FishListing;
+        } else {
+            return null;
+        }
+    } catch (e: any) {
+        if (e.code === 'permission-denied') {
+            const contextualError = new FirestorePermissionError({
+                path: docRef.path,
+                operation: 'get',
+            });
+            errorEmitter.emit('permission-error', contextualError);
+        } else {
+            console.error("Error fetching fish listing by id: ", e);
+        }
+        return null;
+    }
+}
+
+
 export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDate'>) {
   const { firestore } = initializeFirebase();
   
@@ -61,4 +109,18 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
     });
     errorEmitter.emit('permission-error', contextualError);
   });
+}
+
+export async function updateFishListing(id: string, data: Partial<Omit<FishListing, 'id'>>) {
+    const { firestore } = initializeFirebase();
+    const docRef = doc(firestore, 'fishListings', id);
+
+    updateDoc(docRef, data).catch(error => {
+        const contextualError = new FirestorePermissionError({
+            path: docRef.path,
+            operation: 'update',
+            requestResourceData: data,
+        });
+        errorEmitter.emit('permission-error', contextualError);
+    });
 }

@@ -2,18 +2,23 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import Image from 'next/image';
-import { addFishListing } from '@/app/lib/data';
+import { addFishListing, updateFishListing } from '@/app/lib/data';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Camera, Loader2, Trash2, X } from 'lucide-react';
+import { Camera, Loader2, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import placeholderImagesData from '@/lib/placeholder-images.json';
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
+import type { FishListing } from '@/app/types';
 
-export function SellerForm() {
+interface SellerFormProps {
+    listing?: FishListing | null;
+}
+
+export function SellerForm({ listing }: SellerFormProps) {
   const { toast } = useToast();
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
@@ -22,12 +27,19 @@ export function SellerForm() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const isEditMode = !!listing;
 
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/seller/login');
     }
-  }, [user, isUserLoading, router]);
+    
+    if (isEditMode && listing) {
+        setDescription(listing.description);
+        setImageUrls(listing.photoUrls);
+    }
+
+  }, [user, isUserLoading, router, isEditMode, listing]);
 
   const addRandomPhoto = () => {
     const { placeholderImages } = placeholderImagesData;
@@ -38,10 +50,10 @@ export function SellerForm() {
   };
   
   useEffect(() => {
-    if(imageUrls.length === 0) {
+    if(imageUrls.length === 0 && !isEditMode) {
         addRandomPhoto();
     }
-  }, []);
+  }, [isEditMode]);
 
   const addImageFromUrl = () => {
     if (newImageUrl && !imageUrls.includes(newImageUrl)) {
@@ -74,7 +86,7 @@ export function SellerForm() {
         setErrors(newErrors);
         toast({
             variant: 'destructive',
-            title: 'Failed to create listing.',
+            title: `Failed to ${isEditMode ? 'update' : 'create'} listing.`,
             description: 'Please check the fields.',
         });
         return;
@@ -84,27 +96,34 @@ export function SellerForm() {
 
     startTransition(async () => {
       try {
-        await addFishListing({
-          description,
-          photoUrls: imageUrls,
-          sellerId: user.uid,
-        });
-
-        toast({
-          title: 'Success!',
-          description: 'Your fish listing has been created.',
-        });
+        if (isEditMode && listing) {
+            await updateFishListing(listing.id, {
+                description,
+                photoUrls: imageUrls,
+            });
+            toast({
+              title: 'Success!',
+              description: 'Your fish listing has been updated.',
+            });
+        } else {
+             await addFishListing({
+              description,
+              photoUrls: imageUrls,
+              sellerId: user.uid,
+            });
+            toast({
+              title: 'Success!',
+              description: 'Your fish listing has been created.',
+            });
+        }
         
-        // Redirect after successful submission
-        router.push('/listings');
-        router.refresh(); // revalidate cache
+        router.push('/seller/dashboard');
+        router.refresh();
         
       } catch (error) {
-        // Errors from addFishListing will be caught by the global error handler
-        // but we can show a generic toast here.
         toast({
           variant: 'destructive',
-          title: 'Error Creating Listing',
+          title: `Error ${isEditMode ? 'Updating' : 'Creating'} Listing`,
           description: 'Something went wrong. Please try again.',
         });
       }
@@ -156,7 +175,7 @@ export function SellerForm() {
 
       <Button type="submit" disabled={isPending} className="w-full">
         {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-        List My Catch
+        {isEditMode ? 'Update Listing' : 'List My Catch'}
       </Button>
     </form>
   );
