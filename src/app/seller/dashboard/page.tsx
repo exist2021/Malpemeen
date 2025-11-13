@@ -20,7 +20,9 @@ function SellerListings() {
     useEffect(() => {
         if (user) {
             getSellerFishListings(user.uid).then(data => {
-                setListings(data);
+                // Sort by date on the client side to avoid complex index
+                const sortedData = data.sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
+                setListings(sortedData);
                 setLoading(false);
             });
         }

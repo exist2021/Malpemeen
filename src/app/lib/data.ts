@@ -35,7 +35,8 @@ export async function getFishListings(): Promise<FishListing[]> {
 export async function getSellerFishListings(sellerId: string): Promise<FishListing[]> {
   const { firestore } = initializeFirebase();
   const listingsCol = collection(firestore, 'fishListings');
-  const q = query(listingsCol, where("sellerId", "==", sellerId), orderBy('listedDate', 'desc'));
+  // Removed orderBy to avoid needing a composite index. Sorting is now done on the client.
+  const q = query(listingsCol, where("sellerId", "==", sellerId));
 
   try {
     const querySnapshot = await getDocs(q);
@@ -80,7 +81,7 @@ export async function getFishListingById(id: string): Promise<FishListing | null
 }
 
 
-export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDate'>) {
+export async function addFishListing(listing: Omit<FishListing, 'id'>) {
   const { firestore } = initializeFirebase();
   
   // Get seller info to denormalize
