@@ -73,7 +73,7 @@ function SellerListings() {
 }
 
 export default function SellerDashboard() {
-  const { user, isUserLoading }_ = useUser();
+  const { user, isUserLoading } = useUser();
   const router = useRouter();
   const auth = useAuth();
 
