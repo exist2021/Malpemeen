@@ -36,7 +36,7 @@ export function SellerForm({ listing }: SellerFormProps) {
     
     if (isEditMode && listing) {
         setDescription(listing.description);
-        setImageUrls(listing.photoUrls);
+        setImageUrls(listing.photoUrls || []);
     }
 
   }, [user, isUserLoading, router, isEditMode, listing]);
@@ -148,7 +148,7 @@ export function SellerForm({ listing }: SellerFormProps) {
         <Label>Fish Photos</Label>
         
         <div className="grid grid-cols-3 gap-4">
-            {imageUrls.map(url => (
+            {(imageUrls || []).map(url => (
                 <div key={url} className="relative aspect-square">
                     <Image src={url} alt="Fish photo" layout="fill" className="rounded-md object-cover" />
                     <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeImage(url)}>
