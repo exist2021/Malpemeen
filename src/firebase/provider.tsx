@@ -2,7 +2,7 @@
 
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
-import { Firestore } from 'firebase/firestore';
+import { Firestore, doc, getDoc } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 
@@ -47,6 +47,13 @@ export interface UserHookResult { // Renamed from UserAuthHookResult for consist
   user: User | null;
   isUserLoading: boolean;
   userError: Error | null;
+}
+
+export type UserRole = 'seller' | 'customer' | null;
+
+export interface UserRoleHookResult {
+    role: UserRole;
+    isRoleLoading: boolean;
 }
 
 // React Context
@@ -173,4 +180,60 @@ export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | 
 export const useUser = (): UserHookResult => { // Renamed from useAuthUser
   const { user, isUserLoading, userError } = useFirebase(); // Leverages the main hook
   return { user, isUserLoading, userError };
+};
+
+
+export const useUserRole = (): UserRoleHookResult => {
+    const { user, isUserLoading } = useUser();
+    const { firestore } = useFirebase();
+    const [role, setRole] = useState<UserRole>(null);
+    const [isRoleLoading, setRoleLoading] = useState(true);
+
+    useEffect(() => {
+        if (isUserLoading || !user || !firestore) {
+            setRoleLoading(isUserLoading);
+            if(!isUserLoading) {
+                 setRole(null);
+            }
+            return;
+        }
+
+        let isMounted = true;
+        setRoleLoading(true);
+
+        const checkRole = async () => {
+            const sellerRef = doc(firestore, 'sellers', user.uid);
+            const sellerSnap = await getDoc(sellerRef);
+            if (sellerSnap.exists()) {
+                if (isMounted) {
+                    setRole('seller');
+                    setRoleLoading(false);
+                }
+                return;
+            }
+
+            const customerRef = doc(firestore, 'customers', user.uid);
+            const customerSnap = await getDoc(customerRef);
+            if (customerSnap.exists()) {
+                if (isMounted) {
+                    setRole('customer');
+                    setRoleLoading(false);
+                }
+                return;
+            }
+
+            if (isMounted) {
+                setRole(null);
+                setRoleLoading(false);
+            }
+        };
+
+        checkRole();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [user, isUserLoading, firestore]);
+
+    return { role, isRoleLoading };
 };

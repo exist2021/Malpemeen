@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { MainNav } from '@/components/layout/main-nav';
 import { Button } from '@/components/ui/button';
-import { useUser, useAuth } from '@/firebase';
+import { useUser, useAuth, useUserRole } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import {
   DropdownMenu,
@@ -15,10 +15,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { User as UserIcon } from 'lucide-react';
 import { FishLogo } from '../fish-logo';
+import { Skeleton } from '../ui/skeleton';
 
 
 export function Header() {
   const { user, isUserLoading } = useUser();
+  const { role, isRoleLoading } = useUserRole();
   const auth = useAuth();
   const router = useRouter();
 
@@ -43,7 +45,7 @@ export function Header() {
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-1">
             {isUserLoading ? (
-              <div className="h-10 w-24 animate-pulse rounded-md bg-muted" />
+              <Skeleton className="h-10 w-24 rounded-md" />
             ) : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -55,8 +57,14 @@ export function Header() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push('/customer/dashboard')}>Customer Dashboard</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/seller/dashboard')}>Seller Dashboard</DropdownMenuItem>
+                  {isRoleLoading ? (
+                     <DropdownMenuItem disabled>Loading...</DropdownMenuItem>
+                  ): (
+                    <>
+                      {role === 'customer' && <DropdownMenuItem onClick={() => router.push('/customer/dashboard')}>Customer Dashboard</DropdownMenuItem>}
+                      {role === 'seller' && <DropdownMenuItem onClick={() => router.push('/seller/dashboard')}>Seller Dashboard</DropdownMenuItem>}
+                    </>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
                 </DropdownMenuContent>
