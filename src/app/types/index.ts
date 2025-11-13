@@ -2,12 +2,16 @@ export type Seller = {
     id: string;
     phoneNumber: string;
     name: string;
+    email: string;
 };
 
 export type Customer = {
     id: string;
     phoneNumber: string;
     name: string;
+    email: string;
+    place?: string;
+    address?: string;
 };
 
 export type FishListing = {

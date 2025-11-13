@@ -2,9 +2,11 @@
 
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { FirebaseApp } from 'firebase/app';
-import { Firestore, doc, getDoc } from 'firebase/firestore';
+import { Firestore, doc, getDoc, DocumentReference } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged } from 'firebase/auth';
-import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
+import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
+import { useDoc, type WithId } from './firestore/use-doc';
+import type { Customer } from '@/app/types';
 
 interface FirebaseProviderProps {
   children: ReactNode;
@@ -55,6 +57,12 @@ export interface UserRoleHookResult {
     role: UserRole;
     isRoleLoading: boolean;
 }
+
+export interface CustomerProfileResult {
+    profile: WithId<Customer> | null;
+    isLoading: boolean;
+}
+
 
 // React Context
 export const FirebaseContext = createContext<FirebaseContextState | undefined>(undefined);
@@ -236,4 +244,18 @@ export const useUserRole = (): UserRoleHookResult => {
     }, [user, isUserLoading, firestore]);
 
     return { role, isRoleLoading };
+};
+
+export const useCustomerProfile = (): CustomerProfileResult => {
+    const { user, isUserLoading } = useUser();
+    const firestore = useFirestore();
+    
+    const docRef = useMemoFirebase(() => {
+        if (!user || !firestore) return null;
+        return doc(firestore, 'customers', user.uid) as DocumentReference<Customer>;
+    }, [user, firestore]);
+
+    const { data: profile, isLoading } = useDoc<Customer>(docRef);
+
+    return { profile, isLoading: isUserLoading || isLoading };
 };

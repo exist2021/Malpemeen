@@ -12,6 +12,7 @@ import { getFishListings } from '@/app/lib/data';
 import { FishCard } from '@/components/fish-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/layout/header';
+import { CustomerAccountForm } from './customer-account-form';
 
 function ListingsSkeleton() {
   return (
@@ -103,22 +104,37 @@ export default function CustomerDashboard() {
     <>
     <Header />
     <div className="container py-8">
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Welcome, {user.displayName || user.email}!</CardTitle>
-           <CardDescription>
-            This is your customer dashboard. You can view your past orders and manage your account here.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button onClick={handleLogout} className="mt-4">Logout</Button>
-        </CardContent>
-      </Card>
-      
-      <h2 className="mb-8 text-center font-headline text-3xl font-bold tracking-tight">
-        Today's Fresh Catch
-      </h2>
-      <FishListings />
+        <div className="grid md:grid-cols-3 gap-8">
+            <div className="md:col-span-1 space-y-8">
+                 <Card>
+                    <CardHeader>
+                      <CardTitle>Welcome!</CardTitle>
+                       <CardDescription>
+                        This is your customer dashboard.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="font-semibold truncate">{user.displayName || user.email}</p>
+                      <Button onClick={handleLogout} className="mt-4 w-full">Logout</Button>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>My Account</CardTitle>
+                        <CardDescription>View and update your personal information.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <CustomerAccountForm />
+                    </CardContent>
+                </Card>
+            </div>
+            <main className="md:col-span-2">
+                 <h2 className="mb-8 text-center font-headline text-3xl font-bold tracking-tight">
+                    Today's Fresh Catch
+                </h2>
+                <FishListings />
+            </main>
+        </div>
     </div>
     </>
   );
