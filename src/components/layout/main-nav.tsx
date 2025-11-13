@@ -5,13 +5,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
-const routes = [
-  { href: '/', label: 'Home' },
-  { href: '/sell', label: 'Sell Fish' },
-];
-
 export function MainNav() {
   const pathname = usePathname();
+
+  // Hide the 'Sell Fish' link on the customer dashboard
+  const isCustomerDashboard = pathname.startsWith('/customer');
+
+  const routes = [
+    { href: '/', label: 'Home' },
+    ...(!isCustomerDashboard ? [{ href: '/sell', label: 'Sell Fish' }] : [])
+  ];
 
   return (
     <nav className="hidden gap-6 md:flex">
