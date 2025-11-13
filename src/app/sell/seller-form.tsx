@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
@@ -43,7 +44,14 @@ export function SellerForm({ listing }: SellerFormProps) {
 
   const addRandomPhoto = () => {
     const { placeholderImages } = placeholderImagesData;
-    const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
+    const availableImages = placeholderImages.filter(p => !imageUrls.includes(p.imageUrl));
+    
+    if (availableImages.length === 0) {
+        toast({ variant: 'destructive', title: 'No more unique random photos to add.'});
+        return;
+    }
+
+    const randomImage = availableImages[Math.floor(Math.random() * availableImages.length)];
     if (randomImage.imageUrl && !imageUrls.includes(randomImage.imageUrl)) {
         setImageUrls(prev => [...prev, randomImage.imageUrl]);
     }
@@ -57,8 +65,16 @@ export function SellerForm({ listing }: SellerFormProps) {
 
   const addImageFromUrl = () => {
     if (newImageUrl && !imageUrls.includes(newImageUrl)) {
-      setImageUrls(prev => [...prev, newImageUrl]);
-      setNewImageUrl('');
+      try {
+        // Basic URL validation
+        new URL(newImageUrl);
+        setImageUrls(prev => [...prev, newImageUrl]);
+        setNewImageUrl('');
+      } catch (_) {
+        toast({ variant: 'destructive', title: 'Invalid URL', description: 'Please enter a valid image URL.' });
+      }
+    } else if (imageUrls.includes(newImageUrl)) {
+        toast({ variant: 'destructive', title: 'Duplicate Image', description: 'This image URL has already been added.' });
     }
   }
 
@@ -148,8 +164,8 @@ export function SellerForm({ listing }: SellerFormProps) {
         <Label>Fish Photos</Label>
         
         <div className="grid grid-cols-3 gap-4">
-            {(imageUrls || []).map(url => (
-                <div key={url} className="relative aspect-square">
+            {(imageUrls || []).map((url, index) => (
+                <div key={`${url}-${index}`} className="relative aspect-square">
                     <Image src={url} alt="Fish photo" layout="fill" className="rounded-md object-cover" />
                     <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeImage(url)}>
                         <X className="h-4 w-4" />
