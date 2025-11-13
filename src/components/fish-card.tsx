@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import { Phone, ArrowLeft, ArrowRight } from 'lucide-react';
 
@@ -24,26 +25,36 @@ interface FishCardProps {
 }
 
 export function FishCard({ listing }: FishCardProps) {
+  const hasPhotos = listing.photoUrls && Array.isArray(listing.photoUrls) && listing.photoUrls.length > 0;
+
   return (
     <Card className="flex h-full flex-col overflow-hidden transition-shadow duration-300 hover:shadow-xl">
       <Carousel className="w-full">
         <CarouselContent>
-          {listing.photoUrls.map((url, index) => (
-            <CarouselItem key={index}>
-              <div className="relative h-48 w-full">
-                <Image
-                  src={url}
-                  alt={listing.description}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  data-ai-hint="fish"
-                />
+          {hasPhotos ? (
+            listing.photoUrls.map((url, index) => (
+              <CarouselItem key={index}>
+                <div className="relative h-48 w-full">
+                  <Image
+                    src={url}
+                    alt={listing.description}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    data-ai-hint="fish"
+                  />
+                </div>
+              </CarouselItem>
+            ))
+          ) : (
+            <CarouselItem>
+              <div className="relative h-48 w-full bg-muted flex items-center justify-center">
+                <span className="text-sm text-muted-foreground">No Photo</span>
               </div>
             </CarouselItem>
-          ))}
+          )}
         </CarouselContent>
-        {listing.photoUrls.length > 1 && (
+        {hasPhotos && listing.photoUrls.length > 1 && (
             <>
                 <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2" />
                 <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2" />
