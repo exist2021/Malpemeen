@@ -70,6 +70,14 @@ export default function CustomerLoginPage() {
 
   const handlePasswordReset = async () => {
     if (!auth) return;
+    if (!resetEmail) {
+      toast({
+        variant: 'destructive',
+        title: 'Email is required',
+        description: 'Please enter your email address.',
+      });
+      return;
+    }
     try {
       await sendPasswordResetEmail(auth, resetEmail);
       toast({
@@ -78,7 +86,8 @@ export default function CustomerLoginPage() {
       });
       setForgotPasswordOpen(false);
       setResetEmail('');
-    } catch (error: any) {
+    } catch (error: any)
+{
       toast({
         variant: 'destructive',
         title: 'Failed to Send Reset Email',
@@ -225,30 +234,32 @@ export default function CustomerLoginPage() {
             Enter your email address and we will send you a link to reset your password.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="reset-email" className="text-right">
-              Email
-            </Label>
-            <Input
-              id="reset-email"
-              value={resetEmail}
-              onChange={(e) => setResetEmail(e.target.value)}
-              className="col-span-3"
-              placeholder="name@example.com"
-            />
+        <form onSubmit={(e) => { e.preventDefault(); handlePasswordReset(); }}>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="reset-email">
+                Email
+              </Label>
+              <Input
+                id="reset-email"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                placeholder="name@example.com"
+                required
+              />
+            </div>
           </div>
-        </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Cancel
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button type="submit">
+              Send Reset Link
             </Button>
-          </DialogClose>
-          <Button type="button" onClick={handlePasswordReset}>
-            Send Reset Link
-          </Button>
-        </DialogFooter>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
     </>
