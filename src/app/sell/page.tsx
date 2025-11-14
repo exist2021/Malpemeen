@@ -1,17 +1,31 @@
 
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useTransition } from 'react';
 import { SellerForm } from './seller-form';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff } from 'lucide-react';
+import { Mic, MicOff, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { parseListingDetails } from '@/ai/flows/parse-listing-details-flow';
 
 export default function SellPage() {
+    // State for all form fields, lifted up from SellerForm
+    const [productName, setProductName] = useState('');
+    const [pricePerBox, setPricePerBox] = useState('');
+    const [portDetails, setPortDetails] = useState('');
+    const [caughtBy, setCaughtBy] = useState('');
+    const [howCaught, setHowCaught] = useState('');
+    const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | ''>('');
+    const [owner, setOwner] = useState('');
+    const [brandName, setBrandName] = useState('Malpe Meen');
     const [description, setDescription] = useState('');
+    const [mediaUrls, setMediaUrls] = useState<string[]>([]);
+    
+    // State for voice recognition
     const [isListening, setIsListening] = useState(false);
+    const [isProcessingVoice, startProcessingVoice] = useTransition();
     const recognitionRef = useRef<any>(null);
     const { toast } = useToast();
 
@@ -24,18 +38,14 @@ export default function SellPage() {
             recognition.lang = 'en-US';
 
             recognition.onresult = (event) => {
-                let interimTranscript = '';
                 let finalTranscript = '';
-
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
                         finalTranscript += event.results[i][0].transcript;
-                    } else {
-                        interimTranscript += event.results[i][0].transcript;
                     }
                 }
                 if (finalTranscript) {
-                    setDescription(prev => prev ? `${prev.trim()} ${finalTranscript.trim()}` : finalTranscript.trim());
+                    handleVoiceInput(finalTranscript.trim());
                 }
             };
 
@@ -57,6 +67,30 @@ export default function SellPage() {
         }
     }, [toast]);
 
+    const handleVoiceInput = (text: string) => {
+        startProcessingVoice(async () => {
+            try {
+                const parsedDetails = await parseListingDetails(text);
+                if (parsedDetails.productName) setProductName(prev => prev ? `${prev} ${parsedDetails.productName}`.trim() : parsedDetails.productName);
+                if (parsedDetails.pricePerBox) setPricePerBox(String(parsedDetails.pricePerBox));
+                if (parsedDetails.portDetails) setPortDetails(prev => prev ? `${prev} ${parsedDetails.portDetails}`.trim() : parsedDetails.portDetails);
+                if (parsedDetails.caughtBy) setCaughtBy(prev => prev ? `${prev} ${parsedDetails.caughtBy}`.trim() : parsedDetails.caughtBy);
+                if (parsedDetails.howCaught) setHowCaught(prev => prev ? `${prev} ${parsedDetails.howCaught}`.trim() : parsedDetails.howCaught);
+                if (parsedDetails.boatDetails) setBoatDetails(parsedDetails.boatDetails);
+                if (parsedDetails.owner) setOwner(prev => prev ? `${prev} ${parsedDetails.owner}`.trim() : parsedDetails.owner);
+                if (parsedDetails.description) setDescription(prev => prev ? `${prev} ${parsedDetails.description}`.trim() : parsedDetails.description);
+                
+                toast({ title: "Fields Updated", description: "Your details have been updated by voice."});
+
+            } catch (e) {
+                console.error("Failed to parse voice input", e);
+                toast({ variant: 'destructive', title: "AI Error", description: "Could not understand the details."});
+                // As a fallback, append to description
+                setDescription(prev => prev ? `${prev.trim()} ${text}` : text);
+            }
+        });
+    };
+
     const toggleListening = () => {
         if (!recognitionRef.current) {
             toast({
@@ -74,7 +108,6 @@ export default function SellPage() {
         setIsListening(!isListening);
     };
 
-
   return (
     <>
       <Header />
@@ -91,14 +124,40 @@ export default function SellPage() {
                     variant={isListening ? "destructive" : "outline"}
                     onClick={toggleListening}
                     title="Use voice to add description"
+                    disabled={isProcessingVoice}
                 >
-                    {isListening ? <MicOff className="mr-2 h-4 w-4" /> : <Mic className="mr-2 h-4 w-4" />}
-                    {isListening ? 'Listening...' : 'Add with Voice'}
+                    {isProcessingVoice ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isListening ? <MicOff className="mr-2 h-4 w-4" /> : <Mic className="mr-2 h-4 w-4" />)}
+                    {isProcessingVoice ? 'Processing...' : (isListening ? 'Stop Listening' : 'Add with Voice')}
                 </Button>
             </div>
           </CardHeader>
           <CardContent>
-            <SellerForm description={description} setDescription={setDescription} />
+            <SellerForm
+                formState={{
+                    productName,
+                    pricePerBox,
+                    portDetails,
+                    caughtBy,
+                    howCaught,
+                    boatDetails,
+                    owner,
+                    brandName,
+                    description,
+                    mediaUrls,
+                }}
+                setFormState={{
+                    setProductName,
+                    setPricePerBox,
+                    setPortDetails,
+                    setCaughtBy,
+                    setHowCaught,
+                    setBoatDetails,
+                    setOwner,
+                    setBrandName,
+                    setDescription,
+                    setMediaUrls,
+                }}
+             />
           </CardContent>
         </Card>
       </div>

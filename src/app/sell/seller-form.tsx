@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Camera, Loader2, X, Upload, Mic, MicOff, Video, CameraIcon, Circle, Check } from 'lucide-react';
+import { Camera, Loader2, X, Upload, Video, CameraIcon, Circle, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
@@ -27,15 +27,36 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 
 interface SellerFormProps {
     listing?: FishListing | null;
-    description: string;
-    setDescription: (description: string) => void;
+    formState: {
+        productName: string;
+        pricePerBox: string;
+        portDetails: string;
+        caughtBy: string;
+        howCaught: string;
+        boatDetails: 'Ashok Leyland' | 'Persian Boat' | '';
+        owner: string;
+        brandName: string;
+        description: string;
+        mediaUrls: string[];
+    };
+    setFormState: {
+        setProductName: (value: string) => void;
+        setPricePerBox: (value: string) => void;
+        setPortDetails: (value: string) => void;
+        setCaughtBy: (value: string) => void;
+        setHowCaught: (value: string) => void;
+        setBoatDetails: (value: 'Ashok Leyland' | 'Persian Boat' | '') => void;
+        setOwner: (value: string) => void;
+        setBrandName: (value: string) => void;
+        setDescription: (value: string) => void;
+        setMediaUrls: (value: string[] | ((prev: string[]) => string[])) => void;
+    };
 }
 
 function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: boolean, onOpenChange: (open: boolean) => void, onMediaCaptured: (url: string) => void }) {
@@ -104,9 +125,6 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
             };
             mediaRecorderRef.current.onstop = () => {
                 const blob = new Blob(chunks, { type: 'video/webm' });
-                const url = URL.createObjectURL(blob);
-                 onMediaCaptured(url);
-                 // The below converts blob to data URL but can be slow for large videos
                  const reader = new FileReader();
                  reader.onloadend = () => {
                      onMediaCaptured(reader.result as string);
@@ -171,20 +189,16 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
 }
 
 
-export function SellerForm({ listing, description, setDescription }: SellerFormProps) {
+export function SellerForm({ listing, formState, setFormState }: SellerFormProps) {
   const { toast } = useToast();
-  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
-  
-  const [productName, setProductName] = useState('');
-  const [pricePerBox, setPricePerBox] = useState('');
-  const [portDetails, setPortDetails] = useState('');
-  const [caughtBy, setCaughtBy] = useState('');
-  const [howCaught, setHowCaught] = useState('');
-  const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | ''>('');
-  const [owner, setOwner] = useState('');
-  const [brandName, setBrandName] = useState('Malpe Meen');
+  const {
+    productName, pricePerBox, portDetails, caughtBy, howCaught, boatDetails, owner, brandName, description, mediaUrls
+  } = formState;
+  const {
+    setProductName, setPricePerBox, setPortDetails, setCaughtBy, setHowCaught, setBoatDetails, setOwner, setBrandName, setDescription, setMediaUrls
+  } = setFormState;
 
-  const [errors, setErrors] = useState<Partial<Record<keyof Omit<FishListing, 'id' | 'sellerId' | 'mediaUrls' | 'listedDate'>, string[]>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof Omit<FishListing, 'id' | 'sellerId' | 'listedDate'>, string[]>>>({});
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -192,12 +206,6 @@ export function SellerForm({ listing, description, setDescription }: SellerFormP
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isCameraOpen, setCameraOpen] = useState(false);
-
-  useEffect(() => {
-    if (isEditMode && listing) {
-        setDescription(listing.description);
-    }
-  }, []);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -217,7 +225,7 @@ export function SellerForm({ listing, description, setDescription }: SellerFormP
         setMediaUrls(listing.mediaUrls || []);
     }
 
-  }, [user, isUserLoading, router, isEditMode, listing, setDescription]);
+  }, [user, isUserLoading, router, isEditMode, listing, setProductName, setPricePerBox, setPortDetails, setCaughtBy, setHowCaught, setBoatDetails, setOwner, setBrandName, setDescription, setMediaUrls]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
