@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -7,6 +8,7 @@ import { useAuth, useFirebase } from '@/firebase';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
@@ -15,6 +17,15 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { FishLogo } from '@/components/fish-logo';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
 
 export default function SellerLoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -23,6 +34,8 @@ export default function SellerLoginPage() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [isForgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const router = useRouter();
   const { auth, firestore } = useFirebase();
   const { toast } = useToast();
@@ -55,7 +68,27 @@ export default function SellerLoginPage() {
     }
   };
 
+  const handlePasswordReset = async () => {
+    if (!auth) return;
+    try {
+      await sendPasswordResetEmail(auth, resetEmail);
+      toast({
+        title: 'Password Reset Email Sent',
+        description: 'Check your inbox for instructions to reset your password.',
+      });
+      setForgotPasswordOpen(false);
+      setResetEmail('');
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Failed to Send Reset Email',
+        description: error.message,
+      });
+    }
+  };
+
   return (
+    <>
     <div className="flex min-h-screen">
       <div className="flex-1 bg-primary text-primary-foreground p-8 md:p-12 flex flex-col justify-between">
         <div>
@@ -128,9 +161,9 @@ export default function SellerLoginPage() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
                 {!isSignUp && (
-                  <Link href="#" className="text-sm font-medium text-accent hover:underline">
+                  <button type="button" onClick={() => setForgotPasswordOpen(true)} className="text-sm font-medium text-accent hover:underline">
                     Forgot Password?
-                  </Link>
+                  </button>
                 )}
               </div>
               <div className="relative">
@@ -184,5 +217,40 @@ export default function SellerLoginPage() {
         </div>
       </div>
     </div>
+    <Dialog open={isForgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Forgot Password</DialogTitle>
+          <DialogDescription>
+            Enter your email address and we will send you a link to reset your password.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="reset-email" className="text-right">
+              Email
+            </Label>
+            <Input
+              id="reset-email"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              className="col-span-3"
+              placeholder="name@example.com"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button" variant="secondary">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button type="button" onClick={handlePasswordReset}>
+            Send Reset Link
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
