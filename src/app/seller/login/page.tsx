@@ -210,7 +210,7 @@ export default function SellerLoginPage() {
           
           <p className="mt-8 text-center text-sm text-muted-foreground">
             {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
-            <button onClick={() => setIsSignUp(!isSignUp)} className="font-semibold text-accent hover:underline">
+            <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="font-semibold text-accent hover:underline">
               {isSignUp ? 'Login' : 'Sign Up'}
             </button>
           </p>
