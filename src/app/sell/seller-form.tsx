@@ -348,13 +348,12 @@ export function SellerForm({ listing }: SellerFormProps) {
             <Label htmlFor="description">Description</Label>
             <Button
                 type="button"
-                size="icon"
                 variant={isListening ? "destructive" : "outline"}
                 onClick={toggleListening}
                 title="Use voice to add description"
             >
-                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                <span className="sr-only">Toggle voice recognition</span>
+                {isListening ? <MicOff className="mr-2 h-4 w-4" /> : <Mic className="mr-2 h-4 w-4" />}
+                {isListening ? 'Listening...' : 'Add with Voice'}
             </Button>
         </div>
         <Textarea id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the fish, its size, quality, etc." required aria-describedby="description-error" />
