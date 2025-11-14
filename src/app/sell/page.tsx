@@ -81,8 +81,11 @@ export default function SellPage() {
       <div className="container mx-auto max-w-2xl py-12">
         <Card>
           <CardHeader className="text-center">
-            <div className="flex justify-center items-center gap-4">
-                <CardTitle className="text-3xl font-bold tracking-tight font-headline">List Your Fish</CardTitle>
+            <CardTitle className="text-3xl font-bold tracking-tight font-headline">List Your Fish</CardTitle>
+            <CardDescription className="pt-2">
+              Fill out the form below to list your catch. Your listing will be visible to customers immediately.
+            </CardDescription>
+             <div className="flex justify-end pt-2">
                 <Button
                     type="button"
                     variant={isListening ? "destructive" : "outline"}
@@ -93,9 +96,6 @@ export default function SellPage() {
                     {isListening ? 'Listening...' : 'Add with Voice'}
                 </Button>
             </div>
-            <CardDescription className="pt-2">
-              Fill out the form below to list your catch. Your listing will be visible to customers immediately.
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <SellerForm description={description} setDescription={setDescription} />
