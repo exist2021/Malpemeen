@@ -191,8 +191,8 @@ export default function ListingDetailPage() {
                     <p className="text-lg text-muted-foreground">{listing.description}</p>
                     <Separator className="my-6" />
                     <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                        <DetailItem icon={CircleDollarSign} label="Price per Box" value={`₹${listing.pricePerBox.toLocaleString()}`} />
-                        <DetailItem icon={Calendar} label="Listed Date" value={format(new Date(listing.listedDate), 'MMMM d, yyyy')} />
+                        <DetailItem icon={CircleDollarSign} label="Price per Box" value={listing.pricePerBox ? `₹${listing.pricePerBox.toLocaleString()}` : 'N/A'} />
+                        <DetailItem icon={Calendar} label="Listed Date" value={listing.listedDate ? format(new Date(listing.listedDate), 'MMMM d, yyyy') : 'N/A'} />
                         <DetailItem icon={User} label="Seller" value={listing.sellerName} />
                         <DetailItem icon={UserCheck} label="Owner" value={listing.owner} />
                         <DetailItem icon={Anchor} label="Port Details" value={listing.portDetails} />
