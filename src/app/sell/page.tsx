@@ -82,9 +82,13 @@ export default function SellPage() {
                 
                 toast({ title: "Fields Updated", description: "Your details have been updated by voice."});
 
-            } catch (e) {
+            } catch (e: any) {
                 console.error("Failed to parse voice input", e);
-                toast({ variant: 'destructive', title: "AI Error", description: "Could not understand the details."});
+                let description = "Could not understand the details.";
+                if (e.message?.includes('503') || e.message?.includes('overloaded')) {
+                    description = "The AI service is temporarily unavailable. Please try again in a moment.";
+                }
+                toast({ variant: 'destructive', title: "AI Error", description: description});
                 // As a fallback, append to description
                 setDescription(prev => prev ? `${prev.trim()} ${text}` : text);
             }
