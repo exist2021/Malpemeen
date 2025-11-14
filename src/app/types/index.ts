@@ -18,7 +18,7 @@ export type Customer = {
 export type FishListing = {
     id: string;
     sellerId: string;
-    photoUrls: string[];
+    mediaUrls: string[];
     description: string;
     listedDate: string;
     sellerName?: string;
@@ -32,3 +32,4 @@ export type FishListing = {
     owner: string;
     brandName: string;
 };
+

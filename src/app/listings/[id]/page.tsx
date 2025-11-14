@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -123,7 +122,7 @@ export default function ListingDetailPage() {
     );
   }
   
-  const hasPhotos = listing.photoUrls && Array.isArray(listing.photoUrls) && listing.photoUrls.length > 0;
+  const hasMedia = listing.mediaUrls && Array.isArray(listing.mediaUrls) && listing.mediaUrls.length > 0;
 
   return (
     <>
@@ -140,30 +139,38 @@ export default function ListingDetailPage() {
             <div className="md:col-span-2 p-6">
                <Carousel className="w-full">
                 <CarouselContent>
-                  {hasPhotos ? (
-                    listing.photoUrls.map((url, index) => (
+                  {hasMedia ? (
+                    listing.mediaUrls.map((url, index) => (
                       <CarouselItem key={index}>
                         <div className="relative aspect-square w-full">
-                          <Image
-                            src={url}
-                            alt={`Photo ${index + 1} of ${listing.productName}`}
-                            fill
-                            className="object-cover rounded-lg"
-                            sizes="(max-width: 768px) 100vw, 50vw"
-                            data-ai-hint="fish"
-                          />
+                           {url.startsWith('data:video') ? (
+                            <video
+                                src={url}
+                                controls
+                                className="w-full h-full object-cover rounded-lg"
+                            />
+                            ) : (
+                            <Image
+                                src={url}
+                                alt={`Media ${index + 1} of ${listing.productName}`}
+                                fill
+                                className="object-cover rounded-lg"
+                                sizes="(max-width: 768px) 100vw, 50vw"
+                                data-ai-hint="fish"
+                            />
+                            )}
                         </div>
                       </CarouselItem>
                     ))
                   ) : (
                     <CarouselItem>
                       <div className="relative aspect-square w-full bg-muted flex items-center justify-center rounded-lg">
-                        <span className="text-sm text-muted-foreground">No Photo</span>
+                        <span className="text-sm text-muted-foreground">No Media</span>
                       </div>
                     </CarouselItem>
                   )}
                 </CarouselContent>
-                {hasPhotos && listing.photoUrls.length > 1 && (
+                {hasMedia && listing.mediaUrls.length > 1 && (
                     <>
                         <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2" />
                         <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2" />

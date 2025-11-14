@@ -8,9 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Camera, Loader2, X, Upload, Mic, MicOff } from 'lucide-react';
+import { Camera, Loader2, X, Upload, Mic, MicOff, Video, CameraIcon, Circle, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import placeholderImagesData from '@/lib/placeholder-images.json';
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import type { FishListing } from '@/app/types';
@@ -21,18 +20,160 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
 
 interface SellerFormProps {
     listing?: FishListing | null;
 }
 
+function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: boolean, onOpenChange: (open: boolean) => void, onMediaCaptured: (url: string) => void }) {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const [hasCameraPermission, setHasCameraPermission] = useState(true);
+    const [isRecording, setIsRecording] = useState(false);
+    const [stream, setStream] = useState<MediaStream | null>(null);
+    const { toast } = useToast();
+
+    useEffect(() => {
+        const getCameraPermission = async () => {
+            if (!open) {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                return;
+            }
+            try {
+                const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                setStream(mediaStream);
+                setHasCameraPermission(true);
+                if (videoRef.current) {
+                    videoRef.current.srcObject = mediaStream;
+                }
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                setHasCameraPermission(false);
+                toast({
+                    variant: 'destructive',
+                    title: 'Camera Access Denied',
+                    description: 'Please enable camera permissions in your browser settings.',
+                });
+            }
+        };
+
+        getCameraPermission();
+
+        return () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        };
+    }, [open, stream, toast]);
+
+    const handleCapturePhoto = () => {
+        if (videoRef.current) {
+            const canvas = document.createElement('canvas');
+            canvas.width = videoRef.current.videoWidth;
+            canvas.height = videoRef.current.videoHeight;
+            const context = canvas.getContext('2d');
+            if (context) {
+                context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+                onMediaCaptured(canvas.toDataURL('image/jpeg'));
+                onOpenChange(false);
+            }
+        }
+    };
+
+    const handleStartRecording = () => {
+        if (stream) {
+            const chunks: Blob[] = [];
+            mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'video/webm' });
+            mediaRecorderRef.current.ondataavailable = (event) => {
+                chunks.push(event.data);
+            };
+            mediaRecorderRef.current.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                 onMediaCaptured(url);
+                 // The below converts blob to data URL but can be slow for large videos
+                 const reader = new FileReader();
+                 reader.onloadend = () => {
+                     onMediaCaptured(reader.result as string);
+                 };
+                 reader.readAsDataURL(blob);
+            };
+            mediaRecorderRef.current.start();
+            setIsRecording(true);
+        }
+    };
+
+    const handleStopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+            onOpenChange(false);
+        }
+    };
+
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-[625px]">
+                <DialogHeader>
+                    <DialogTitle>Live Capture</DialogTitle>
+                    <DialogDescription>
+                        Capture a photo or record a short video of your product.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                    <div className="relative w-full aspect-video bg-black rounded-md overflow-hidden">
+                       <video ref={videoRef} className="w-full h-full" autoPlay muted playsInline />
+                       {isRecording && <Circle className="h-4 w-4 text-red-500 absolute top-2 right-2 animate-pulse" fill="red" />}
+                    </div>
+                    {!hasCameraPermission && (
+                        <Alert variant="destructive">
+                            <AlertTitle>Camera Access Required</AlertTitle>
+                            <AlertDescription>
+                                Please allow camera access in your browser to use this feature.
+                            </AlertDescription>
+                        </Alert>
+                    )}
+                </div>
+                <DialogFooter>
+                     <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+                    <Button type="button" onClick={handleCapturePhoto} disabled={!hasCameraPermission || isRecording}>
+                        <CameraIcon className="mr-2 h-4 w-4" /> Capture Photo
+                    </Button>
+                    {!isRecording ? (
+                        <Button type="button" onClick={handleStartRecording} disabled={!hasCameraPermission}>
+                            <Video className="mr-2 h-4 w-4" /> Start Recording
+                        </Button>
+                    ) : (
+                         <Button type="button" variant="destructive" onClick={handleStopRecording}>
+                            <Check className="mr-2 h-4 w-4" /> Finish Recording
+                        </Button>
+                    )}
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+
 export function SellerForm({ listing }: SellerFormProps) {
   const { toast } = useToast();
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [newImageUrl, setNewImageUrl] = useState('');
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
   const [description, setDescription] = useState('');
   
-  // New fields
   const [productName, setProductName] = useState('');
   const [pricePerBox, setPricePerBox] = useState('');
   const [portDetails, setPortDetails] = useState('');
@@ -42,7 +183,7 @@ export function SellerForm({ listing }: SellerFormProps) {
   const [owner, setOwner] = useState('');
   const [brandName, setBrandName] = useState('Malpe Meen');
 
-  const [errors, setErrors] = useState<Partial<Record<keyof Omit<FishListing, 'id' | 'sellerId' | 'photoUrls' | 'listedDate'>, string[]>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof Omit<FishListing, 'id' | 'sellerId' | 'mediaUrls' | 'listedDate'>, string[]>>>({});
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -51,9 +192,9 @@ export function SellerForm({ listing }: SellerFormProps) {
 
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const [isCameraOpen, setCameraOpen] = useState(false);
 
   useEffect(() => {
-    // Check if SpeechRecognition is available
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
@@ -72,7 +213,6 @@ export function SellerForm({ listing }: SellerFormProps) {
             interimTranscript += event.results[i][0].transcript;
           }
         }
-        // Append final transcript to existing description
         if (finalTranscript) {
           setDescription(prev => prev ? `${prev.trim()} ${finalTranscript.trim()}` : finalTranscript.trim());
         }
@@ -129,47 +269,10 @@ export function SellerForm({ listing }: SellerFormProps) {
         setOwner(listing.owner);
         setBrandName(listing.brandName);
         setDescription(listing.description);
-        setImageUrls(listing.photoUrls || []);
+        setMediaUrls(listing.mediaUrls || []);
     }
 
   }, [user, isUserLoading, router, isEditMode, listing]);
-
-  const addRandomPhoto = () => {
-    const { placeholderImages } = placeholderImagesData;
-    const availableImages = placeholderImages.filter(p => !imageUrls.includes(p.imageUrl));
-    
-    if (availableImages.length === 0) {
-        toast({ variant: 'destructive', title: 'No more unique random photos to add.'});
-        return;
-    }
-
-    const randomImage = availableImages[Math.floor(Math.random() * availableImages.length)];
-    if (randomImage.imageUrl && !imageUrls.includes(randomImage.imageUrl)) {
-        setImageUrls(prev => [...prev, randomImage.imageUrl]);
-    }
-  };
-  
-  useEffect(() => {
-    if(imageUrls.length === 0 && !isEditMode) {
-        addRandomPhoto();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEditMode]);
-
-  const addImageFromUrl = () => {
-    if (newImageUrl && !imageUrls.includes(newImageUrl)) {
-      try {
-        // Basic URL validation
-        new URL(newImageUrl);
-        setImageUrls(prev => [...prev, newImageUrl]);
-        setNewImageUrl('');
-      } catch (_) {
-        toast({ variant: 'destructive', title: 'Invalid URL', description: 'Please enter a valid image URL.' });
-      }
-    } else if (imageUrls.includes(newImageUrl)) {
-        toast({ variant: 'destructive', title: 'Duplicate Image', description: 'This image URL has already been added.' });
-    }
-  }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -177,22 +280,21 @@ export function SellerForm({ listing }: SellerFormProps) {
       const reader = new FileReader();
       reader.onloadend = () => {
         const result = reader.result as string;
-        if (!imageUrls.includes(result)) {
-            setImageUrls(prev => [...prev, result]);
+        if (!mediaUrls.includes(result)) {
+            setMediaUrls(prev => [...prev, result]);
         } else {
-            toast({ variant: 'destructive', title: 'Duplicate Image', description: 'You have already uploaded this image.' });
+            toast({ variant: 'destructive', title: 'Duplicate Media', description: 'You have already uploaded this file.' });
         }
       };
       reader.readAsDataURL(file);
     }
-    // Reset file input to allow uploading the same file again
     if(fileInputRef.current) {
         fileInputRef.current.value = '';
     }
   };
 
-  const removeImage = (urlToRemove: string) => {
-    setImageUrls(prev => prev.filter(url => url !== urlToRemove));
+  const removeMedia = (urlToRemove: string) => {
+    setMediaUrls(prev => prev.filter(url => url !== urlToRemove));
   }
 
 
@@ -203,7 +305,7 @@ export function SellerForm({ listing }: SellerFormProps) {
       return;
     }
 
-    const newErrors: typeof errors = {};
+    const newErrors: any = {};
     if (!productName) newErrors.productName = ['Product Name is required.'];
     if (!pricePerBox || isNaN(Number(pricePerBox)) || Number(pricePerBox) <= 0) newErrors.pricePerBox = ['Please enter a valid price.'];
     if (!portDetails) newErrors.portDetails = ['Port Details are required.'];
@@ -212,7 +314,7 @@ export function SellerForm({ listing }: SellerFormProps) {
     if (!boatDetails) newErrors.boatDetails = ['Please select a boat.'];
     if (!owner) newErrors.owner = ['Owner is required.'];
     if (description.length < 10) newErrors.description = ['Description must be at least 10 characters.'];
-    if (imageUrls.length === 0) newErrors.photoUrls = ['Please add at least one photo.'];
+    if (mediaUrls.length === 0) newErrors.mediaUrls = ['Please add at least one photo or video.'];
 
 
     if (Object.keys(newErrors).length > 0) {
@@ -239,7 +341,7 @@ export function SellerForm({ listing }: SellerFormProps) {
           owner,
           brandName,
           description,
-          photoUrls: imageUrls,
+          mediaUrls: mediaUrls,
         };
 
         if (isEditMode && listing) {
@@ -276,8 +378,15 @@ export function SellerForm({ listing }: SellerFormProps) {
     return <p>Loading...</p>
   }
 
+  const handleMediaCaptured = (url: string) => {
+    if (url && !mediaUrls.includes(url)) {
+        setMediaUrls(prev => [...prev, url]);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="mt-2 space-y-8">
+       <CameraCaptureDialog open={isCameraOpen} onOpenChange={setCameraOpen} onMediaCaptured={handleMediaCaptured} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
             <Label htmlFor="productName">Product Name</Label>
@@ -363,13 +472,18 @@ export function SellerForm({ listing }: SellerFormProps) {
       </div>
 
       <div className="space-y-4">
-        <Label>Fish Photos</Label>
+        <Label>Product Media (Photos & Videos)</Label>
         
         <div className="grid grid-cols-3 gap-4">
-            {(imageUrls || []).map((url, index) => (
+            {(mediaUrls || []).map((url, index) => (
                 <div key={`${url}-${index}`} className="relative aspect-square">
-                    <Image src={url} alt="Fish photo" fill className="rounded-md object-cover" />
-                    <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeImage(url)}>
+                    {url.startsWith('data:video') ? (
+                       <video src={url} className="rounded-md object-cover w-full h-full" controls />
+                    ) : (
+                       <Image src={url} alt="Product media" fill className="rounded-md object-cover" />
+                    )}
+
+                    <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeMedia(url)}>
                         <X className="h-4 w-4" />
                     </Button>
                 </div>
@@ -377,30 +491,24 @@ export function SellerForm({ listing }: SellerFormProps) {
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
-          <div className="relative flex-grow">
-            <Input id="photoUrl" name="photoUrl" value={newImageUrl} onChange={(e) => setNewImageUrl(e.target.value)} placeholder="Add image URL" aria-describedby="photoUrls-error" />
-          </div>
-          <Button type="button" variant="outline" onClick={addImageFromUrl}>
-            Add URL
-          </Button>
-          <Button type="button" variant="outline" onClick={addRandomPhoto}>
-            <Camera className="mr-2 h-4 w-4" />
-            Random
-          </Button>
            <input
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
             className="hidden"
-            accept="image/*"
+            accept="image/*,video/*"
           />
           <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
             <Upload className="mr-2 h-4 w-4" />
-            Upload
+            Upload from Device
+          </Button>
+          <Button type="button" variant="outline" onClick={() => setCameraOpen(true)}>
+            <Camera className="mr-2 h-4 w-4" />
+            Use Camera
           </Button>
         </div>
-        <div id="photoUrls-error" aria-live="polite" aria-atomic="true">
-          {errors?.photoUrls && <p className="text-sm font-medium text-destructive">{errors.photoUrls}</p>}
+        <div id="mediaUrls-error" aria-live="polite" aria-atomic="true">
+          {errors?.mediaUrls && <p className="text-sm font-medium text-destructive">{errors.mediaUrls}</p>}
         </div>
       </div>
 

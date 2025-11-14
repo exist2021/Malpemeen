@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { getSellerFishListings } from '@/app/lib/data';
 import type { FishListing } from '@/app/types';
 import Image from 'next/image';
-import { Pencil, LogOut } from 'lucide-react';
+import { Pencil, LogOut, Video } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/layout/header';
 
@@ -46,27 +46,36 @@ function SellerListings() {
 
     return (
         <div className="space-y-4">
-            {listings.map(listing => (
-                <Card key={listing.id} className="flex items-center p-4 gap-4">
-                    <div className="relative h-20 w-20 rounded-md overflow-hidden">
-                        {listing.photoUrls && listing.photoUrls.length > 0 ? (
-                            <Image src={listing.photoUrls[0]} alt={listing.description} layout="fill" className="object-cover" />
-                        ): (
-                            <div className="flex items-center justify-center h-full bg-muted text-muted-foreground text-xs">No Photo</div>
-                        )}
-                    </div>
-                    <div className="flex-grow">
-                        <p className="font-semibold truncate">{listing.description}</p>
-                        <p className="text-sm text-muted-foreground">Listed on {new Date(listing.listedDate).toLocaleDateString()}</p>
-                    </div>
-                    <Button asChild variant="outline" size="icon">
-                        <Link href={`/sell/${listing.id}/edit`}>
-                            <Pencil className="h-4 w-4" />
-                            <span className="sr-only">Edit Listing</span>
-                        </Link>
-                    </Button>
-                </Card>
-            ))}
+            {listings.map(listing => {
+                const firstMediaUrl = listing.mediaUrls && listing.mediaUrls.length > 0 ? listing.mediaUrls[0] : null;
+                const isVideo = firstMediaUrl && firstMediaUrl.startsWith('data:video');
+
+                return (
+                    <Card key={listing.id} className="flex items-center p-4 gap-4">
+                        <div className="relative h-20 w-20 rounded-md overflow-hidden bg-muted flex items-center justify-center">
+                            {firstMediaUrl ? (
+                                isVideo ? (
+                                    <Video className="h-8 w-8 text-muted-foreground" />
+                                ) : (
+                                    <Image src={firstMediaUrl} alt={listing.productName} layout="fill" className="object-cover" />
+                                )
+                            ): (
+                                <div className="text-xs text-muted-foreground">No Media</div>
+                            )}
+                        </div>
+                        <div className="flex-grow">
+                            <p className="font-semibold truncate">{listing.productName}</p>
+                            <p className="text-sm text-muted-foreground">Listed on {new Date(listing.listedDate).toLocaleDateString()}</p>
+                        </div>
+                        <Button asChild variant="outline" size="icon">
+                            <Link href={`/sell/${listing.id}/edit`}>
+                                <Pencil className="h-4 w-4" />
+                                <span className="sr-only">Edit Listing</span>
+                            </Link>
+                        </Button>
+                    </Card>
+                );
+            })}
         </div>
     )
 
