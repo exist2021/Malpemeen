@@ -60,10 +60,14 @@ export default function SellerLoginPage() {
         router.push('/seller/dashboard');
       }
     } catch (error: any) {
+        let description = error.message;
+        if (error.code === 'auth/invalid-credential') {
+            description = "Invalid email or password. Please try again.";
+        }
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
-        description: error.message,
+        description: description,
       });
     }
   };
@@ -87,6 +91,14 @@ export default function SellerLoginPage() {
       setForgotPasswordOpen(false);
       setResetEmail('');
     } catch (error: any) {
+        if (error.code === 'auth/missing-email') {
+            toast({
+                variant: 'destructive',
+                title: 'Email is required',
+                description: 'Please enter your email address.',
+            });
+            return;
+        }
       toast({
         variant: 'destructive',
         title: 'Failed to Send Reset Email',
@@ -245,6 +257,7 @@ export default function SellerLoginPage() {
                   onChange={(e) => setResetEmail(e.target.value)}
                   placeholder="name@example.com"
                   required
+                  type="email"
                 />
               </div>
             </div>
