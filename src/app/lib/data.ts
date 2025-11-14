@@ -2,7 +2,7 @@
 'use client';
 
 import type { FishListing } from '@/app/types';
-import { collection, addDoc, getDocs, query, orderBy, doc, getDoc, where, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, doc, getDoc, where, updateDoc, deleteDoc } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -122,6 +122,19 @@ export async function updateFishListing(id: string, data: Partial<Omit<FishListi
             path: docRef.path,
             operation: 'update',
             requestResourceData: data,
+        });
+        errorEmitter.emit('permission-error', contextualError);
+    });
+}
+
+export async function deleteFishListing(id: string) {
+    const { firestore } = initializeFirebase();
+    const docRef = doc(firestore, 'fishListings', id);
+
+    deleteDoc(docRef).catch(error => {
+        const contextualError = new FirestorePermissionError({
+            path: docRef.path,
+            operation: 'delete',
         });
         errorEmitter.emit('permission-error', contextualError);
     });
