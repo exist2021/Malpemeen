@@ -13,7 +13,6 @@ export function MainNav() {
   const isCustomerPage = role === 'customer' || pathname.startsWith('/listings');
 
   const routes = [
-    ...(!isCustomerPage ? [{ href: '/sell', label: 'Sell Fish' }] : [])
   ];
 
   return (
