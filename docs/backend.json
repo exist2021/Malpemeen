@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "Seller": {
@@ -107,6 +108,39 @@
           "type": "string",
           "description": "The date when listing was created",
           "format": "date-time"
+        },
+        "productName": {
+          "type": "string",
+          "description": "Name of the fish product."
+        },
+        "pricePerBox": {
+          "type": "number",
+          "description": "Selling price per box."
+        },
+        "portDetails": {
+          "type": "string",
+          "description": "Details about the port of origin."
+        },
+        "caughtBy": {
+          "type": "string",
+          "description": "Name of the person or group who caught the fish."
+        },
+        "howCaught": {
+          "type": "string",
+          "description": "Method used to catch the fish."
+        },
+        "boatDetails": {
+          "type": "string",
+          "description": "Type of boat used.",
+          "enum": ["Ashok Leyland", "Persian Boat"]
+        },
+        "owner": {
+          "type": "string",
+          "description": "Owner of the boat/catch."
+        },
+        "brandName": {
+          "type": "string",
+          "description": "Brand name for the product, e.g., 'Malpe Meen'."
         }
       },
       "required": [
@@ -116,7 +150,15 @@
         "sellerPhone",
         "photoUrls",
         "description",
-        "listedDate"
+        "listedDate",
+        "productName",
+        "pricePerBox",
+        "portDetails",
+        "caughtBy",
+        "howCaught",
+        "boatDetails",
+        "owner",
+        "brandName"
       ]
     }
   },

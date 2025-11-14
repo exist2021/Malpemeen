@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,10 +10,11 @@ import type { FishListing } from '@/app/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Button } from '@/components/ui/button';
-import { Phone, Calendar, User, ArrowLeft } from 'lucide-react';
+import { Phone, Calendar, User, ArrowLeft, Anchor, UserCheck, Ship, Info, Tag, Copyright, CircleDollarSign } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/layout/header';
 import { format } from 'date-fns';
+import { Separator } from '@/components/ui/separator';
 
 function ListingDetailSkeleton() {
   return (
@@ -58,6 +60,18 @@ function ListingDetailSkeleton() {
   );
 }
 
+function DetailItem({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: React.ReactNode }) {
+    if (!value) return null;
+    return (
+        <div className="flex items-start gap-3">
+            <Icon className="h-5 w-5 text-muted-foreground mt-1" />
+            <div>
+                <p className="text-sm font-medium text-muted-foreground">{label}</p>
+                <p className="text-base font-semibold">{value}</p>
+            </div>
+        </div>
+    );
+}
 
 export default function ListingDetailPage() {
   const params = useParams();
@@ -114,7 +128,7 @@ export default function ListingDetailPage() {
   return (
     <>
     <Header />
-    <div className="container mx-auto max-w-4xl py-12">
+    <div className="container mx-auto max-w-5xl py-12">
         <div className="mb-4">
           <Button variant="outline" onClick={() => router.back()}>
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -122,9 +136,8 @@ export default function ListingDetailPage() {
           </Button>
         </div>
       <Card className="overflow-hidden">
-        <CardContent className="p-0">
-          <div className="grid md:grid-cols-2">
-            <div className="p-4 md:p-6">
+        <div className="grid md:grid-cols-5">
+            <div className="md:col-span-2 p-6">
                <Carousel className="w-full">
                 <CarouselContent>
                   {hasPhotos ? (
@@ -133,7 +146,7 @@ export default function ListingDetailPage() {
                         <div className="relative aspect-square w-full">
                           <Image
                             src={url}
-                            alt={`Photo ${index + 1} of ${listing.description}`}
+                            alt={`Photo ${index + 1} of ${listing.productName}`}
                             fill
                             className="object-cover rounded-lg"
                             sizes="(max-width: 768px) 100vw, 50vw"
@@ -159,23 +172,29 @@ export default function ListingDetailPage() {
               </Carousel>
             </div>
             
-            <div className="p-6 flex flex-col justify-between">
-                <div>
-                    <CardHeader className="px-0 pt-0">
-                        <CardDescription className="flex items-center gap-2">
-                            <User className="h-4 w-4" />
-                            <span>{listing.sellerName || 'A Seller'}</span>
-                        </CardDescription>
-                        <CardTitle className="text-2xl font-bold font-headline">{listing.description}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="px-0">
-                        <div className="flex items-center text-sm text-muted-foreground gap-2">
-                            <Calendar className="h-4 w-4" />
-                            <span>Listed on {format(new Date(listing.listedDate), 'MMMM d, yyyy')}</span>
-                        </div>
-                    </CardContent>
-                </div>
-                <CardFooter className="px-0 pb-0">
+            <div className="md:col-span-3 p-6 flex flex-col">
+                <CardHeader className="px-0 pt-0">
+                     <CardTitle className="text-3xl font-bold font-headline">{listing.productName}</CardTitle>
+                    <CardDescription className="flex items-center gap-2 pt-2">
+                        <Copyright className="h-4 w-4" />
+                        <span>{listing.brandName}</span>
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="px-0 flex-grow">
+                    <p className="text-lg text-muted-foreground">{listing.description}</p>
+                    <Separator className="my-6" />
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                        <DetailItem icon={CircleDollarSign} label="Price per Box" value={`₹${listing.pricePerBox.toLocaleString()}`} />
+                        <DetailItem icon={Calendar} label="Listed Date" value={format(new Date(listing.listedDate), 'MMMM d, yyyy')} />
+                        <DetailItem icon={User} label="Seller" value={listing.sellerName} />
+                        <DetailItem icon={UserCheck} label="Owner" value={listing.owner} />
+                        <DetailItem icon={Anchor} label="Port Details" value={listing.portDetails} />
+                        <DetailItem icon={Info} label="How Caught" value={listing.howCaught} />
+                        <DetailItem icon={Tag} label="Caught By" value={listing.caughtBy} />
+                        <DetailItem icon={Ship} label="Boat" value={listing.boatDetails} />
+                    </div>
+                </CardContent>
+                <CardFooter className="px-0 pb-0 mt-6">
                     <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90 h-12 text-lg">
                         <a href={`tel:${listing.sellerPhone}`}>
                             <Phone className="mr-2 h-5 w-5" />
@@ -186,7 +205,6 @@ export default function ListingDetailPage() {
             </div>
 
           </div>
-        </CardContent>
       </Card>
     </div>
     </>

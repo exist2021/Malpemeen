@@ -14,6 +14,13 @@ import placeholderImagesData from '@/lib/placeholder-images.json';
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import type { FishListing } from '@/app/types';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface SellerFormProps {
     listing?: FishListing | null;
@@ -24,7 +31,18 @@ export function SellerForm({ listing }: SellerFormProps) {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [description, setDescription] = useState('');
-  const [errors, setErrors] = useState<{ description?: string[]; photoUrls?: string[] }>({});
+  
+  // New fields
+  const [productName, setProductName] = useState('');
+  const [pricePerBox, setPricePerBox] = useState('');
+  const [portDetails, setPortDetails] = useState('');
+  const [caughtBy, setCaughtBy] = useState('');
+  const [howCaught, setHowCaught] = useState('');
+  const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | ''>('');
+  const [owner, setOwner] = useState('');
+  const [brandName, setBrandName] = useState('Malpe Meen');
+
+  const [errors, setErrors] = useState<Partial<Record<keyof Omit<FishListing, 'id' | 'sellerId' | 'photoUrls' | 'listedDate'>, string[]>>>({});
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -102,6 +120,14 @@ export function SellerForm({ listing }: SellerFormProps) {
     }
     
     if (isEditMode && listing) {
+        setProductName(listing.productName);
+        setPricePerBox(String(listing.pricePerBox));
+        setPortDetails(listing.portDetails);
+        setCaughtBy(listing.caughtBy);
+        setHowCaught(listing.howCaught);
+        setBoatDetails(listing.boatDetails);
+        setOwner(listing.owner);
+        setBrandName(listing.brandName);
         setDescription(listing.description);
         setImageUrls(listing.photoUrls || []);
     }
@@ -177,13 +203,17 @@ export function SellerForm({ listing }: SellerFormProps) {
       return;
     }
 
-    const newErrors: { description?: string[]; photoUrls?: string[] } = {};
-    if (description.length < 10) {
-        newErrors.description = ['Description must be at least 10 characters.'];
-    }
-    if (imageUrls.length === 0) {
-        newErrors.photoUrls = ['Please add at least one photo.'];
-    }
+    const newErrors: typeof errors = {};
+    if (!productName) newErrors.productName = ['Product Name is required.'];
+    if (!pricePerBox || isNaN(Number(pricePerBox)) || Number(pricePerBox) <= 0) newErrors.pricePerBox = ['Please enter a valid price.'];
+    if (!portDetails) newErrors.portDetails = ['Port Details are required.'];
+    if (!caughtBy) newErrors.caughtBy = ['"Who Caught" is required.'];
+    if (!howCaught) newErrors.howCaught = ['"How Caught" is required.'];
+    if (!boatDetails) newErrors.boatDetails = ['Please select a boat.'];
+    if (!owner) newErrors.owner = ['Owner is required.'];
+    if (description.length < 10) newErrors.description = ['Description must be at least 10 characters.'];
+    if (imageUrls.length === 0) newErrors.photoUrls = ['Please add at least one photo.'];
+
 
     if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
@@ -199,24 +229,29 @@ export function SellerForm({ listing }: SellerFormProps) {
 
     startTransition(async () => {
       try {
+        const listingData = {
+          productName,
+          pricePerBox: Number(pricePerBox),
+          portDetails,
+          caughtBy,
+          howCaught,
+          boatDetails: boatDetails as 'Ashok Leyland' | 'Persian Boat',
+          owner,
+          brandName,
+          description,
+          photoUrls: imageUrls,
+        };
+
         if (isEditMode && listing) {
-            await updateFishListing(listing.id, {
-                description,
-                photoUrls: imageUrls,
-            });
+            await updateFishListing(listing.id, listingData);
             toast({
               title: 'Success!',
               description: 'Your fish listing has been updated.',
             });
         } else {
              await addFishListing({
-              description,
-              photoUrls: imageUrls,
+              ...listingData,
               sellerId: user.uid,
-              // These will be overridden by the denormalized data in `addFishListing`
-              sellerName: user.displayName || 'Seller',
-              sellerPhone: user.phoneNumber || '',
-              listedDate: new Date().toISOString(),
             });
             toast({
               title: 'Success!',
@@ -243,6 +278,71 @@ export function SellerForm({ listing }: SellerFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-2 space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+            <Label htmlFor="productName">Product Name</Label>
+            <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="e.g., Fresh Tuna" required aria-describedby="productName-error" />
+            <div id="productName-error" aria-live="polite" aria-atomic="true">
+              {errors?.productName && <p className="text-sm font-medium text-destructive">{errors.productName}</p>}
+            </div>
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="pricePerBox">Price per Box (₹)</Label>
+            <Input id="pricePerBox" type="number" value={pricePerBox} onChange={(e) => setPricePerBox(e.target.value)} placeholder="e.g., 5000" required aria-describedby="pricePerBox-error" />
+            <div id="pricePerBox-error" aria-live="polite" aria-atomic="true">
+              {errors?.pricePerBox && <p className="text-sm font-medium text-destructive">{errors.pricePerBox}</p>}
+            </div>
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="portDetails">Port Details</Label>
+            <Input id="portDetails" value={portDetails} onChange={(e) => setPortDetails(e.target.value)} placeholder="e.g., Malpe Port" required aria-describedby="portDetails-error" />
+            <div id="portDetails-error" aria-live="polite" aria-atomic="true">
+              {errors?.portDetails && <p className="text-sm font-medium text-destructive">{errors.portDetails}</p>}
+            </div>
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="caughtBy">Who Caught</Label>
+            <Input id="caughtBy" value={caughtBy} onChange={(e) => setCaughtBy(e.target.value)} placeholder="e.g., Local Fishermen" required aria-describedby="caughtBy-error" />
+            <div id="caughtBy-error" aria-live="polite" aria-atomic="true">
+              {errors?.caughtBy && <p className="text-sm font-medium text-destructive">{errors.caughtBy}</p>}
+            </div>
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="howCaught">How Caught</Label>
+            <Input id="howCaught" value={howCaught} onChange={(e) => setHowCaught(e.target.value)} placeholder="e.g., Net Fishing" required aria-describedby="howCaught-error" />
+            <div id="howCaught-error" aria-live="polite" aria-atomic="true">
+              {errors?.howCaught && <p className="text-sm font-medium text-destructive">{errors.howCaught}</p>}
+            </div>
+        </div>
+         <div className="space-y-2">
+            <Label htmlFor="boatDetails">Boat Details</Label>
+            <Select value={boatDetails} onValueChange={(value) => setBoatDetails(value as any)} required>
+              <SelectTrigger id="boatDetails" aria-describedby="boatDetails-error">
+                <SelectValue placeholder="Select a boat type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Ashok Leyland">Ashok Leyland</SelectItem>
+                <SelectItem value="Persian Boat">Persian Boat</SelectItem>
+              </SelectContent>
+            </Select>
+            <div id="boatDetails-error" aria-live="polite" aria-atomic="true">
+              {errors?.boatDetails && <p className="text-sm font-medium text-destructive">{errors.boatDetails}</p>}
+            </div>
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="owner">Owner</Label>
+            <Input id="owner" value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="e.g., John Doe" required aria-describedby="owner-error" />
+            <div id="owner-error" aria-live="polite" aria-atomic="true">
+              {errors?.owner && <p className="text-sm font-medium text-destructive">{errors.owner}</p>}
+            </div>
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="brandName">Brand Name</Label>
+            <Input id="brandName" value={brandName} onChange={(e) => setBrandName(e.target.value)} required />
+        </div>
+      </div>
+
+
       <div className="space-y-2">
         <div className="flex items-center justify-between">
             <Label htmlFor="description">Description</Label>
@@ -257,7 +357,7 @@ export function SellerForm({ listing }: SellerFormProps) {
                 <span className="sr-only">Toggle voice recognition</span>
             </Button>
         </div>
-        <Textarea id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the fish, its size, price, etc." required aria-describedby="description-error" />
+        <Textarea id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the fish, its size, quality, etc." required aria-describedby="description-error" />
         <div id="description-error" aria-live="polite" aria-atomic="true">
           {errors?.description && <p className="text-sm font-medium text-destructive">{errors.description}</p>}
         </div>
@@ -279,7 +379,7 @@ export function SellerForm({ listing }: SellerFormProps) {
         
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative flex-grow">
-            <Input id="photoUrl" name="photoUrl" value={newImageUrl} onChange={(e) => setNewImageUrl(e.target.value)} placeholder="Add image URL" aria-describedby="photoUrl-error" />
+            <Input id="photoUrl" name="photoUrl" value={newImageUrl} onChange={(e) => setNewImageUrl(e.target.value)} placeholder="Add image URL" aria-describedby="photoUrls-error" />
           </div>
           <Button type="button" variant="outline" onClick={addImageFromUrl}>
             Add URL
@@ -300,7 +400,7 @@ export function SellerForm({ listing }: SellerFormProps) {
             Upload
           </Button>
         </div>
-        <div id="photoUrl-error" aria-live="polite" aria-atomic="true">
+        <div id="photoUrls-error" aria-live="polite" aria-atomic="true">
           {errors?.photoUrls && <p className="text-sm font-medium text-destructive">{errors.photoUrls}</p>}
         </div>
       </div>

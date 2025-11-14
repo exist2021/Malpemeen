@@ -1,3 +1,4 @@
+
 export type Seller = {
     id: string;
     phoneNumber: string;
@@ -22,4 +23,12 @@ export type FishListing = {
     listedDate: string;
     sellerName?: string;
     sellerPhone?: string;
+    productName: string;
+    pricePerBox: number;
+    portDetails: string;
+    caughtBy: string;
+    howCaught: string;
+    boatDetails: 'Ashok Leyland' | 'Persian Boat';
+    owner: string;
+    brandName: string;
 };

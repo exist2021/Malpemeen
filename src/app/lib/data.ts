@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { FishListing } from '@/app/types';
@@ -81,7 +82,7 @@ export async function getFishListingById(id: string): Promise<FishListing | null
 }
 
 
-export async function addFishListing(listing: Omit<FishListing, 'id'>) {
+export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDate' | 'sellerName' | 'sellerPhone'>) {
   const { firestore } = initializeFirebase();
   
   // Get seller info to denormalize
@@ -95,7 +96,7 @@ export async function addFishListing(listing: Omit<FishListing, 'id'>) {
 
   const fishListingsRef = collection(firestore, `fishListings`);
   
-  const data = {
+  const data: Omit<FishListing, 'id'> = {
     ...listing,
     sellerName: sellerData.name,
     sellerPhone: sellerData.phoneNumber,
