@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Camera, Loader2, X, Upload } from 'lucide-react';
+import { Camera, Loader2, X, Upload, Mic, MicOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import placeholderImagesData from '@/lib/placeholder-images.json';
 import { useUser } from '@/firebase';
@@ -30,6 +30,71 @@ export function SellerForm({ listing }: SellerFormProps) {
   const [isPending, startTransition] = useTransition();
   const isEditMode = !!listing;
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    // Check if SpeechRecognition is available
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        // Append final transcript to existing description
+        if (finalTranscript) {
+          setDescription(prev => prev ? `${prev.trim()} ${finalTranscript.trim()}` : finalTranscript.trim());
+        }
+      };
+      
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error', event.error);
+        toast({
+          variant: 'destructive',
+          title: 'Voice Error',
+          description: `An error occurred during speech recognition: ${event.error}`,
+        });
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+  }, [toast]);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      toast({
+        variant: 'destructive',
+        title: 'Not Supported',
+        description: 'Your browser does not support voice recognition.',
+      });
+      return;
+    }
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -62,6 +127,7 @@ export function SellerForm({ listing }: SellerFormProps) {
     if(imageUrls.length === 0 && !isEditMode) {
         addRandomPhoto();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditMode]);
 
   const addImageFromUrl = () => {
@@ -147,6 +213,10 @@ export function SellerForm({ listing }: SellerFormProps) {
               description,
               photoUrls: imageUrls,
               sellerId: user.uid,
+              // These will be overridden by the denormalized data in `addFishListing`
+              sellerName: user.displayName || 'Seller',
+              sellerPhone: user.phoneNumber || '',
+              listedDate: new Date().toISOString(),
             });
             toast({
               title: 'Success!',
@@ -174,7 +244,19 @@ export function SellerForm({ listing }: SellerFormProps) {
   return (
     <form onSubmit={handleSubmit} className="mt-2 space-y-8">
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <div className="flex items-center justify-between">
+            <Label htmlFor="description">Description</Label>
+            <Button
+                type="button"
+                size="icon"
+                variant={isListening ? "destructive" : "outline"}
+                onClick={toggleListening}
+                title="Use voice to add description"
+            >
+                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                <span className="sr-only">Toggle voice recognition</span>
+            </Button>
+        </div>
         <Textarea id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the fish, its size, price, etc." required aria-describedby="description-error" />
         <div id="description-error" aria-live="polite" aria-atomic="true">
           {errors?.description && <p className="text-sm font-medium text-destructive">{errors.description}</p>}
@@ -187,7 +269,7 @@ export function SellerForm({ listing }: SellerFormProps) {
         <div className="grid grid-cols-3 gap-4">
             {(imageUrls || []).map((url, index) => (
                 <div key={`${url}-${index}`} className="relative aspect-square">
-                    <Image src={url} alt="Fish photo" layout="fill" className="rounded-md object-cover" />
+                    <Image src={url} alt="Fish photo" fill className="rounded-md object-cover" />
                     <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeImage(url)}>
                         <X className="h-4 w-4" />
                     </Button>
@@ -196,7 +278,9 @@ export function SellerForm({ listing }: SellerFormProps) {
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
-          <Input id="photoUrl" name="photoUrl" value={newImageUrl} onChange={(e) => setNewImageUrl(e.target.value)} placeholder="Add image URL" aria-describedby="photoUrl-error" />
+          <div className="relative flex-grow">
+            <Input id="photoUrl" name="photoUrl" value={newImageUrl} onChange={(e) => setNewImageUrl(e.target.value)} placeholder="Add image URL" aria-describedby="photoUrl-error" />
+          </div>
           <Button type="button" variant="outline" onClick={addImageFromUrl}>
             Add URL
           </Button>
