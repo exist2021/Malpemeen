@@ -10,9 +10,8 @@ import Link from 'next/link';
 import { getSellerFishListings, deleteFishListing } from '@/app/lib/data';
 import type { FishListing } from '@/app/types';
 import Image from 'next/image';
-import { Pencil, LogOut, Video, Trash2, Loader2 } from 'lucide-react';
+import { Pencil, LogOut, Video, Trash2, Loader2, PlusCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Header } from '@/components/layout/header';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -86,7 +85,17 @@ function SellerListings() {
     }
     
     if (listings.length === 0) {
-        return <p className="text-center text-muted-foreground">You haven't listed any fish yet.</p>
+        return (
+             <div className="text-center py-10 border-2 border-dashed border-border rounded-xl">
+                <h3 className="mt-2 text-sm font-semibold text-foreground">No listings yet</h3>
+                <p className="mt-1 text-sm text-muted-foreground">Get started by creating a new listing.</p>
+                <div className="mt-6">
+                    <Button asChild>
+                      <Link href="/sell"><PlusCircle className="mr-2 h-4 w-4" /> Create Listing</Link>
+                    </Button>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -155,8 +164,7 @@ function SellerListings() {
 export default function SellerDashboard() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
-  const auth = useAuth();
-
+  
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/seller/login');
@@ -165,55 +173,31 @@ export default function SellerDashboard() {
 
   if (isUserLoading || !user) {
     return (
-      <>
-        <Header />
-        <div className="container py-8">
-          <p>Loading...</p>
-        </div>
-      </>
+      <div className="p-8">
+          <Skeleton className="h-10 w-48 mb-8" />
+          <div className="space-y-4">
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+            </div>
+      </div>
     );
   }
-  
-  const handleLogout = () => {
-    if(auth) {
-      auth.signOut();
-      router.push('/');
-    }
-  };
-
 
   return (
-    <>
-    <Header />
-    <div className="container py-8">
-      <div className="grid gap-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome, {user.displayName || user.email}!</CardTitle>
-            <CardDescription>This is your seller dashboard. You can manage your listings here.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col space-y-4">
-            <Button asChild>
-              <Link href="/sell">Create a new listing</Link>
-            </Button>
-            <Button onClick={handleLogout} variant="outline">
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-            </Button>
-          </CardContent>
-        </Card>
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="font-bold text-2xl tracking-tight uppercase">Your Listings</h1>
+         <Button asChild>
+            <Link href="/sell">Create a new listing</Link>
+         </Button>
+      </div>
 
-        <Card>
-            <CardHeader>
-                <CardTitle>Your Listings</CardTitle>
-                <CardDescription>View and manage your current fish listings.</CardDescription>
-            </CardHeader>
-            <CardContent>
+       <Card>
+            <CardContent className="p-6">
                 <SellerListings />
             </CardContent>
         </Card>
-      </div>
     </div>
-    </>
   );
 }

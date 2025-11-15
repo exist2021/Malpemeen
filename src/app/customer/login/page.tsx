@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { FishLogo } from '@/components/fish-logo';
 import {
   Dialog,
@@ -110,32 +110,17 @@ export default function CustomerLoginPage() {
   return (
     <>
     <div className="flex min-h-screen">
-      <div className="flex-1 bg-primary text-primary-foreground p-8 md:p-12 flex flex-col justify-between">
-        <div>
-          <Link href="/" className="inline-flex items-center gap-2 text-sm">
-            <ArrowLeft className="w-4 h-4" />
-            Back to role selection
-          </Link>
-          <div className="mt-8">
-            <h1 className="text-4xl font-bold">Welcome Back, Customer!</h1>
-            <p className="mt-4 text-lg text-primary-foreground/80">
-              Find the freshest catch from local sellers.
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 mx-auto">
+        <div className="w-full max-w-sm">
+          <div className="text-center mb-8">
+            <FishLogo className="h-16 w-16 text-primary mx-auto"/>
+            <h2 className="text-3xl font-bold tracking-tight mt-4">{isSignUp ? 'Create an Account' : 'Customer Login'}</h2>
+            <p className="mt-2 text-muted-foreground">
+                {isSignUp ? 'Create an account to start buying.' : 'Welcome back, customer.'}
             </p>
           </div>
-        </div>
-        <div className="w-40 h-40 mx-auto">
-         <FishLogo className="text-primary-foreground" />
-        </div>
-      </div>
-
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-sm">
-          <h2 className="text-3xl font-bold tracking-tight">{isSignUp ? 'Create an Account' : 'Login'}</h2>
-          <p className="mt-2 text-muted-foreground">
-            {isSignUp ? 'Create an account to start buying.' : 'Welcome back, customer.'}
-          </p>
           
-          <form className="mt-8 space-y-6" onSubmit={(e) => { e.preventDefault(); handleAuthAction(); }}>
+          <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleAuthAction(); }}>
             {isSignUp && (
               <>
                 <div className="space-y-2">
@@ -181,7 +166,7 @@ export default function CustomerLoginPage() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
                 {!isSignUp && (
-                  <button type="button" onClick={() => setForgotPasswordOpen(true)} className="text-sm font-medium text-accent hover:underline">
+                  <button type="button" onClick={() => setForgotPasswordOpen(true)} className="text-sm font-medium text-primary hover:underline">
                     Forgot Password?
                   </button>
                 )}
@@ -206,33 +191,23 @@ export default function CustomerLoginPage() {
               </div>
             </div>
             
-            <Button type="submit" className="w-full bg-accent hover:bg-accent/90 h-12 text-base">
+            <Button type="submit" className="w-full h-12 text-base">
               {isSignUp ? 'Sign Up' : 'Login'}
             </Button>
             
-            <div className="relative mt-6">
-                <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-border"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                    <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-                </div>
-            </div>
-
-            <div className="mt-6 grid grid-cols-3 gap-3">
-                {/* Placeholder for social logins */}
-                <Button variant="outline" disabled><span className="sr-only">Facebook</span>f</Button>
-                <Button variant="outline" disabled><span className="sr-only">Google</span>G</Button>
-                <Button variant="outline" disabled><span className="sr-only">Apple</span></Button>
-            </div>
-
           </form>
           
           <p className="mt-8 text-center text-sm text-muted-foreground">
             {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
-            <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="font-semibold text-accent hover:underline">
+            <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="font-semibold text-primary hover:underline">
               {isSignUp ? 'Login' : 'Sign Up'}
             </button>
+          </p>
+           <p className="mt-4 text-center text-sm text-muted-foreground">
+            Not a customer?{' '}
+            <Link href="/seller/login" className="font-semibold text-primary hover:underline">
+               Seller Login
+            </Link>
           </p>
         </div>
       </div>

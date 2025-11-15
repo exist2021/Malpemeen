@@ -4,19 +4,16 @@
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/firebase';
 import type { FishListing } from '@/app/types';
 import { getFishListings } from '@/app/lib/data';
 import { FishCard } from '@/components/fish-card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Header } from '@/components/layout/header';
 
 
 function ListingsSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {Array.from({ length: 4 }).map((_, i) => (
+      {Array.from({ length: 8 }).map((_, i) => (
         <Skeleton key={i} className="h-64 w-full rounded-xl" />
       ))}
     </div>
@@ -58,51 +55,25 @@ function FishListings() {
 export default function CustomerDashboard() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
-  const auth = useAuth();
-
-  useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.push('/customer/login');
-    }
-  }, [user, isUserLoading, router]);
-
-  if (isUserLoading) {
-    return (
-      <>
-        <Header />
-        <div className="container py-8">
-          <p>Loading...</p>
-        </div>
-      </>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
-
-  const handleLogout = () => {
-    if(auth) {
-      auth.signOut();
-      router.push('/');
-    }
-  };
+  
+  // No strict redirect, page is public now
+  // useEffect(() => {
+  //   if (!isUserLoading && !user) {
+  //     router.push('/customer/login');
+  //   }
+  // }, [user, isUserLoading, router]);
 
 
   return (
-    <>
-    <Header />
-    <div className="container py-8">
+    <div className="p-4 sm:p-6 lg:p-8">
         <div className="flex justify-between items-center mb-8">
-            <h2 className="font-headline text-3xl font-bold tracking-tight">
-                Today's Fresh Catch
-            </h2>
+            <h1 className="font-bold text-2xl tracking-tight uppercase">
+                Dashboard
+            </h1>
         </div>
         <main>
             <FishListings />
         </main>
     </div>
-    </>
   );
 }
-
