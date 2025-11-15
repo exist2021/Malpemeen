@@ -1,3 +1,4 @@
+
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -87,7 +88,7 @@ export function AppHeader() {
     }
 
     return (
-        <Button onClick={() => router.push('/login')}>
+        <Button onClick={() => router.push('/customer/login')}>
             Login
         </Button>
     )
