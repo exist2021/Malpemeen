@@ -4,26 +4,33 @@ import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FishLogo } from '@/components/fish-logo';
-import { ArrowRight, User, Briefcase } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function RoleSelectionPage() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
-      <div className="text-center mb-12">
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4">
+       <Image
+        src="https://images.unsplash.com/photo-1574636904128-97036a439a9c?q=80&w=1974&auto=format&fit=crop"
+        alt="Fish market"
+        fill
+        className="object-cover opacity-10"
+        data-ai-hint="fish market"
+      />
+      <div className="relative z-10 text-center mb-12">
         <FishLogo className="h-24 w-24 text-primary mx-auto"/>
         <h1 className="text-4xl font-bold tracking-tight mt-6 font-headline">Welcome to Malpe Meen</h1>
         <p className="mt-2 text-lg text-muted-foreground">Connecting sellers with customers, seamlessly.</p>
       </div>
 
-      <div className="w-full max-w-4xl mx-auto">
+      <div className="relative z-10 w-full max-w-4xl mx-auto">
         <h2 className="text-2xl font-semibold text-center mb-6">Choose Your Role</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card className="flex flex-col text-center hover:shadow-lg transition-shadow">
+            <Card className="flex flex-col text-center hover:shadow-lg transition-shadow bg-background/80 backdrop-blur-sm">
                 <CardHeader>
-                    <User className="h-12 w-12 text-primary mx-auto mb-4" />
                     <CardTitle className="text-2xl font-bold">I'm a Customer</CardTitle>
                     <CardDescription>Browse and buy the freshest catch directly from the source.</CardDescription>
                 </CardHeader>
@@ -34,9 +41,8 @@ export default function RoleSelectionPage() {
                 </CardContent>
             </Card>
 
-            <Card className="flex flex-col text-center hover:shadow-lg transition-shadow">
+            <Card className="flex flex-col text-center hover:shadow-lg transition-shadow bg-background/80 backdrop-blur-sm">
                 <CardHeader>
-                    <Briefcase className="h-12 w-12 text-primary mx-auto mb-4" />
                     <CardTitle className="text-2xl font-bold">I'm a Seller</CardTitle>
                     <CardDescription>List your products and reach a wider market of customers.</CardDescription>
                 </CardHeader>
