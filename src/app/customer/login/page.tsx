@@ -117,9 +117,9 @@ export default function CustomerLoginPage() {
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
             <FishLogo className="h-16 w-16 text-primary mx-auto"/>
-            <h2 className="text-3xl font-bold tracking-tight mt-4">{isSignUp ? 'Create an Account' : 'Customer Login'}</h2>
+            <h2 className="text-3xl font-bold tracking-tight mt-4">{isSignUp ? 'Create a Customer Account' : 'Customer Login'}</h2>
             <p className="mt-2 text-muted-foreground">
-                {isSignUp ? 'Create an account to start buying.' : 'Welcome back, customer.'}
+                {isSignUp ? 'Join our community to find and purchase the freshest catch directly from local sellers.' : 'Welcome back! Ready to find the freshest catch from Malpe?'}
             </p>
           </div>
           

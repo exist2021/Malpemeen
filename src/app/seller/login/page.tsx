@@ -119,7 +119,7 @@ export default function SellerLoginPage() {
             <FishLogo className="h-16 w-16 text-primary mx-auto"/>
             <h2 className="text-3xl font-bold tracking-tight mt-4">{isSignUp ? 'Create a Seller Account' : 'Seller Login'}</h2>
             <p className="mt-2 text-muted-foreground">
-                {isSignUp ? 'Create an account to start selling.' : 'Welcome back, seller.'}
+                {isSignUp ? 'Join our network to reach more customers and grow your business.' : 'Welcome back! Let\'s get your products to market.'}
             </p>
          </div>
           
