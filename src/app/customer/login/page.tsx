@@ -1,9 +1,9 @@
-
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth, useFirebase } from '@/firebase';
 import {
   createUserWithEmailAndPassword,
@@ -110,6 +110,16 @@ export default function CustomerLoginPage() {
   return (
     <>
     <div className="flex min-h-screen">
+       <div className="relative hidden lg:block lg:w-1/2">
+        <Image
+          src="https://images.unsplash.com/photo-1599056024921-b3d551c89b88?q=80&w=1974&auto=format&fit=crop"
+          alt="Fresh fish at a market"
+          fill
+          className="object-cover"
+          data-ai-hint="fish market"
+        />
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 mx-auto relative">
          <Button variant="ghost" asChild className="absolute top-4 left-4">
             <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>

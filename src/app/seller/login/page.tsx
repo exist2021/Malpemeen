@@ -1,9 +1,9 @@
-
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth, useFirebase } from '@/firebase';
 import {
   createUserWithEmailAndPassword,
@@ -110,7 +110,7 @@ export default function SellerLoginPage() {
   return (
     <>
     <div className="flex min-h-screen">
-       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 mx-auto relative">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 mx-auto relative">
          <Button variant="ghost" asChild className="absolute top-4 left-4">
             <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>
         </Button>
@@ -213,6 +213,16 @@ export default function SellerLoginPage() {
             </Link>
           </p>
         </div>
+      </div>
+      <div className="relative hidden lg:block lg:w-1/2">
+        <Image
+          src="https://images.unsplash.com/photo-1574636904128-97036a439a9c?q=80&w=1974&auto=format&fit=crop"
+          alt="Fishing boat at sea"
+          fill
+          className="object-cover"
+          data-ai-hint="fishing boat"
+        />
+        <div className="absolute inset-0 bg-black/50" />
       </div>
     </div>
     <Dialog open={isForgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
