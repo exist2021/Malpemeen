@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { FishLogo } from '@/components/fish-logo';
 import {
   Dialog,
@@ -110,7 +110,10 @@ export default function CustomerLoginPage() {
   return (
     <>
     <div className="flex min-h-screen">
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 mx-auto">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 mx-auto relative">
+         <Button variant="ghost" asChild className="absolute top-4 left-4">
+            <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>
+        </Button>
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
             <FishLogo className="h-16 w-16 text-primary mx-auto"/>

@@ -53,7 +53,7 @@ export function Header() {
     if (role === 'customer') {
       return '/customer/dashboard';
     }
-    return '/customer/dashboard';
+    return '/'; // Go to role selection if not logged in
   }
 
   const renderUserActions = () => {
@@ -125,7 +125,7 @@ export function Header() {
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-4">
-            <Link href={getDashboardLink()} className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-2">
               <FishLogo className="h-8 w-8 text-primary" />
               <span className="font-bold hidden sm:inline-block">Malpe Meen</span>
             </Link>
