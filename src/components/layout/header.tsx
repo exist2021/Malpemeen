@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard } from 'lucide-react';
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Home } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import {
   Dialog,
@@ -47,7 +47,7 @@ export function Header() {
     if (role === 'customer') {
       return '/customer/dashboard';
     }
-    return '/';
+    return '/customer/dashboard';
   }
 
   const renderUserActions = () => {
@@ -117,10 +117,18 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <Link href={getDashboardLink()} className="flex items-center space-x-2">
-          <FishLogo className="h-8 w-8 text-primary" />
-          <span className="font-bold hidden sm:inline-block">Malpe Meen</span>
-        </Link>
+        <div className="flex items-center gap-4">
+            <Link href={getDashboardLink()} className="flex items-center space-x-2">
+              <FishLogo className="h-8 w-8 text-primary" />
+              <span className="font-bold hidden sm:inline-block">Malpe Meen</span>
+            </Link>
+            <Button asChild variant="ghost">
+                <Link href={getDashboardLink()}>
+                    <Home className="mr-2 h-4 w-4" />
+                    Home
+                </Link>
+            </Button>
+        </div>
         <div className="flex items-center gap-4">
           {renderUserActions()}
         </div>
