@@ -6,23 +6,19 @@ export function FishLogo({ className }: { className?: string }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
       className={cn("w-full h-full", className)}
     >
-        <path d="M16.5 22a2.5 2.5 0 0 0-4.4-2.1" />
-        <path d="M16.5 22a2.5 2.5 0 0 1-4.4-2.1" />
-        <path d="M7 10.1A2.5 2.5 0 0 1 9.1 5.7" />
-        <path d="m3.3 12.8 1.8-1.9" />
-        <path d="M2 10.9s3.8 2.3 6.5 0" />
-        <path d="M12.5 5.3a2.5 2.5 0 0 1 5-2.6" />
-        <path d="M12.5 5.3a2.5 2.5 0 0 0 5-2.6" />
-        <path d="M17.8 12.8s-3.5 2.9-7.2.2" />
-        <path d="M20.7 7.2s.9 3.5-1.3 6.3" />
-        <path d="M10.1 18.5s-2.4.5-4.2-1.3" />
-        <path d="M10.1 18.5s-2.4.5-4.2-1.3" />
-        <path d="M12.2 13.7a2.5 2.5 0 0 1 3.6-3.6" />
+      <path d="M2 16.1A5 5 0 0 1 5.9 11a5 5 0 0 1 6.22 8.35" />
+      <path d="M22 16.1a5 5 0 0 0-3.9-5.1 5 5 0 0 0-6.22 8.35" />
+      <path d="M10.83 15.39a2.25 2.25 0 0 1-2.05-2.25c0-1.24 1.01-2.25 2.25-2.25" />
+      <path d="M13.43 17.58a2.25 2.25 0 0 0 2.05 2.25c1.24 0 2.25-1.01 2.25-2.25" />
+      <path d="m2.5 12.5 5-2.5L12 12.5l5-2.5 4.5 2.5" />
+      <path d="m2.5 17.5 5-2.5L12 17.5l5-2.5 4.5 2.5" />
+      <path d="M12 2v4" />
+      <path d="M12 12.5v5" />
     </svg>
   );
 }
