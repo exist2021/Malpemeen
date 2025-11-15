@@ -34,8 +34,14 @@ export function Header() {
 
   const handleLogout = () => {
     if (auth) {
-      auth.signOut();
-      router.push('/');
+      const lastRole = role;
+      auth.signOut().then(() => {
+        if (lastRole === 'seller') {
+          router.push('/seller/login');
+        } else {
+          router.push('/customer/login');
+        }
+      });
     }
   };
 
