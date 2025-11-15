@@ -59,8 +59,9 @@ export function Header() {
        return (
             <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                <UserIcon />
+              <Button variant="ghost">
+                <UserIcon className="mr-2 h-4 w-4" />
+                Profile
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -122,14 +123,14 @@ export function Header() {
               <FishLogo className="h-8 w-8 text-primary" />
               <span className="font-bold hidden sm:inline-block">Malpe Meen</span>
             </Link>
+        </div>
+        <div className="flex items-center gap-2">
             <Button asChild variant="ghost">
                 <Link href={getDashboardLink()}>
                     <Home className="mr-2 h-4 w-4" />
                     Home
                 </Link>
             </Button>
-        </div>
-        <div className="flex items-center gap-4">
           {renderUserActions()}
         </div>
       </div>
