@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import type { FishListing } from '@/app/types';
 import { getFishListings } from '@/app/lib/data';
 import { FishCard } from '@/components/fish-card';
+import { Header } from '@/components/layout/header';
 import { Skeleton } from '@/components/ui/skeleton';
 
 
@@ -65,15 +66,12 @@ export default function CustomerDashboard() {
 
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-        <div className="flex justify-between items-center mb-8">
-            <h1 className="font-bold text-2xl tracking-tight uppercase">
-                Dashboard
-            </h1>
-        </div>
-        <main>
-            <FishListings />
-        </main>
-    </div>
+    <>
+    <Header />
+    <main className="p-4 sm:p-6 lg:p-8">
+        <h1 className="text-3xl font-bold tracking-tight mb-8">Available Listings</h1>
+        <FishListings />
+    </main>
+    </>
   );
 }

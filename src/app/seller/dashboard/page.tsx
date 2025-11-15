@@ -11,6 +11,7 @@ import { getSellerFishListings, deleteFishListing } from '@/app/lib/data';
 import type { FishListing } from '@/app/types';
 import Image from 'next/image';
 import { Pencil, LogOut, Video, Trash2, Loader2, PlusCircle } from 'lucide-react';
+import { Header } from '@/components/layout/header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -173,31 +174,37 @@ export default function SellerDashboard() {
 
   if (isUserLoading || !user) {
     return (
-      <div className="p-8">
-          <Skeleton className="h-10 w-48 mb-8" />
-          <div className="space-y-4">
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-24 w-full" />
-            </div>
-      </div>
+      <>
+        <Header />
+         <div className="container mx-auto p-8">
+            <Skeleton className="h-10 w-48 mb-8" />
+            <div className="space-y-4">
+                  <Skeleton className="h-24 w-full" />
+                  <Skeleton className="h-24 w-full" />
+                  <Skeleton className="h-24 w-full" />
+              </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="font-bold text-2xl tracking-tight uppercase">Your Listings</h1>
-         <Button asChild>
-            <Link href="/sell">Create a new listing</Link>
-         </Button>
-      </div>
+    <>
+      <Header />
+      <main className="container mx-auto p-8">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">Your Listings</h1>
+           <Button asChild>
+              <Link href="/sell">Create a new listing</Link>
+           </Button>
+        </div>
 
-       <Card>
-            <CardContent className="p-6">
-                <SellerListings />
-            </CardContent>
-        </Card>
-    </div>
+         <Card>
+              <CardContent className="p-6">
+                  <SellerListings />
+              </CardContent>
+          </Card>
+      </main>
+    </>
   );
 }
