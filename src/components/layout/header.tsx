@@ -48,19 +48,29 @@ export function Header() {
 
   const handleHomeClick = () => {
     if (isUserLoading || isRoleLoading) {
-      return; // Should not be clickable if disabled, but as a safeguard.
+      return;
     }
-    if (user) {
-        if (role === 'seller') {
-            router.push('/seller/dashboard');
-        } else if (role === 'customer') {
-            router.push('/customer/dashboard');
-        } else {
-            // Fallback for user with no role, though this shouldn't happen
-            router.push('/'); 
-        }
-    } else {
+
+    console.log("User:", user);
+    console.log("Role:", role);
+
+    if (!user) {
+      router.push('/');
+      return;
+    }
+
+    switch (role) {
+      case 'seller':
+        router.push('/seller/dashboard');
+        break;
+
+      case 'customer':
+        router.push('/customer/dashboard');
+        break;
+
+      default:
         router.push('/');
+        break;
     }
   };
 
