@@ -213,26 +213,27 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     }
     
     if (isEditMode && listing) {
-        setProductName(listing.productName || 'Sardine');
-        setPricePerBox(String(listing.pricePerBox) || '10000');
-        setPortDetails(listing.portDetails || 'Malpe Port');
-        setCaughtBy(listing.caughtBy || 'Local Fishers');
-        setHowCaught(listing.howCaught || 'Net Fishing');
-        setBoatDetails(listing.boatDetails || 'Persian Boat');
-        setOwner(listing.owner || 'Prabhakar');
+        setProductName(listing.productName || '');
+        setPricePerBox(String(listing.pricePerBox) || '');
+        setPortDetails(listing.portDetails || '');
+        setCaughtBy(listing.caughtBy || '');
+        setHowCaught(listing.howCaught || '');
+        setBoatDetails(listing.boatDetails || '');
+        setOwner(listing.owner || '');
         setBrandName(listing.brandName || 'Malpe Meen');
-        setDescription(listing.description || 'placeholder description about the fish, mention that this is a placeholder and should be updated');
+        setDescription(listing.description || '');
         setMediaUrls(listing.mediaUrls || []);
     } else if (!isEditMode) {
-        setProductName('Sardine');
-        setPricePerBox('10000');
-        setPortDetails('Malpe Port');
-        setCaughtBy('Local Fishers');
-        setHowCaught('Net Fishing');
-        setBoatDetails('Persian Boat');
-        setOwner('Prabhakar');
+        setProductName('');
+        setPricePerBox('');
+        setPortDetails('');
+        setCaughtBy('');
+        setHowCaught('');
+        setBoatDetails('');
+        setOwner('');
         setBrandName('Malpe Meen');
-        setDescription('placeholder description about the fish, mention that this is a placeholder and should be updated');
+        setDescription('');
+        setMediaUrls([]);
     }
 
   }, [user, isUserLoading, router, isEditMode, listing, setProductName, setPricePerBox, setPortDetails, setCaughtBy, setHowCaught, setBoatDetails, setOwner, setBrandName, setDescription, setMediaUrls]);
@@ -329,13 +330,18 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         router.refresh();
         
       } catch (error: any) {
+        let errorMessage = 'Something went wrong. Please try again.';
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+
         // The global error handler for FirestorePermissionError will catch permission issues
         // so we only need to toast other generic errors.
-        if (error.name !== 'FirebaseError') {
+        if (!error.message.includes('permission-denied')) {
             toast({
-            variant: 'destructive',
-            title: `Error Creating Listing`,
-            description: error.message || 'Something went wrong. Please try again.',
+              variant: 'destructive',
+              title: `Error ${isEditMode ? 'Updating' : 'Creating'} Listing`,
+              description: errorMessage,
             });
         }
       }
@@ -358,35 +364,35 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
             <Label htmlFor="productName">Product Name</Label>
-            <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Sardine" required aria-describedby="productName-error" />
+            <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="e.g., Sardine" required aria-describedby="productName-error" />
             <div id="productName-error" aria-live="polite" aria-atomic="true">
               {errors?.productName && <p className="text-sm font-medium text-destructive">{errors.productName}</p>}
             </div>
         </div>
         <div className="space-y-2">
             <Label htmlFor="pricePerBox">Price per Box (₹)</Label>
-            <Input id="pricePerBox" type="number" value={pricePerBox} onChange={(e) => setPricePerBox(e.target.value)} placeholder="9500" required aria-describedby="pricePerBox-error" />
+            <Input id="pricePerBox" type="number" value={pricePerBox} onChange={(e) => setPricePerBox(e.target.value)} placeholder="e.g., 9500" required aria-describedby="pricePerBox-error" />
             <div id="pricePerBox-error" aria-live="polite" aria-atomic="true">
               {errors?.pricePerBox && <p className="text-sm font-medium text-destructive">{errors.pricePerBox}</p>}
             </div>
         </div>
         <div className="space-y-2">
             <Label htmlFor="portDetails">Port Details</Label>
-            <Input id="portDetails" value={portDetails} onChange={(e) => setPortDetails(e.target.value)} placeholder="Malpe Port" required aria-describedby="portDetails-error" />
+            <Input id="portDetails" value={portDetails} onChange={(e) => setPortDetails(e.target.value)} placeholder="e.g., Malpe Port" required aria-describedby="portDetails-error" />
             <div id="portDetails-error" aria-live="polite" aria-atomic="true">
               {errors?.portDetails && <p className="text-sm font-medium text-destructive">{errors.portDetails}</p>}
             </div>
         </div>
         <div className="space-y-2">
             <Label htmlFor="caughtBy">Who Caught</Label>
-            <Input id="caughtBy" value={caughtBy} onChange={(e) => setCaughtBy(e.target.value)} placeholder="Local Fishers" required aria-describedby="caughtBy-error" />
+            <Input id="caughtBy" value={caughtBy} onChange={(e) => setCaughtBy(e.target.value)} placeholder="e.g., Local Fishers" required aria-describedby="caughtBy-error" />
             <div id="caughtBy-error" aria-live="polite" aria-atomic="true">
               {errors?.caughtBy && <p className="text-sm font-medium text-destructive">{errors.caughtBy}</p>}
             </div>
         </div>
         <div className="space-y-2">
             <Label htmlFor="howCaught">How Caught</Label>
-            <Input id="howCaught" value={howCaught} onChange={(e) => setHowCaught(e.target.value)} placeholder="Net Fishing" required aria-describedby="howCaught-error" />
+            <Input id="howCaught" value={howCaught} onChange={(e) => setHowCaught(e.target.value)} placeholder="e.g., Net Fishing" required aria-describedby="howCaught-error" />
             <div id="howCaught-error" aria-live="polite" aria-atomic="true">
               {errors?.howCaught && <p className="text-sm font-medium text-destructive">{errors.howCaught}</p>}
             </div>
@@ -395,7 +401,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             <Label htmlFor="boatDetails">Boat Details</Label>
             <Select value={boatDetails} onValueChange={(value) => setBoatDetails(value as any)} required>
               <SelectTrigger id="boatDetails" aria-describedby="boatDetails-error">
-                <SelectValue placeholder="Persian Boat" />
+                <SelectValue placeholder="Select a boat type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Ashok Leyland">Ashok Leyland</SelectItem>
@@ -408,14 +414,14 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         </div>
         <div className="space-y-2">
             <Label htmlFor="owner">Owner</Label>
-            <Input id="owner" value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="Prabhakar" required aria-describedby="owner-error" />
+            <Input id="owner" value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="e.g., Prabhakar" required aria-describedby="owner-error" />
             <div id="owner-error" aria-live="polite" aria-atomic="true">
               {errors?.owner && <p className="text-sm font-medium text-destructive">{errors.owner}</p>}
             </div>
         </div>
         <div className="space-y-2">
             <Label htmlFor="brandName">Brand Name</Label>
-            <Input id="brandName" value={brandName} onChange={(e) => setBrandName(e.target.value)} placeholder="Malpe Meen" required />
+            <Input id="brandName" value={brandName} onChange={(e) => setBrandName(e.target.value)} placeholder="e.g., Malpe Meen" required />
         </div>
       </div>
 
@@ -424,7 +430,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         <div className="flex items-center justify-between">
             <Label htmlFor="description">Description</Label>
         </div>
-        <Textarea id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Fresh Catch and Local Sourced" required aria-describedby="description-error" />
+        <Textarea id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the fish, its quality, size, and any other relevant details." required aria-describedby="description-error" />
         <div id="description-error" aria-live="polite" aria-atomic="true">
           {errors?.description && <p className="text-sm font-medium text-destructive">{errors.description}</p>}
         </div>
