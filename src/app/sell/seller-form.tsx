@@ -213,16 +213,26 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     }
     
     if (isEditMode && listing) {
-        setProductName(listing.productName || '');
-        setPricePerBox(String(listing.pricePerBox) || '');
-        setPortDetails(listing.portDetails || '');
-        setCaughtBy(listing.caughtBy || '');
-        setHowCaught(listing.howCaught || '');
-        setBoatDetails(listing.boatDetails || '');
-        setOwner(listing.owner || '');
-        setBrandName(listing.brandName || '');
-        setDescription(listing.description || '');
+        setProductName(listing.productName || 'Sardine');
+        setPricePerBox(String(listing.pricePerBox) || '10000');
+        setPortDetails(listing.portDetails || 'Malpe Port');
+        setCaughtBy(listing.caughtBy || 'Local Fishers');
+        setHowCaught(listing.howCaught || 'Net Fishing');
+        setBoatDetails(listing.boatDetails || 'Persian Boat');
+        setOwner(listing.owner || 'Prabhakar');
+        setBrandName(listing.brandName || 'Malpe Meen');
+        setDescription(listing.description || 'placeholder description about the fish, mention that this is a placeholder and should be updated');
         setMediaUrls(listing.mediaUrls || []);
+    } else if (!isEditMode) {
+        setProductName('Sardine');
+        setPricePerBox('10000');
+        setPortDetails('Malpe Port');
+        setCaughtBy('Local Fishers');
+        setHowCaught('Net Fishing');
+        setBoatDetails('Persian Boat');
+        setOwner('Prabhakar');
+        setBrandName('Malpe Meen');
+        setDescription('placeholder description about the fish, mention that this is a placeholder and should be updated');
     }
 
   }, [user, isUserLoading, router, isEditMode, listing, setProductName, setPricePerBox, setPortDetails, setCaughtBy, setHowCaught, setBoatDetails, setOwner, setBrandName, setDescription, setMediaUrls]);
@@ -319,11 +329,15 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         router.refresh();
         
       } catch (error: any) {
-        toast({
-          variant: 'destructive',
-          title: `Error Creating Listing`,
-          description: error.message || 'Something went wrong. Please try again.',
-        });
+        // The global error handler for FirestorePermissionError will catch permission issues
+        // so we only need to toast other generic errors.
+        if (error.name !== 'FirebaseError') {
+            toast({
+            variant: 'destructive',
+            title: `Error Creating Listing`,
+            description: error.message || 'Something went wrong. Please try again.',
+            });
+        }
       }
     });
   };
@@ -469,5 +483,3 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     </form>
   );
 }
-
-    
