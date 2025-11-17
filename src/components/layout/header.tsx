@@ -47,30 +47,12 @@ export function Header() {
   };
 
   const handleHomeClick = () => {
-    if (isUserLoading || isRoleLoading) {
-      return;
-    }
-
-    console.log("User:", user);
-    console.log("Role:", role);
-
-    if (!user) {
+    if (user && role === 'seller') {
+      router.push('/seller/dashboard');
+    } else if (user && role === 'customer') {
+      router.push('/customer/dashboard');
+    } else {
       router.push('/');
-      return;
-    }
-
-    switch (role) {
-      case 'seller':
-        router.push('/seller/dashboard');
-        break;
-
-      case 'customer':
-        router.push('/customer/dashboard');
-        break;
-
-      default:
-        router.push('/');
-        break;
     }
   };
 
