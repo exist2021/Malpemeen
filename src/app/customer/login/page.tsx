@@ -52,11 +52,11 @@ export default function CustomerLoginPage() {
           phoneNumber: phone,
           email: user.email,
         });
-        toast({ title: 'Sign up successful!' });
+        toast({ title: 'Sign up successful! Redirecting...' });
         router.push('/customer/dashboard');
       } else {
         await signInWithEmailAndPassword(auth, email, password);
-        toast({ title: 'Login successful!' });
+        toast({ title: 'Login successful! Redirecting...' });
         router.push('/customer/dashboard');
       }
     } catch (error: any) {
