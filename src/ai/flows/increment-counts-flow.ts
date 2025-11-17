@@ -5,12 +5,14 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { initializeApp } from 'firebase-admin/app';
+import { initializeApp, getApps } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 
 // Initialize Firebase Admin SDK
 try {
-  initializeApp();
+  if (!getApps().length) {
+    initializeApp();
+  }
 } catch (e) {
   // Ignore re-initialization error in dev mode
   if (process.env.NODE_ENV !== 'development' || !getApps().length) {

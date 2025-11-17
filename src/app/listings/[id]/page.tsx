@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { getFishListingById, incrementListingViewCount, incrementListingCallCount } from '@/app/lib/data';
+import { getFishListingById, incrementListingCallCount } from '@/app/lib/data';
 import type { FishListing } from '@/app/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -86,7 +86,6 @@ export default function ListingDetailPage() {
         .then(data => {
           if (data) {
             setListing(data);
-            incrementListingViewCount(id, data.sellerId);
           } else {
             setError("Listing not found.");
           }

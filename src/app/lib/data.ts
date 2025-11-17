@@ -66,7 +66,10 @@ export async function getFishListingById(id: string): Promise<FishListing | null
     try {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return { id: docSnap.id, ...docSnap.data() } as FishListing;
+            const listingData = { id: docSnap.id, ...docSnap.data() } as FishListing;
+            // Fire-and-forget view count increment
+            incrementListingViewCount(id, listingData.sellerId);
+            return listingData;
         } else {
             return null;
         }
