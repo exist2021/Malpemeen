@@ -24,6 +24,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { CustomerAccountForm } from '@/app/customer/dashboard/customer-account-form';
+import { SellerAccountForm } from '@/app/seller/dashboard/seller-account-form';
 
 
 export function Header() {
@@ -83,10 +84,29 @@ export function Header() {
                 </Dialog>
                )}
               {role === 'seller' && (
-                <DropdownMenuItem onClick={() => router.push('/seller/dashboard')}>
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Seller Dashboard
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuItem onClick={() => router.push('/seller/dashboard')}>
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Seller Dashboard
+                  </DropdownMenuItem>
+                   <Dialog>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                              <Settings className="mr-2 h-4 w-4" />
+                              Account Settings
+                          </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[425px]">
+                          <DialogHeader>
+                          <DialogTitle>Seller Details</DialogTitle>
+                          <DialogDescription>
+                              View and update your seller information.
+                          </DialogDescription>
+                          </DialogHeader>
+                          <SellerAccountForm />
+                      </DialogContent>
+                  </Dialog>
+                </>
               )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>

@@ -64,6 +64,11 @@ export interface CustomerProfileResult {
     isLoading: boolean;
 }
 
+export interface SellerProfileResult {
+    profile: WithId<Seller> | null;
+    isLoading: boolean;
+}
+
 
 // React Context
 export const FirebaseContext = createContext<FirebaseContextState | undefined>(undefined);
@@ -249,6 +254,20 @@ export const useCustomerProfile = (): CustomerProfileResult => {
     }, [user, firestore]);
 
     const { data: profile, isLoading } = useDoc<Customer>(docRef);
+
+    return { profile, isLoading: isUserLoading || isLoading };
+};
+
+export const useSellerProfile = (): SellerProfileResult => {
+    const { user, isUserLoading } = useUser();
+    const firestore = useFirestore();
+    
+    const docRef = useMemoFirebase(() => {
+        if (!user || !firestore) return null;
+        return doc(firestore, 'sellers', user.uid) as DocumentReference<Seller>;
+    }, [user, firestore]);
+
+    const { data: profile, isLoading } = useDoc<Seller>(docRef);
 
     return { profile, isLoading: isUserLoading || isLoading };
 };
