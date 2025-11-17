@@ -70,11 +70,6 @@ function SellerListings({ listings, setListings }: { listings: FishListing[], se
                 <Package className="mx-auto h-12 w-12 text-muted-foreground" />
                 <h3 className="mt-4 text-lg font-semibold text-foreground">No listings yet</h3>
                 <p className="mt-1 text-sm text-muted-foreground">Get started by creating your first listing.</p>
-                <div className="mt-6">
-                    <Button asChild>
-                      <Link href="/sell"><PlusCircle className="mr-2 h-4 w-4" /> Create Listing</Link>
-                    </Button>
-                </div>
             </div>
         )
     }
@@ -101,7 +96,9 @@ function SellerListings({ listings, setListings }: { listings: FishListing[], se
                             </div>
                             <div className="flex-grow min-w-0 text-center sm:text-left">
                                 <Link href={`/listings/${listing.id}`} className="font-semibold truncate hover:underline">{listing.productName}</Link>
-                                <p className="text-sm text-muted-foreground">₹{listing.pricePerBox.toLocaleString()} / box</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {listing.pricePerBox ? `₹${listing.pricePerBox.toLocaleString()} / box` : 'Price not set'}
+                                </p>
                                 <p className="text-sm text-muted-foreground">Listed on {format(new Date(listing.listedDate), 'MMM d, yyyy')}</p>
                             </div>
                             <div className="flex gap-2 flex-shrink-0 mt-4 sm:mt-0">
@@ -210,7 +207,7 @@ export default function SellerDashboard() {
     );
   }
 
-  const totalValue = listings.reduce((acc, listing) => acc + listing.pricePerBox, 0);
+  const totalValue = listings.reduce((acc, listing) => acc + (listing.pricePerBox || 0), 0);
 
   return (
     <>
