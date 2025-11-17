@@ -46,40 +46,42 @@ export default function SellerLoginPage() {
         return;
     };
     if (isSignUp) {
-        createUserWithEmailAndPassword(auth, email, password)
-            .then(userCredential => {
-                const user = userCredential.user;
-                const sellerData = {
-                    id: user.uid,
-                    name: name,
-                    phoneNumber: phone,
-                    email: user.email,
-                };
-                const docRef = doc(firestore, 'sellers', user.uid);
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const sellerData = {
+            id: user.uid,
+            name: name,
+            phoneNumber: phone,
+            email: user.email,
+        };
+        const docRef = doc(firestore, 'sellers', user.uid);
 
-                setDoc(docRef, sellerData)
-                .then(() => {
-                    toast({ title: 'Sign up successful! Redirecting...' });
-                    router.push('/seller/dashboard');
-                })
-                .catch(error => {
-                    const contextualError = new FirestorePermissionError({
-                        path: docRef.path,
-                        operation: 'create',
-                        requestResourceData: sellerData,
-                    });
-                    errorEmitter.emit('permission-error', contextualError);
-                });
-                
-            })
-            .catch(error => {
-                 let description = error.message;
-                 if (error.code === 'auth/email-already-in-use') {
-                     description = "This email is already in use. Please log in or use a different email.";
-                 }
-                 toast({ variant: 'destructive', title: 'Sign Up Failed', description });
-            });
+        await setDoc(docRef, sellerData);
+        
+        toast({ title: 'Sign up successful! Redirecting...' });
+        router.push('/seller/dashboard');
 
+      } catch (error: any) {
+          let description = error.message;
+          if (error.code === 'auth/email-already-in-use') {
+              description = "This email is already in use. Please log in or use a different email.";
+          } else if (error.name === 'FirebaseError' && error.message.includes('permission-denied')) {
+              // This is a Firestore security rule error after user creation.
+              // Let's create a more contextual error.
+              const sellerData = { id: auth.currentUser?.uid, name, phoneNumber: phone, email };
+              const docRef = doc(firestore, 'sellers', auth.currentUser!.uid);
+              const contextualError = new FirestorePermissionError({
+                  path: docRef.path,
+                  operation: 'create',
+                  requestResourceData: sellerData,
+              });
+              errorEmitter.emit('permission-error', contextualError);
+              // We don't show a toast here because the global listener will throw
+              return; 
+          }
+          toast({ variant: 'destructive', title: 'Sign Up Failed', description });
+      }
     } else {
         signInWithEmailAndPassword(auth, email, password)
             .then(() => {
