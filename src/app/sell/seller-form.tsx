@@ -213,15 +213,15 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     }
     
     if (isEditMode && listing) {
-        setProductName(listing.productName);
-        setPricePerBox(String(listing.pricePerBox));
-        setPortDetails(listing.portDetails);
-        setCaughtBy(listing.caughtBy);
-        setHowCaught(listing.howCaught);
-        setBoatDetails(listing.boatDetails);
-        setOwner(listing.owner);
-        setBrandName(listing.brandName);
-        setDescription(listing.description);
+        setProductName(listing.productName || '');
+        setPricePerBox(String(listing.pricePerBox) || '');
+        setPortDetails(listing.portDetails || '');
+        setCaughtBy(listing.caughtBy || '');
+        setHowCaught(listing.howCaught || '');
+        setBoatDetails(listing.boatDetails || '');
+        setOwner(listing.owner || '');
+        setBrandName(listing.brandName || '');
+        setDescription(listing.description || '');
         setMediaUrls(listing.mediaUrls || []);
     }
 
@@ -344,14 +344,14 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
             <Label htmlFor="productName">Product Name</Label>
-            <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Tuna" required aria-describedby="productName-error" />
+            <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Sardine" required aria-describedby="productName-error" />
             <div id="productName-error" aria-live="polite" aria-atomic="true">
               {errors?.productName && <p className="text-sm font-medium text-destructive">{errors.productName}</p>}
             </div>
         </div>
         <div className="space-y-2">
             <Label htmlFor="pricePerBox">Price per Box (₹)</Label>
-            <Input id="pricePerBox" type="number" value={pricePerBox} onChange={(e) => setPricePerBox(e.target.value)} placeholder="6250" required aria-describedby="pricePerBox-error" />
+            <Input id="pricePerBox" type="number" value={pricePerBox} onChange={(e) => setPricePerBox(e.target.value)} placeholder="9500" required aria-describedby="pricePerBox-error" />
             <div id="pricePerBox-error" aria-live="polite" aria-atomic="true">
               {errors?.pricePerBox && <p className="text-sm font-medium text-destructive">{errors.pricePerBox}</p>}
             </div>
@@ -365,7 +365,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         </div>
         <div className="space-y-2">
             <Label htmlFor="caughtBy">Who Caught</Label>
-            <Input id="caughtBy" value={caughtBy} onChange={(e) => setCaughtBy(e.target.value)} placeholder="Local Fishermen" required aria-describedby="caughtBy-error" />
+            <Input id="caughtBy" value={caughtBy} onChange={(e) => setCaughtBy(e.target.value)} placeholder="Local Fishers" required aria-describedby="caughtBy-error" />
             <div id="caughtBy-error" aria-live="polite" aria-atomic="true">
               {errors?.caughtBy && <p className="text-sm font-medium text-destructive">{errors.caughtBy}</p>}
             </div>
@@ -410,7 +410,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         <div className="flex items-center justify-between">
             <Label htmlFor="description">Description</Label>
         </div>
-        <Textarea id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="FRESH CATCH OF THE MORNING" required aria-describedby="description-error" />
+        <Textarea id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Fresh Catch and Local Sourced" required aria-describedby="description-error" />
         <div id="description-error" aria-live="polite" aria-atomic="true">
           {errors?.description && <p className="text-sm font-medium text-destructive">{errors.description}</p>}
         </div>
@@ -420,12 +420,12 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         <Label>Product Media (Photos & Videos)</Label>
         
         <div className="grid grid-cols-3 gap-4">
-            {(mediaUrls.length > 0 ? mediaUrls : ["https://images.unsplash.com/photo-1559106037-5435fac0c497?q=80&w=2070&auto=format&fit=crop"]).map((url, index) => (
+            {mediaUrls.map((url, index) => (
                 <div key={`${url}-${index}`} className="relative aspect-square">
                     {url.startsWith('data:video') ? (
                        <video src={url} className="rounded-md object-cover w-full h-full" controls />
                     ) : (
-                       <Image src={url} alt="Product media" fill className="rounded-md object-cover" data-ai-hint="fish market"/>
+                       <Image src={url} alt="Product media" fill className="rounded-md object-cover" data-ai-hint="fish"/>
                     )}
 
                     <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeMedia(url)}>
@@ -433,6 +433,11 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
                     </Button>
                 </div>
             ))}
+             {mediaUrls.length === 0 && (
+                <div className="relative aspect-square">
+                    <Image src="https://images.unsplash.com/photo-1559106037-5435fac0c497?q=80&w=2070&auto=format&fit=crop" alt="Placeholder fish" fill className="rounded-md object-cover" data-ai-hint="fish market"/>
+                </div>
+            )}
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
@@ -464,3 +469,5 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     </form>
   );
 }
+
+    
