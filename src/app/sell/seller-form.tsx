@@ -320,7 +320,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
       } catch (error) {
         toast({
           variant: 'destructive',
-          title: `Error ${isEditMode ? 'Updating' : 'Creating'} Listing`,
+          title: `Error Creating Listing`,
           description: 'Something went wrong. Please try again.',
         });
       }
@@ -343,35 +343,35 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
             <Label htmlFor="productName">Product Name</Label>
-            <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="e.g., Fresh Tuna" required aria-describedby="productName-error" />
+            <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Tuna" required aria-describedby="productName-error" />
             <div id="productName-error" aria-live="polite" aria-atomic="true">
               {errors?.productName && <p className="text-sm font-medium text-destructive">{errors.productName}</p>}
             </div>
         </div>
         <div className="space-y-2">
             <Label htmlFor="pricePerBox">Price per Box (₹)</Label>
-            <Input id="pricePerBox" type="number" value={pricePerBox} onChange={(e) => setPricePerBox(e.target.value)} placeholder="e.g., 5000" required aria-describedby="pricePerBox-error" />
+            <Input id="pricePerBox" type="number" value={pricePerBox} onChange={(e) => setPricePerBox(e.target.value)} placeholder="6250" required aria-describedby="pricePerBox-error" />
             <div id="pricePerBox-error" aria-live="polite" aria-atomic="true">
               {errors?.pricePerBox && <p className="text-sm font-medium text-destructive">{errors.pricePerBox}</p>}
             </div>
         </div>
         <div className="space-y-2">
             <Label htmlFor="portDetails">Port Details</Label>
-            <Input id="portDetails" value={portDetails} onChange={(e) => setPortDetails(e.target.value)} placeholder="e.g., Malpe Port" required aria-describedby="portDetails-error" />
+            <Input id="portDetails" value={portDetails} onChange={(e) => setPortDetails(e.target.value)} placeholder="Malpe Port" required aria-describedby="portDetails-error" />
             <div id="portDetails-error" aria-live="polite" aria-atomic="true">
               {errors?.portDetails && <p className="text-sm font-medium text-destructive">{errors.portDetails}</p>}
             </div>
         </div>
         <div className="space-y-2">
             <Label htmlFor="caughtBy">Who Caught</Label>
-            <Input id="caughtBy" value={caughtBy} onChange={(e) => setCaughtBy(e.target.value)} placeholder="e.g., Local Fishermen" required aria-describedby="caughtBy-error" />
+            <Input id="caughtBy" value={caughtBy} onChange={(e) => setCaughtBy(e.target.value)} placeholder="Local Fishermen" required aria-describedby="caughtBy-error" />
             <div id="caughtBy-error" aria-live="polite" aria-atomic="true">
               {errors?.caughtBy && <p className="text-sm font-medium text-destructive">{errors.caughtBy}</p>}
             </div>
         </div>
         <div className="space-y-2">
             <Label htmlFor="howCaught">How Caught</Label>
-            <Input id="howCaught" value={howCaught} onChange={(e) => setHowCaught(e.target.value)} placeholder="e.g., Net Fishing" required aria-describedby="howCaught-error" />
+            <Input id="howCaught" value={howCaught} onChange={(e) => setHowCaught(e.target.value)} placeholder="Net Fishing" required aria-describedby="howCaught-error" />
             <div id="howCaught-error" aria-live="polite" aria-atomic="true">
               {errors?.howCaught && <p className="text-sm font-medium text-destructive">{errors.howCaught}</p>}
             </div>
@@ -380,7 +380,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             <Label htmlFor="boatDetails">Boat Details</Label>
             <Select value={boatDetails} onValueChange={(value) => setBoatDetails(value as any)} required>
               <SelectTrigger id="boatDetails" aria-describedby="boatDetails-error">
-                <SelectValue placeholder="Select a boat type" />
+                <SelectValue placeholder="Persian Boat" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Ashok Leyland">Ashok Leyland</SelectItem>
@@ -393,14 +393,14 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         </div>
         <div className="space-y-2">
             <Label htmlFor="owner">Owner</Label>
-            <Input id="owner" value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="e.g., John Doe" required aria-describedby="owner-error" />
+            <Input id="owner" value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="Prabhakar" required aria-describedby="owner-error" />
             <div id="owner-error" aria-live="polite" aria-atomic="true">
               {errors?.owner && <p className="text-sm font-medium text-destructive">{errors.owner}</p>}
             </div>
         </div>
         <div className="space-y-2">
             <Label htmlFor="brandName">Brand Name</Label>
-            <Input id="brandName" value={brandName} onChange={(e) => setBrandName(e.target.value)} required />
+            <Input id="brandName" value={brandName} onChange={(e) => setBrandName(e.target.value)} placeholder="Malpe Meen" required />
         </div>
       </div>
 
@@ -409,7 +409,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         <div className="flex items-center justify-between">
             <Label htmlFor="description">Description</Label>
         </div>
-        <Textarea id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the fish, its size, quality, etc." required aria-describedby="description-error" />
+        <Textarea id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="FRESH CATCH OF THE MORNING" required aria-describedby="description-error" />
         <div id="description-error" aria-live="polite" aria-atomic="true">
           {errors?.description && <p className="text-sm font-medium text-destructive">{errors.description}</p>}
         </div>
@@ -419,12 +419,12 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         <Label>Product Media (Photos & Videos)</Label>
         
         <div className="grid grid-cols-3 gap-4">
-            {(mediaUrls || []).map((url, index) => (
+            {(mediaUrls.length > 0 ? mediaUrls : ["https://images.unsplash.com/photo-1722635622839-0bdd0bb64887?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxzYXJkaW5lcyUyMGZpc2h8ZW58MHx8fHwxNzYzMDA2OTE4fDA&ixlib=rb-4.1.0&q=80&w=1080"]).map((url, index) => (
                 <div key={`${url}-${index}`} className="relative aspect-square">
                     {url.startsWith('data:video') ? (
                        <video src={url} className="rounded-md object-cover w-full h-full" controls />
                     ) : (
-                       <Image src={url} alt="Product media" fill className="rounded-md object-cover" />
+                       <Image src={url} alt="Product media" fill className="rounded-md object-cover" data-ai-hint="sardines fish"/>
                     )}
 
                     <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeMedia(url)}>
