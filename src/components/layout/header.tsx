@@ -1,4 +1,3 @@
-
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -46,25 +45,20 @@ export function Header() {
   };
 
   const getDashboardLink = () => {
-    if (!user || isRoleLoading) return '#';
-    if (role === 'seller') {
-      return '/seller/dashboard';
-    }
-    if (role === 'customer') {
-      return '/customer/dashboard';
-    }
-    return '/'; // Go to role selection if not logged in
-  }
+    if (!user) return '/';
+    if (role === 'seller') return '/seller/dashboard';
+    if (role === 'customer') return '/customer/dashboard';
+    // While role is loading, default to the generic home page, but the onClick handler will prevent mis-navigation.
+    return '/';
+  };
 
-  const handleHomeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (isRoleLoading) {
-      e.preventDefault();
-      return;
+  // This function now robustly checks the role on click.
+  const handleHomeClick = () => {
+    if (isUserLoading || isRoleLoading) {
+      return; // Do nothing if we are still loading user or role.
     }
     const link = getDashboardLink();
-    if (link !== '#') {
-      router.push(link);
-    }
+    router.push(link);
   };
 
   const renderUserActions = () => {
@@ -143,7 +137,7 @@ export function Header() {
         </div>
         <div className="flex items-center gap-2">
             <Button variant="ghost" onClick={handleHomeClick} disabled={isUserLoading || isRoleLoading}>
-              {(isUserLoading || isRoleLoading) && user ? (
+              {(isUserLoading || (user && isRoleLoading)) ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Home className="mr-2 h-4 w-4" />
