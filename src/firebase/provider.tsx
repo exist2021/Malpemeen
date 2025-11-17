@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
@@ -216,25 +217,34 @@ export const useUserRole = (): UserRoleHookResult => {
 
         setIsRoleLoading(true);
         const checkRoles = async () => {
+            // Important: Create stable references
             const sellerRef = doc(firestore, 'sellers', user.uid);
             const customerRef = doc(firestore, 'customers', user.uid);
 
-            const sellerSnap = await getDoc(sellerRef);
-            if (sellerSnap.exists()) {
-                setRole('seller');
-                setIsRoleLoading(false);
-                return;
-            }
+            try {
+                const sellerSnap = await getDoc(sellerRef);
+                if (sellerSnap.exists()) {
+                    setRole('seller');
+                    setIsRoleLoading(false);
+                    return;
+                }
 
-            const customerSnap = await getDoc(customerRef);
-            if (customerSnap.exists()) {
-                setRole('customer');
-                setIsRoleLoading(false);
-                return;
-            }
+                const customerSnap = await getDoc(customerRef);
+                if (customerSnap.exists()) {
+                    setRole('customer');
+                    setIsRoleLoading(false);
+                    return;
+                }
+                
+                // If neither doc exists after checking
+                setRole(null);
 
-            setRole(null);
-            setIsRoleLoading(false);
+            } catch (error) {
+                console.error("Error checking user role:", error);
+                setRole(null);
+            } finally {
+                setIsRoleLoading(false);
+            }
         };
 
         checkRoles();
