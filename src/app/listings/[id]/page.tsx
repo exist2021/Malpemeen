@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { getFishListingById } from '@/app/lib/data';
+import { getFishListingById, incrementListingViewCount, incrementListingCallCount } from '@/app/lib/data';
 import type { FishListing } from '@/app/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -86,6 +86,7 @@ export default function ListingDetailPage() {
         .then(data => {
           if (data) {
             setListing(data);
+            incrementListingViewCount(id, data.sellerId);
           } else {
             setError("Listing not found.");
           }
@@ -94,6 +95,12 @@ export default function ListingDetailPage() {
         .finally(() => setLoading(false));
     }
   }, [id]);
+
+  const handleCallClick = () => {
+    if (listing) {
+        incrementListingCallCount(listing.id, listing.sellerId);
+    }
+  }
 
   if (loading) {
     return (
@@ -202,7 +209,7 @@ export default function ListingDetailPage() {
                     </div>
                 </CardContent>
                 <CardFooter className="px-0 pb-0 mt-6">
-                    <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90 h-12 text-lg">
+                    <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90 h-12 text-lg" onClick={handleCallClick}>
                         <a href={`tel:${listing.sellerPhone}`}>
                             <Phone className="mr-2 h-5 w-5" />
                             Call Seller

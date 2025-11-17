@@ -23,6 +23,14 @@
             "type": "string",
             "format": "email",
             "description": "Seller's email address."
+        },
+        "totalViews": {
+            "type": "number",
+            "description": "Total number of views across all of the seller's listings."
+        },
+        "totalCalls": {
+            "type": "number",
+            "description": "Total number of call clicks across all of the seller's listings."
         }
       },
       "required": [
@@ -141,6 +149,14 @@
         "brandName": {
           "type": "string",
           "description": "Brand name for the product, e.g., 'Malpe Meen'."
+        },
+        "viewCount": {
+            "type": "number",
+            "description": "Number of times the listing has been viewed."
+        },
+        "callClickCount": {
+            "type": "number",
+            "description": "Number of times the call button has been clicked."
         }
       },
       "required": [

@@ -2,7 +2,7 @@
 'use client';
 
 import type { FishListing, Seller } from '@/app/types';
-import { collection, addDoc, getDocs, query, orderBy, doc, getDoc, where, updateDoc, deleteDoc, DocumentReference, setDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, doc, getDoc, where, updateDoc, deleteDoc, DocumentReference, setDoc, increment } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -106,6 +106,8 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
     sellerName: sellerData.name,
     sellerPhone: sellerData.phoneNumber,
     listedDate: new Date().toISOString(),
+    viewCount: 0,
+    callClickCount: 0,
   };
 
   try {
@@ -151,4 +153,30 @@ export async function deleteFishListing(id: string) {
         });
         errorEmitter.emit('permission-error', contextualError);
     });
+}
+
+export async function incrementListingViewCount(listingId: string, sellerId: string) {
+    const { firestore } = initializeFirebase();
+    const listingRef = doc(firestore, 'fishListings', listingId);
+    const sellerRef = doc(firestore, 'sellers', sellerId);
+    try {
+        await updateDoc(listingRef, { viewCount: increment(1) });
+        await updateDoc(sellerRef, { totalViews: increment(1) });
+    } catch (error) {
+        // This is a non-critical background operation, so we just log the error.
+        console.warn("Could not increment view count", error);
+    }
+}
+
+export async function incrementListingCallCount(listingId: string, sellerId: string) {
+    const { firestore } = initializeFirebase();
+    const listingRef = doc(firestore, 'fishListings', listingId);
+    const sellerRef = doc(firestore, 'sellers', sellerId);
+    try {
+        await updateDoc(listingRef, { callClickCount: increment(1) });
+        await updateDoc(sellerRef, { totalCalls: increment(1) });
+    } catch (error) {
+        // This is a non-critical background operation, so we just log the error.
+        console.warn("Could not increment call count", error);
+    }
 }

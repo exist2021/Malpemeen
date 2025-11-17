@@ -4,6 +4,8 @@ export type Seller = {
     phoneNumber: string;
     name: string;
     email: string;
+    totalViews?: number;
+    totalCalls?: number;
 };
 
 export type Customer = {
@@ -31,5 +33,8 @@ export type FishListing = {
     boatDetails: 'Ashok Leyland' | 'Persian Boat';
     owner: string;
     brandName: string;
+    viewCount?: number;
+    callClickCount?: number;
 };
+
 
