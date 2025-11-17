@@ -44,21 +44,22 @@ export function Header() {
     }
   };
 
-  const getDashboardLink = () => {
-    if (!user) return '/';
-    if (role === 'seller') return '/seller/dashboard';
-    if (role === 'customer') return '/customer/dashboard';
-    // While role is loading, default to the generic home page, but the onClick handler will prevent mis-navigation.
-    return '/';
-  };
-
   // This function now robustly checks the role on click.
   const handleHomeClick = () => {
     if (isUserLoading || isRoleLoading) {
       return; // Do nothing if we are still loading user or role.
     }
-    const link = getDashboardLink();
-    router.push(link);
+    if (user) {
+        if (role === 'seller') {
+            router.push('/seller/dashboard');
+        } else if (role === 'customer') {
+            router.push('/customer/dashboard');
+        } else {
+            router.push('/');
+        }
+    } else {
+        router.push('/');
+    }
   };
 
   const renderUserActions = () => {
