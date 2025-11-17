@@ -58,6 +58,10 @@ export default function SellerLoginPage() {
                 const docRef = doc(firestore, 'sellers', user.uid);
 
                 setDoc(docRef, sellerData)
+                .then(() => {
+                    toast({ title: 'Sign up successful! Redirecting...' });
+                    router.push('/seller/dashboard');
+                })
                 .catch(error => {
                     const contextualError = new FirestorePermissionError({
                         path: docRef.path,
@@ -67,8 +71,6 @@ export default function SellerLoginPage() {
                     errorEmitter.emit('permission-error', contextualError);
                 });
                 
-                toast({ title: 'Sign up successful! Redirecting...' });
-                router.push('/seller/dashboard');
             })
             .catch(error => {
                  let description = error.message;

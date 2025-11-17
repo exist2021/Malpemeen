@@ -68,7 +68,7 @@ service cloud.firestore {
       allow get: if isOwner(sellerId);
       allow list: if false; // Sellers list is not public
 
-      allow create: if isSignedIn() && request.auth.uid == sellerId && request.resource.data.id == sellerId;
+      allow create: if isOwner(sellerId) && request.resource.data.id == sellerId;
       allow update: if isExistingOwner(sellerId) && request.resource.data.id == resource.data.id;
       allow delete: if isExistingOwner(sellerId);
     }
@@ -80,7 +80,7 @@ service cloud.firestore {
       allow get: if isOwner(customerId);
       allow list: if false;
 
-      allow create: if isSignedIn() && request.auth.uid == customerId && request.resource.data.id == customerId;
+      allow create: if isOwner(customerId) && request.resource.data.id == customerId;
       allow update: if isExistingOwner(customerId) && request.resource.data.id == resource.data.id;
       allow delete: if isExistingOwner(customerId);
     }
