@@ -211,7 +211,7 @@ export default function SellerDashboard() {
   }
 
   const totalValue = listings.reduce((acc, listing) => acc + listing.pricePerBox, 0);
-  const dashboardTitle = seller?.name ? `${seller.name}'s Dashboard` : 'Seller Dashboard';
+  const dashboardTitle = seller?.name ? seller.name : 'Seller Dashboard';
 
   return (
     <>
