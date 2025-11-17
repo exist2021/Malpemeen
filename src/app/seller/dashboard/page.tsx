@@ -202,9 +202,6 @@ export default function SellerDashboard() {
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <h1 className="text-3xl font-bold tracking-tight">Seller Dashboard</h1>
-           <Button asChild>
-              <Link href="/sell"><PlusCircle className="mr-2 h-4 w-4" /> Create New Listing</Link>
-           </Button>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
