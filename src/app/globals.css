@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 204 20% 92%; /* Soft blue-gray from image */
+    --background: 48 43% 94%; /* Off-cream color */
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
