@@ -48,17 +48,19 @@ const incrementCountsFlow = ai.defineFlow(
     const batch = db.batch();
 
     if (type === 'view') {
-      batch.update(listingRef, { viewCount: FieldValue.increment(1) });
-      batch.update(sellerRef, { totalViews: FieldValue.increment(1) });
+      // Use set with merge to handle cases where the field might not exist yet.
+      batch.set(listingRef, { viewCount: FieldValue.increment(1) }, { merge: true });
+      batch.set(sellerRef, { totalViews: FieldValue.increment(1) }, { merge: true });
     } else if (type === 'call') {
-      batch.update(listingRef, { callClickCount: FieldValue.increment(1) });
-      batch.update(sellerRef, { totalCalls: FieldValue.increment(1) });
+      // Use set with merge for robustness.
+      batch.set(listingRef, { callClickCount: FieldValue.increment(1) }, { merge: true });
+      batch.set(sellerRef, { totalCalls: FieldValue.increment(1) }, { merge: true });
     }
 
     try {
         await batch.commit();
     } catch (error) {
-        console.error(`Error incrementing ${type} count:`, error);
+        console.error(`Error incrementing ${type} count for listing ${listingId}:`, error);
         // We don't throw here as this is a non-critical background task
     }
   }
