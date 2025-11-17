@@ -9,7 +9,7 @@ import type { FishListing } from '@/app/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Button } from '@/components/ui/button';
-import { Phone, Calendar, User, ArrowLeft, Anchor, UserCheck, Ship, Info, Tag, Copyright, CircleDollarSign } from 'lucide-react';
+import { Phone, Calendar, User, ArrowLeft, Anchor, UserCheck, Ship, Info, Tag, Copyright, IndianRupee } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/layout/header';
 import { format } from 'date-fns';
@@ -191,7 +191,7 @@ export default function ListingDetailPage() {
                     <p className="text-lg text-muted-foreground">{listing.description}</p>
                     <Separator className="my-6" />
                     <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                        <DetailItem icon={CircleDollarSign} label="Price per Box" value={listing.pricePerBox ? `₹${listing.pricePerBox.toLocaleString()}` : 'N/A'} />
+                        <DetailItem icon={IndianRupee} label="Price per Box" value={listing.pricePerBox ? `₹${listing.pricePerBox.toLocaleString()}` : 'N/A'} />
                         <DetailItem icon={Calendar} label="Listed Date" value={listing.listedDate ? format(new Date(listing.listedDate), 'MMMM d, yyyy') : 'N/A'} />
                         <DetailItem icon={User} label="Seller" value={listing.sellerName} />
                         <DetailItem icon={UserCheck} label="Owner" value={listing.owner} />
