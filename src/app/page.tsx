@@ -13,6 +13,15 @@ export default function RoleSelectionPage() {
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4">
+       <Image
+          src="https://images.unsplash.com/photo-1599056024921-b3d551c89b88?q=80&w=1974&auto=format&fit=crop"
+          alt="Background fish market"
+          fill
+          className="object-cover"
+          data-ai-hint="fish market"
+        />
+        <div className="absolute inset-0 bg-background/80" />
+
       <div className="relative z-10 text-center mb-12">
         <FishLogo className="h-24 w-24 text-primary mx-auto"/>
         <h1 className="text-4xl font-bold tracking-tight mt-6 font-headline">Welcome to Malpe Meen</h1>
