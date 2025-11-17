@@ -1,7 +1,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Video } from 'lucide-react';
+import { ArrowRight, Video, User } from 'lucide-react';
 import type { FishListing } from '@/app/types';
 import { cn } from '@/lib/utils';
 
@@ -56,7 +56,13 @@ export function FishCard({ listing }: FishCardProps) {
           {isVideo && <Video className="absolute top-4 right-4 h-6 w-6 text-white" />}
           <div className="space-y-1">
             <h3 className="font-bold text-xl uppercase tracking-wide font-headline">{listing.productName || 'Fresh Fish'}</h3>
-            <p className="text-base line-clamp-2 font-normal font-body">{listing.description}</p>
+             {listing.sellerName && (
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                    <User className="h-4 w-4" />
+                    <span>{listing.sellerName}</span>
+                </div>
+            )}
+            <p className="text-base line-clamp-2 font-normal font-body pt-1">{listing.description}</p>
           </div>
           <ArrowRight className="absolute bottom-4 right-4 h-6 w-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         </div>
