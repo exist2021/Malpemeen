@@ -303,8 +303,9 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
               title: 'Success!',
               description: 'Your fish listing has been updated.',
             });
+            router.push(`/listings/${listing.id}`);
         } else {
-             await addFishListing({
+             const newListingRef = await addFishListing({
               ...listingData,
               sellerId: user.uid,
             });
@@ -312,9 +313,9 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
               title: 'Success!',
               description: 'Your fish listing has been created.',
             });
+            router.push(`/listings/${newListingRef.id}`);
         }
         
-        router.push('/seller/dashboard');
         router.refresh();
         
       } catch (error: any) {

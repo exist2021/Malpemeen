@@ -2,7 +2,7 @@
 'use client';
 
 import type { FishListing } from '@/app/types';
-import { collection, addDoc, getDocs, query, orderBy, doc, getDoc, where, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, doc, getDoc, where, updateDoc, deleteDoc, DocumentReference } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -82,7 +82,7 @@ export async function getFishListingById(id: string): Promise<FishListing | null
 }
 
 
-export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDate' | 'sellerName' | 'sellerPhone'>) {
+export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDate' | 'sellerName' | 'sellerPhone'>): Promise<DocumentReference> {
   const { firestore } = initializeFirebase();
   
   // Get seller info to denormalize
@@ -103,7 +103,10 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
     listedDate: new Date().toISOString(),
   };
 
-  return addDoc(fishListingsRef, data).catch(error => {
+  try {
+    const docRef = await addDoc(fishListingsRef, data);
+    return docRef;
+  } catch (error) {
     const contextualError = new FirestorePermissionError({
       path: fishListingsRef.path,
       operation: 'create',
@@ -112,21 +115,24 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
     errorEmitter.emit('permission-error', contextualError);
     // Re-throw the original error to be caught by the calling function
     throw error;
-  });
+  }
 }
 
 export async function updateFishListing(id: string, data: Partial<Omit<FishListing, 'id'>>) {
     const { firestore } = initializeFirebase();
     const docRef = doc(firestore, 'fishListings', id);
 
-    updateDoc(docRef, data).catch(error => {
+    try {
+        await updateDoc(docRef, data);
+    } catch(error) {
         const contextualError = new FirestorePermissionError({
             path: docRef.path,
             operation: 'update',
             requestResourceData: data,
         });
         errorEmitter.emit('permission-error', contextualError);
-    });
+        throw error;
+    };
 }
 
 export async function deleteFishListing(id: string) {
