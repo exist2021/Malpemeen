@@ -212,18 +212,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
       router.push('/seller/login');
     }
     
-    if (isEditMode && listing) {
-        setProductName(listing.productName || '');
-        setPricePerBox(String(listing.pricePerBox) || '');
-        setPortDetails(listing.portDetails || '');
-        setCaughtBy(listing.caughtBy || '');
-        setHowCaught(listing.howCaught || '');
-        setBoatDetails(listing.boatDetails || '');
-        setOwner(listing.owner || '');
-        setBrandName(listing.brandName || 'Malpe Meen');
-        setDescription(listing.description || '');
-        setMediaUrls(listing.mediaUrls || []);
-    } else if (!isEditMode) {
+    if (!isEditMode) {
         setProductName('');
         setPricePerBox('');
         setPortDetails('');
@@ -236,7 +225,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         setMediaUrls([]);
     }
 
-  }, [user, isUserLoading, router, isEditMode, listing, setProductName, setPricePerBox, setPortDetails, setCaughtBy, setHowCaught, setBoatDetails, setOwner, setBrandName, setDescription, setMediaUrls]);
+  }, [user, isUserLoading, router, isEditMode, setProductName, setPricePerBox, setPortDetails, setCaughtBy, setHowCaught, setBoatDetails, setOwner, setBrandName, setDescription, setMediaUrls]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

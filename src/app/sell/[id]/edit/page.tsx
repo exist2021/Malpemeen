@@ -22,12 +22,35 @@ export default function EditSellPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+    // State for all form fields, lifted up from SellerForm
+    const [productName, setProductName] = useState('');
+    const [pricePerBox, setPricePerBox] = useState('');
+    const [portDetails, setPortDetails] = useState('');
+    const [caughtBy, setCaughtBy] = useState('');
+    const [howCaught, setHowCaught] = useState('');
+    const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | ''>('');
+    const [owner, setOwner] = useState('');
+    const [brandName, setBrandName] = useState('Malpe Meen');
+    const [description, setDescription] = useState('');
+    const [mediaUrls, setMediaUrls] = useState<string[]>([]);
+
   useEffect(() => {
     if (id) {
       getFishListingById(id)
         .then(data => {
           if (data) {
             setListing(data);
+            // Populate form state when listing is fetched
+            setProductName(data.productName || '');
+            setPricePerBox(String(data.pricePerBox) || '');
+            setPortDetails(data.portDetails || '');
+            setCaughtBy(data.caughtBy || '');
+            setHowCaught(data.howCaught || '');
+            setBoatDetails(data.boatDetails || '');
+            setOwner(data.owner || '');
+            setBrandName(data.brandName || 'Malpe Meen');
+            setDescription(data.description || '');
+            setMediaUrls(data.mediaUrls || []);
           } else {
             setError("Listing not found.");
           }
@@ -120,7 +143,33 @@ export default function EditSellPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <SellerForm listing={listing} />
+          <SellerForm 
+            listing={listing}
+            formState={{
+              productName,
+              pricePerBox,
+              portDetails,
+              caughtBy,
+              howCaught,
+              boatDetails,
+              owner,
+              brandName,
+              description,
+              mediaUrls,
+            }}
+            setFormState={{
+                setProductName,
+                setPricePerBox,
+                setPortDetails,
+                setCaughtBy,
+                setHowCaught,
+                setBoatDetails,
+                setOwner,
+                setBrandName,
+                setDescription,
+                setMediaUrls,
+            }}
+          />
         </CardContent>
       </Card>
     </div>
