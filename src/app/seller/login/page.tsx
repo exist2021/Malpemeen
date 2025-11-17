@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth, useFirebase } from '@/firebase';
+import { useAuth, useFirebase, errorEmitter, FirestorePermissionError } from '@/firebase';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -41,34 +41,56 @@ export default function SellerLoginPage() {
   const { toast } = useToast();
 
   const handleAuthAction = async () => {
-    try {
-      if (!auth || !firestore) return;
-      if (isSignUp) {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        await setDoc(doc(firestore, 'sellers', user.uid), {
-          id: user.uid,
-          name: name,
-          phoneNumber: phone,
-          email: user.email,
-        });
-        toast({ title: 'Sign up successful! Redirecting...' });
-        router.push('/seller/dashboard');
-      } else {
-        await signInWithEmailAndPassword(auth, email, password);
-        toast({ title: 'Login successful! Redirecting...' });
-        router.push('/seller/dashboard');
-      }
-    } catch (error: any) {
-        let description = error.message;
-        if (error.code === 'auth/invalid-credential') {
-            description = "Invalid email or password. Please try again.";
-        }
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: description,
-      });
+    if (!auth || !firestore) {
+        toast({ variant: 'destructive', title: 'Firebase not initialized.'});
+        return;
+    };
+    if (isSignUp) {
+        createUserWithEmailAndPassword(auth, email, password)
+            .then(userCredential => {
+                const user = userCredential.user;
+                const sellerData = {
+                    id: user.uid,
+                    name: name,
+                    phoneNumber: phone,
+                    email: user.email,
+                };
+                const docRef = doc(firestore, 'sellers', user.uid);
+
+                setDoc(docRef, sellerData)
+                .catch(error => {
+                    const contextualError = new FirestorePermissionError({
+                        path: docRef.path,
+                        operation: 'create',
+                        requestResourceData: sellerData,
+                    });
+                    errorEmitter.emit('permission-error', contextualError);
+                });
+                
+                toast({ title: 'Sign up successful! Redirecting...' });
+                router.push('/seller/dashboard');
+            })
+            .catch(error => {
+                 let description = error.message;
+                 if (error.code === 'auth/email-already-in-use') {
+                     description = "This email is already in use. Please log in or use a different email.";
+                 }
+                 toast({ variant: 'destructive', title: 'Sign Up Failed', description });
+            });
+
+    } else {
+        signInWithEmailAndPassword(auth, email, password)
+            .then(() => {
+                toast({ title: 'Login successful! Redirecting...' });
+                router.push('/seller/dashboard');
+            })
+            .catch(error => {
+                let description = error.message;
+                if (error.code === 'auth/invalid-credential') {
+                    description = "Invalid email or password. Please try again.";
+                }
+                toast({ variant: 'destructive', title: 'Login Failed', description });
+            });
     }
   };
 
