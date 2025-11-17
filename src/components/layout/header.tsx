@@ -30,20 +30,13 @@ import { SellerAccountForm } from '@/app/seller/dashboard/seller-account-form';
 export function Header() {
   const router = useRouter();
   const { user, isUserLoading } = useUser();
-  const { role, setRole } = useUserRole();
+  const { role } = useUserRole();
   const auth = useAuth();
 
   const handleLogout = () => {
     if (auth) {
-      const lastRole = role;
-      auth.signOut().then(() => {
-        setRole(null); // Immediately clear role on logout
-        if (lastRole === 'seller') {
-          router.push('/seller/login');
-        } else {
-          router.push('/customer/login');
-        }
-      });
+      auth.signOut();
+      router.push('/');
     }
   };
 

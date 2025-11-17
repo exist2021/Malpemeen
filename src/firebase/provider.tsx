@@ -57,7 +57,6 @@ export type UserRole = 'seller' | 'customer' | null;
 export interface UserRoleHookResult {
     role: UserRole;
     isRoleLoading: boolean;
-    setRole: (role: UserRole) => void;
 }
 
 export interface CustomerProfileResult {
@@ -215,43 +214,30 @@ export const useUserRole = (): UserRoleHookResult => {
             return;
         }
 
-        setIsRoleLoading(true);
         const checkRoles = async () => {
-            // Important: Create stable references
             const sellerRef = doc(firestore, 'sellers', user.uid);
-            const customerRef = doc(firestore, 'customers', user.uid);
-
-            try {
-                const sellerSnap = await getDoc(sellerRef);
-                if (sellerSnap.exists()) {
-                    setRole('seller');
-                    setIsRoleLoading(false);
-                    return;
-                }
-
-                const customerSnap = await getDoc(customerRef);
-                if (customerSnap.exists()) {
-                    setRole('customer');
-                    setIsRoleLoading(false);
-                    return;
-                }
-                
-                // If neither doc exists after checking
-                setRole(null);
-
-            } catch (error) {
-                console.error("Error checking user role:", error);
-                setRole(null);
-            } finally {
+            const sellerSnap = await getDoc(sellerRef);
+            if (sellerSnap.exists()) {
+                setRole('seller');
                 setIsRoleLoading(false);
+                return;
             }
+
+            const customerRef = doc(firestore, 'customers', user.uid);
+            const customerSnap = await getDoc(customerRef);
+            if (customerSnap.exists()) {
+                setRole('customer');
+                setIsRoleLoading(false);
+                return;
+            }
+
+            setIsRoleLoading(false);
         };
 
         checkRoles();
-
     }, [user, isUserLoading, firestore]);
 
-    return { role, isRoleLoading, setRole };
+    return { role, isRoleLoading };
 };
 
 export const useCustomerProfile = (): CustomerProfileResult => {
