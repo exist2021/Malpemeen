@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { getSellerFishListings, deleteFishListing } from '@/app/lib/data';
-import type { FishListing } from '@/app/types';
+import type { FishListing, Seller } from '@/app/types';
 import Image from 'next/image';
 import { Pencil, Video, Trash2, Loader2, PlusCircle, List, IndianRupee, Package } from 'lucide-react';
 import { Header } from '@/components/layout/header';
@@ -25,6 +25,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { format } from 'date-fns';
+import { doc, getDoc } from 'firebase/firestore';
+import { useFirestore } from '@/firebase/provider';
 
 function SellerListings({ listings, setListings }: { listings: FishListing[], setListings: React.Dispatch<React.SetStateAction<FishListing[]>> }) {
     const { toast } = useToast();
@@ -164,8 +166,10 @@ function DashboardSkeleton() {
 
 export default function SellerDashboard() {
   const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
   const router = useRouter();
   const [listings, setListings] = useState<FishListing[]>([]);
+  const [seller, setSeller] = useState<Seller | null>(null);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
@@ -175,15 +179,27 @@ export default function SellerDashboard() {
   }, [user, isUserLoading, router]);
 
   useEffect(() => {
-    if (user) {
+    if (user && firestore) {
         setLoading(true);
-        getSellerFishListings(user.uid).then(data => {
+        const fetchSellerData = async () => {
+            const sellerRef = doc(firestore, 'sellers', user.uid);
+            const sellerSnap = await getDoc(sellerRef);
+            if(sellerSnap.exists()){
+                setSeller(sellerSnap.data() as Seller);
+            }
+        }
+        
+        const fetchListings = async () => {
+            const data = await getSellerFishListings(user.uid);
             const sortedData = data.sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
             setListings(sortedData);
+        }
+
+        Promise.all([fetchSellerData(), fetchListings()]).finally(() => {
             setLoading(false);
         });
     }
-  }, [user]);
+  }, [user, firestore]);
 
   if (isUserLoading || loading) {
     return (
@@ -195,13 +211,14 @@ export default function SellerDashboard() {
   }
 
   const totalValue = listings.reduce((acc, listing) => acc + listing.pricePerBox, 0);
+  const dashboardTitle = seller?.name ? `${seller.name}'s Dashboard` : 'Seller Dashboard';
 
   return (
     <>
       <Header />
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Seller Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{dashboardTitle}</h1>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
