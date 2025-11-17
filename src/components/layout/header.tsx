@@ -1,3 +1,4 @@
+
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -28,13 +29,14 @@ import { CustomerAccountForm } from '@/app/customer/dashboard/customer-account-f
 export function Header() {
   const router = useRouter();
   const { user, isUserLoading } = useUser();
-  const { role, isRoleLoading } = useUserRole();
+  const { role, isRoleLoading, setRole } = useUserRole();
   const auth = useAuth();
 
   const handleLogout = () => {
     if (auth) {
       const lastRole = role;
       auth.signOut().then(() => {
+        setRole(null); // Immediately clear role on logout
         if (lastRole === 'seller') {
           router.push('/seller/login');
         } else {
@@ -44,10 +46,9 @@ export function Header() {
     }
   };
 
-  // This function now robustly checks the role on click.
   const handleHomeClick = () => {
     if (isUserLoading || isRoleLoading) {
-      return; // Do nothing if we are still loading user or role.
+      return; 
     }
     if (user) {
         if (role === 'seller') {
@@ -55,7 +56,8 @@ export function Header() {
         } else if (role === 'customer') {
             router.push('/customer/dashboard');
         } else {
-            router.push('/');
+            // Fallback for user with no role, though this shouldn't happen
+            router.push('/'); 
         }
     } else {
         router.push('/');
@@ -111,7 +113,7 @@ export function Header() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
     }
 
     return (
@@ -123,7 +125,7 @@ export function Header() {
                 Customer Login
             </Button>
         </div>
-    )
+    );
   }
 
 

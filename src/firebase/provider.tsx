@@ -56,6 +56,7 @@ export type UserRole = 'seller' | 'customer' | null;
 export interface UserRoleHookResult {
     role: UserRole;
     isRoleLoading: boolean;
+    setRole: (role: UserRole) => void;
 }
 
 export interface CustomerProfileResult {
@@ -194,29 +195,48 @@ export const useUser = (): UserHookResult => { // Renamed from useAuthUser
 export const useUserRole = (): UserRoleHookResult => {
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
+    const [role, setRole] = useState<UserRole>(null);
+    const [isRoleLoading, setIsRoleLoading] = useState(true);
 
-    const sellerRef = useMemoFirebase(() => {
-        if (!user) return null;
-        return doc(firestore, 'sellers', user.uid) as DocumentReference<Seller>;
-    }, [user, firestore]);
+    useEffect(() => {
+        if (isUserLoading) {
+            setIsRoleLoading(true);
+            return;
+        }
+        if (!user) {
+            setRole(null);
+            setIsRoleLoading(false);
+            return;
+        }
 
-    const customerRef = useMemoFirebase(() => {
-        if (!user) return null;
-        return doc(firestore, 'customers', user.uid) as DocumentReference<Customer>;
-    }, [user, firestore]);
-    
-    const { data: sellerProfile, isLoading: isSellerLoading } = useDoc<Seller>(sellerRef);
-    const { data: customerProfile, isLoading: isCustomerLoading } = useDoc<Customer>(customerRef);
+        setIsRoleLoading(true);
+        const checkRoles = async () => {
+            const sellerRef = doc(firestore, 'sellers', user.uid);
+            const customerRef = doc(firestore, 'customers', user.uid);
 
-    const role = useMemo((): UserRole => {
-        if (sellerProfile) return 'seller';
-        if (customerProfile) return 'customer';
-        return null;
-    }, [sellerProfile, customerProfile]);
+            const sellerSnap = await getDoc(sellerRef);
+            if (sellerSnap.exists()) {
+                setRole('seller');
+                setIsRoleLoading(false);
+                return;
+            }
 
-    const isRoleLoading = isUserLoading || (user && (isSellerLoading || isCustomerLoading));
+            const customerSnap = await getDoc(customerRef);
+            if (customerSnap.exists()) {
+                setRole('customer');
+                setIsRoleLoading(false);
+                return;
+            }
 
-    return { role, isRoleLoading };
+            setRole(null);
+            setIsRoleLoading(false);
+        };
+
+        checkRoles();
+
+    }, [user, isUserLoading, firestore]);
+
+    return { role, isRoleLoading, setRole };
 };
 
 export const useCustomerProfile = (): CustomerProfileResult => {
