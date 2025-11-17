@@ -13,8 +13,12 @@ export default function RoleSelectionPage() {
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4">
+
+      <div className="absolute top-4 left-4 z-20">
+        <FishLogo className="h-28 w-28 text-primary" />
+      </div>
+
       <div className="relative z-10 text-center mb-12">
-        <FishLogo className="h-24 w-24 text-primary mx-auto"/>
         <h1 className="text-4xl font-bold tracking-tight mt-6 font-headline">Welcome to Malpe Meen</h1>
         <p className="mt-2 text-lg text-muted-foreground">Connecting sellers with customers, seamlessly.</p>
       </div>
