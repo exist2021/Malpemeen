@@ -103,13 +103,15 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
     listedDate: new Date().toISOString(),
   };
 
-  addDoc(fishListingsRef, data).catch(error => {
+  return addDoc(fishListingsRef, data).catch(error => {
     const contextualError = new FirestorePermissionError({
       path: fishListingsRef.path,
       operation: 'create',
       requestResourceData: data,
     });
     errorEmitter.emit('permission-error', contextualError);
+    // Re-throw the original error to be caught by the calling function
+    throw error;
   });
 }
 

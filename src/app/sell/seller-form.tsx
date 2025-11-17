@@ -317,11 +317,11 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         router.push('/seller/dashboard');
         router.refresh();
         
-      } catch (error) {
+      } catch (error: any) {
         toast({
           variant: 'destructive',
           title: `Error Creating Listing`,
-          description: 'Something went wrong. Please try again.',
+          description: error.message || 'Something went wrong. Please try again.',
         });
       }
     });
@@ -419,12 +419,12 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         <Label>Product Media (Photos & Videos)</Label>
         
         <div className="grid grid-cols-3 gap-4">
-            {(mediaUrls.length > 0 ? mediaUrls : ["https://images.unsplash.com/photo-1722635622839-0bdd0bb64887?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxzYXJkaW5lcyUyMGZpc2h8ZW58MHx8fHwxNzYzMDA2OTE4fDA&ixlib=rb-4.1.0&q=80&w=1080"]).map((url, index) => (
+            {(mediaUrls.length > 0 ? mediaUrls : ["https://images.unsplash.com/photo-1559106037-5435fac0c497?q=80&w=2070&auto=format&fit=crop"]).map((url, index) => (
                 <div key={`${url}-${index}`} className="relative aspect-square">
                     {url.startsWith('data:video') ? (
                        <video src={url} className="rounded-md object-cover w-full h-full" controls />
                     ) : (
-                       <Image src={url} alt="Product media" fill className="rounded-md object-cover" data-ai-hint="sardines fish"/>
+                       <Image src={url} alt="Product media" fill className="rounded-md object-cover" data-ai-hint="fish market"/>
                     )}
 
                     <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeMedia(url)}>
