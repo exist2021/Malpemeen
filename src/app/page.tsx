@@ -13,7 +13,6 @@ export default function RoleSelectionPage() {
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4">
-
       <div className="absolute top-4 left-4 z-20">
         <FishLogo className="h-28 w-28 text-primary" />
       </div>
