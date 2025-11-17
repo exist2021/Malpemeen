@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, Home } from 'lucide-react';
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, Home, Loader2 } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import {
   Dialog,
@@ -46,7 +46,7 @@ export function Header() {
   };
 
   const getDashboardLink = () => {
-    if (isUserLoading || isRoleLoading) return "/";
+    if (!user || isRoleLoading) return '#';
     if (role === 'seller') {
       return '/seller/dashboard';
     }
@@ -55,6 +55,17 @@ export function Header() {
     }
     return '/'; // Go to role selection if not logged in
   }
+
+  const handleHomeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (isRoleLoading) {
+      e.preventDefault();
+      return;
+    }
+    const link = getDashboardLink();
+    if (link !== '#') {
+      router.push(link);
+    }
+  };
 
   const renderUserActions = () => {
     if (isUserLoading) {
@@ -131,11 +142,13 @@ export function Header() {
             </Link>
         </div>
         <div className="flex items-center gap-2">
-            <Button asChild variant="ghost">
-                <Link href={getDashboardLink()}>
-                    <Home className="mr-2 h-4 w-4" />
-                    Home
-                </Link>
+            <Button variant="ghost" onClick={handleHomeClick} disabled={isUserLoading || isRoleLoading}>
+              {(isUserLoading || isRoleLoading) && user ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Home className="mr-2 h-4 w-4" />
+              )}
+              Home
             </Button>
           {renderUserActions()}
         </div>
