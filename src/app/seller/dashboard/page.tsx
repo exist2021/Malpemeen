@@ -248,9 +248,14 @@ export default function SellerDashboard() {
         </div>
 
          <Card>
-            <CardHeader>
-                <CardTitle>Your Listings</CardTitle>
-                <CardDescription>Manage your existing product listings below.</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Your Listings</CardTitle>
+                    <CardDescription>Manage your existing product listings below.</CardDescription>
+                </div>
+                <Button asChild>
+                    <Link href="/sell"><PlusCircle className="mr-2 h-4 w-4" /> Create New Listing</Link>
+                </Button>
             </CardHeader>
             <CardContent>
                 <SellerListings listings={listings} setListings={setListings} />
@@ -260,5 +265,3 @@ export default function SellerDashboard() {
     </>
   );
 }
-
-    
