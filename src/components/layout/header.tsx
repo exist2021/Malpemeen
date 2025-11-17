@@ -48,7 +48,7 @@ export function Header() {
 
   const handleHomeClick = () => {
     if (isUserLoading || isRoleLoading) {
-      return; 
+      return; // Should not be clickable if disabled, but as a safeguard.
     }
     if (user) {
         if (role === 'seller') {
@@ -128,6 +128,7 @@ export function Header() {
     );
   }
 
+  const isHomeButtonLoading = isUserLoading || (user && isRoleLoading);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -139,8 +140,8 @@ export function Header() {
             </Link>
         </div>
         <div className="flex items-center gap-2">
-            <Button variant="ghost" onClick={handleHomeClick} disabled={isUserLoading || isRoleLoading}>
-              {(isUserLoading || (user && isRoleLoading)) ? (
+            <Button variant="ghost" onClick={handleHomeClick} disabled={isHomeButtonLoading}>
+              {isHomeButtonLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Home className="mr-2 h-4 w-4" />
