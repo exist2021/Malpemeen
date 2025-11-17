@@ -136,9 +136,9 @@ export default function ListingDetailPage() {
     <Header />
     <div className="container mx-auto max-w-5xl py-12">
         <div className="mb-4">
-          <Button variant="outline" onClick={() => router.push('/seller/dashboard')}>
+          <Button variant="outline" onClick={() => router.push('/customer/dashboard')}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
+            Back to Listings
           </Button>
         </div>
       <Card className="overflow-hidden">
