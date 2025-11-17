@@ -6,11 +6,13 @@ import { SellerForm } from './seller-form';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, Loader2 } from 'lucide-react';
+import { Mic, MicOff, Loader2, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { parseListingDetails } from '@/ai/flows/parse-listing-details-flow';
+import { useRouter } from 'next/navigation';
 
 export default function SellPage() {
+    const router = useRouter();
     // State for all form fields, lifted up from SellerForm
     const [productName, setProductName] = useState('');
     const [pricePerBox, setPricePerBox] = useState('');
@@ -116,6 +118,12 @@ export default function SellPage() {
     <>
       <Header />
       <div className="container mx-auto max-w-2xl py-12">
+        <div className="mb-4">
+          <Button variant="outline" onClick={() => router.push('/seller/dashboard')}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold tracking-tight font-headline">List Your Fish</CardTitle>
