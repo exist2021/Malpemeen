@@ -4,6 +4,7 @@ export type Seller = {
     phoneNumber: string;
     name: string;
     email: string;
+    address?: string;
     totalViews?: number;
     totalCalls?: number;
 };
@@ -25,6 +26,7 @@ export type FishListing = {
     listedDate: string;
     sellerName?: string;
     sellerPhone?: string;
+    sellerAddress?: string;
     productName: string;
     pricePerBox: number;
     portDetails: string;
@@ -36,5 +38,6 @@ export type FishListing = {
     viewCount?: number;
     callClickCount?: number;
 };
+
 
 

@@ -11,6 +11,7 @@ import { updateDoc, doc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import { Loader2 } from 'lucide-react';
 import type { Seller } from '@/app/types';
+import { Textarea } from '@/components/ui/textarea';
 
 export function SellerAccountForm() {
     const { profile, isLoading } = useSellerProfile();
@@ -22,6 +23,7 @@ export function SellerAccountForm() {
         name: '',
         email: '',
         phoneNumber: '',
+        address: '',
     });
 
     useEffect(() => {
@@ -30,11 +32,12 @@ export function SellerAccountForm() {
                 name: profile.name || '',
                 email: profile.email || '',
                 phoneNumber: profile.phoneNumber || '',
+                address: profile.address || '',
             });
         }
     }, [profile]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
@@ -46,6 +49,7 @@ export function SellerAccountForm() {
         const updatedData: Partial<Seller> = {};
         if (formData.name !== profile.name) updatedData.name = formData.name;
         if (formData.phoneNumber !== profile.phoneNumber) updatedData.phoneNumber = formData.phoneNumber;
+        if (formData.address !== profile.address) updatedData.address = formData.address;
 
         if (Object.keys(updatedData).length === 0) {
             toast({ title: 'No changes to save.' });
@@ -86,6 +90,10 @@ export function SellerAccountForm() {
                     <Skeleton className="h-4 w-1/4" />
                     <Skeleton className="h-10 w-full" />
                 </div>
+                 <div className="space-y-2">
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-20 w-full" />
+                </div>
                 <Skeleton className="h-10 w-full" />
             </div>
         );
@@ -104,6 +112,10 @@ export function SellerAccountForm() {
             <div className="space-y-2">
                 <Label htmlFor="phoneNumber">Contact Number</Label>
                 <Input id="phoneNumber" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="address">Address</Label>
+                <Textarea id="address" name="address" value={formData.address} onChange={handleInputChange} placeholder="Your business address"/>
             </div>
             <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

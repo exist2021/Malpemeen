@@ -24,6 +24,10 @@
             "format": "email",
             "description": "Seller's email address."
         },
+        "address": {
+            "type": "string",
+            "description": "The detailed address of the seller."
+        },
         "totalViews": {
             "type": "number",
             "description": "Total number of views across all of the seller's listings."
@@ -100,6 +104,10 @@
         "sellerPhone": {
             "type": "string",
             "description": "Denormalized seller phone for display."
+        },
+        "sellerAddress": {
+            "type": "string",
+            "description": "Denormalized seller address for display."
         },
         "mediaUrls": {
           "type": "array",
