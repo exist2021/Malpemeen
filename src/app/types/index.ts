@@ -17,6 +17,7 @@ export type Customer = {
     email: string;
     place?: string;
     address?: string;
+    photoUrl?: string;
 };
 
 export type FishListing = {

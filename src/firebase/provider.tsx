@@ -215,6 +215,7 @@ export const useUserRole = (): UserRoleHookResult => {
         }
 
         const checkRoles = async () => {
+            setIsRoleLoading(true);
             const sellerRef = doc(firestore, 'sellers', user.uid);
             const sellerSnap = await getDoc(sellerRef);
             if (sellerSnap.exists()) {
@@ -231,6 +232,7 @@ export const useUserRole = (): UserRoleHookResult => {
                 return;
             }
 
+            setRole(null);
             setIsRoleLoading(false);
         };
 

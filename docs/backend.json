@@ -78,6 +78,10 @@
         "address": {
             "type": "string",
             "description": "The detailed address of the customer."
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "URL of the customer's profile photo, stored as a data URI."
         }
       },
       "required": [
@@ -151,7 +155,6 @@
         },
         "boatDetails": {
           "type": "string",
-          "description": "Type of boat used.",
           "enum": ["Ashok Leyland", "Persian Boat"]
         },
         "owner": {

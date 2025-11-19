@@ -2,7 +2,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useUser, useAuth, useUserRole, useSellerProfile } from '@/firebase';
+import { useUser, useAuth, useUserRole, useSellerProfile, useCustomerProfile } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { FishLogo } from '../fish-logo';
 import {
@@ -33,6 +33,7 @@ export function Header() {
   const { user, isUserLoading } = useUser();
   const { role } = useUserRole();
   const { profile: sellerProfile, isLoading: isSellerProfileLoading } = useSellerProfile();
+  const { profile: customerProfile, isLoading: isCustomerProfileLoading } = useCustomerProfile();
   const auth = useAuth();
 
   const handleLogout = () => {
@@ -48,26 +49,40 @@ export function Header() {
     }
     
     if (user) {
-        const triggerContent =
-            role === 'seller' && sellerProfile?.logoUrl ? (
+        let triggerContent;
+        const isLoading = isSellerProfileLoading || isCustomerProfileLoading;
+
+        if (isLoading) {
+            triggerContent = <Skeleton className="h-9 w-9 rounded-full" />;
+        } else if (role === 'seller' && sellerProfile?.logoUrl) {
+            triggerContent = (
                 <Avatar className="h-9 w-9">
                     <AvatarImage src={sellerProfile.logoUrl} alt={sellerProfile.name} />
-                    <AvatarFallback>
-                        <UserIcon className="h-4 w-4" />
-                    </AvatarFallback>
+                    <AvatarFallback><UserIcon className="h-4 w-4" /></AvatarFallback>
                 </Avatar>
-            ) : (
+            );
+        } else if (role === 'customer' && customerProfile?.photoUrl) {
+            triggerContent = (
+                <Avatar className="h-9 w-9">
+                    <AvatarImage src={customerProfile.photoUrl} alt={customerProfile.name} />
+                    <AvatarFallback><UserIcon className="h-4 w-4" /></AvatarFallback>
+                </Avatar>
+            );
+        } else {
+             triggerContent = (
                 <>
                     <UserIcon className="mr-2 h-4 w-4" />
                     Profile
                 </>
             );
+        }
+
 
        return (
             <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost">
-                {isSellerProfileLoading && role === 'seller' ? <Skeleton className="h-9 w-9 rounded-full" /> : triggerContent}
+                {triggerContent}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
