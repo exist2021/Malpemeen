@@ -73,14 +73,14 @@ export default function SellPage() {
         startProcessingVoice(async () => {
             try {
                 const parsedDetails = await parseListingDetails(text);
-                if (parsedDetails.productName) setProductName(prev => prev ? `${prev} ${parsedDetails.productName}`.trim() : parsedDetails.productName);
+                if (parsedDetails.productName) setProductName(parsedDetails.productName);
                 if (parsedDetails.pricePerBox) setPricePerBox(String(parsedDetails.pricePerBox));
-                if (parsedDetails.portDetails) setPortDetails(prev => prev ? `${prev} ${parsedDetails.portDetails}`.trim() : parsedDetails.portDetails);
-                if (parsedDetails.caughtBy) setCaughtBy(prev => prev ? `${prev} ${parsedDetails.caughtBy}`.trim() : parsedDetails.caughtBy);
-                if (parsedDetails.howCaught) setHowCaught(prev => prev ? `${prev} ${parsedDetails.howCaught}`.trim() : parsedDetails.howCaught);
+                if (parsedDetails.portDetails) setPortDetails(parsedDetails.portDetails);
+                if (parsedDetails.caughtBy) setCaughtBy(parsedDetails.caughtBy);
+                if (parsedDetails.howCaught) setHowCaught(parsedDetails.howCaught);
                 if (parsedDetails.boatDetails) setBoatDetails(parsedDetails.boatDetails);
-                if (parsedDetails.owner) setOwner(prev => prev ? `${prev} ${parsedDetails.owner}`.trim() : parsedDetails.owner);
-                if (parsedDetails.description) setDescription(prev => prev ? `${prev} ${parsedDetails.description}`.trim() : parsedDetails.description);
+                if (parsedDetails.owner) setOwner(parsedDetails.owner);
+                if (parsedDetails.description) setDescription(parsedDetails.description);
                 
                 toast({ title: "Fields Updated", description: "Your details have been updated by voice."});
 
