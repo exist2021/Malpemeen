@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, HelpCircle, Mail, Phone } from 'lucide-react';
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, HelpCircle, Mail, Phone, Info } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import {
   Dialog,
@@ -164,6 +164,12 @@ export function Header() {
                       </div>
                   </DialogContent>
               </Dialog>
+              <DropdownMenuItem asChild>
+                <a href="https://www.malpemeen.com/" target="_blank" rel="noopener noreferrer">
+                  <Info className="mr-2 h-4 w-4" />
+                  About
+                </a>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
