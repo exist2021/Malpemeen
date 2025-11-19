@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -60,7 +61,7 @@ export default function SellerLoginPage() {
         await setDoc(docRef, sellerData);
         
         toast({ title: 'Sign up successful! Redirecting...' });
-        router.push('/seller/dashboard');
+        router.push('/seller/home');
 
       } catch (error: any) {
           let description = error.message;
@@ -86,7 +87,7 @@ export default function SellerLoginPage() {
         signInWithEmailAndPassword(auth, email, password)
             .then(() => {
                 toast({ title: 'Login successful! Redirecting...' });
-                router.push('/seller/dashboard');
+                router.push('/seller/home');
             })
             .catch(error => {
                 let description = error.message;
