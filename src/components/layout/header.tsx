@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard } from 'lucide-react';
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, HelpCircle, Mail, Phone } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import {
   Dialog,
@@ -132,6 +132,38 @@ export function Header() {
                   </Dialog>
                 </>
               )}
+               <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                          <HelpCircle className="mr-2 h-4 w-4" />
+                          Help & Support
+                      </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                      <DialogTitle>Help & Support</DialogTitle>
+                      <DialogDescription>
+                          Contact us for any questions or issues.
+                      </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div className="flex items-center gap-4">
+                            <Mail className="h-5 w-5 text-muted-foreground" />
+                            <div className="flex flex-col">
+                                <span className="text-sm text-muted-foreground">Email</span>
+                                <a href="mailto:operationsupport@malpemeen.com" className="font-semibold hover:underline">operationsupport@malpemeen.com</a>
+                            </div>
+                        </div>
+                         <div className="flex items-center gap-4">
+                            <Phone className="h-5 w-5 text-muted-foreground" />
+                             <div className="flex flex-col">
+                                <span className="text-sm text-muted-foreground">Phone</span>
+                                <a href="tel:9945932828" className="font-semibold hover:underline">9945932828</a>
+                            </div>
+                        </div>
+                      </div>
+                  </DialogContent>
+              </Dialog>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
