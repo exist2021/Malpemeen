@@ -6,15 +6,19 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { PlusCircle, LayoutDashboard } from 'lucide-react';
 import { Header } from '@/components/layout/header';
-import { useUser } from '@/firebase';
-import { useEffect } from 'react';
+import { useUser, useFirestore } from '@/firebase';
+import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { doc, getDoc } from 'firebase/firestore';
+import type { Seller } from '@/app/types';
 
 function SellerHomeSkeleton() {
     return (
         <main className="container mx-auto max-w-4xl py-12">
-            <Skeleton className="h-9 w-1/2 mb-2" />
-            <Skeleton className="h-5 w-3/4 mb-12" />
+            <div className="text-center mb-12">
+                <Skeleton className="h-10 w-1/2 mx-auto mb-2" />
+                <Skeleton className="h-5 w-3/4 mx-auto" />
+            </div>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <Card>
                     <CardHeader>
@@ -45,6 +49,9 @@ function SellerHomeSkeleton() {
 export default function SellerHomePage() {
   const router = useRouter();
   const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
+  const [seller, setSeller] = useState<Seller | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -52,7 +59,24 @@ export default function SellerHomePage() {
     }
   }, [user, isUserLoading, router]);
 
-  if (isUserLoading) {
+  useEffect(() => {
+    if (user && firestore) {
+        setLoading(true);
+        const fetchSellerData = async () => {
+            const sellerRef = doc(firestore, 'sellers', user.uid);
+            const sellerSnap = await getDoc(sellerRef);
+            if(sellerSnap.exists()){
+                setSeller(sellerSnap.data() as Seller);
+            }
+            setLoading(false);
+        }
+        fetchSellerData();
+    } else if (!isUserLoading) {
+        setLoading(false);
+    }
+  }, [user, firestore, isUserLoading]);
+
+  if (isUserLoading || loading) {
       return (
         <>
             <Header />
@@ -67,7 +91,7 @@ export default function SellerHomePage() {
       <Header />
       <main className="container mx-auto max-w-4xl py-12">
         <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold tracking-tight font-headline">Welcome, Seller!</h1>
+            <h1 className="text-4xl font-bold tracking-tight font-headline">Welcome, {seller?.name || 'Seller'}!</h1>
             <p className="mt-2 text-lg text-muted-foreground">What would you like to do today?</p>
         </div>
 
