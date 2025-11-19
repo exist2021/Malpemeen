@@ -70,113 +70,114 @@ export function Header() {
             );
         } else {
              triggerContent = (
-                <>
-                    <UserIcon className="mr-2 h-4 w-4" />
-                    Profile
-                </>
+                <UserIcon className="h-5 w-5" />
             );
         }
 
 
        return (
-            <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost">
-                {triggerContent}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-               {role === 'customer' && (
-                <Dialog>
-                    <DialogTrigger asChild>
-                       <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <Settings className="mr-2 h-4 w-4" />
-                            Account Settings
-                        </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                        <DialogTitle>My Account</DialogTitle>
-                        <DialogDescription>
-                            View and update your personal information.
-                        </DialogDescription>
-                        </DialogHeader>
-                        <CustomerAccountForm />
-                    </DialogContent>
-                </Dialog>
-               )}
+            <div className="flex items-center gap-2">
               {role === 'seller' && (
-                <>
-                  <DropdownMenuItem onClick={() => router.push('/seller/home')}>
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Seller Home
-                  </DropdownMenuItem>
-                   <Dialog>
+                <Button variant="ghost" onClick={() => router.push('/seller/home')}>
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Seller Home
+                </Button>
+              )}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="rounded-full h-9 w-9 p-0">
+                    {triggerContent}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {role === 'customer' && (
+                    <Dialog>
+                        <DialogTrigger asChild>
+                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <Settings className="mr-2 h-4 w-4" />
+                                Account Settings
+                            </DropdownMenuItem>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                            <DialogTitle>My Account</DialogTitle>
+                            <DialogDescription>
+                                View and update your personal information.
+                            </DialogDescription>
+                            </DialogHeader>
+                            <CustomerAccountForm />
+                        </DialogContent>
+                    </Dialog>
+                  )}
+                  {role === 'seller' && (
+                    <>
+                      <Dialog>
+                          <DialogTrigger asChild>
+                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                  <Settings className="mr-2 h-4 w-4" />
+                                  Account Settings
+                              </DropdownMenuItem>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-[425px]">
+                              <DialogHeader>
+                              <DialogTitle>Seller Details</DialogTitle>
+                              <DialogDescription>
+                                  View and update your seller information.
+                              </DialogDescription>
+                              </DialogHeader>
+                              <SellerAccountForm />
+                          </DialogContent>
+                      </Dialog>
+                    </>
+                  )}
+                  <Dialog>
                       <DialogTrigger asChild>
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                              <Settings className="mr-2 h-4 w-4" />
-                              Account Settings
+                              <HelpCircle className="mr-2 h-4 w-4" />
+                              Help & Support
                           </DropdownMenuItem>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-[425px]">
                           <DialogHeader>
-                          <DialogTitle>Seller Details</DialogTitle>
+                          <DialogTitle>Help & Support</DialogTitle>
                           <DialogDescription>
-                              View and update your seller information.
+                              Contact us for any questions or issues.
                           </DialogDescription>
                           </DialogHeader>
-                          <SellerAccountForm />
+                          <div className="space-y-4 py-4">
+                            <div className="flex items-center gap-4">
+                                <Mail className="h-5 w-5 text-muted-foreground" />
+                                <div className="flex flex-col">
+                                    <span className="text-sm text-muted-foreground">Email</span>
+                                    <a href="mailto:operationsupport@malpemeen.com" className="font-semibold hover:underline">operationsupport@malpemeen.com</a>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <Phone className="h-5 w-5 text-muted-foreground" />
+                                <div className="flex flex-col">
+                                    <span className="text-sm text-muted-foreground">Phone</span>
+                                    <a href="tel:9945932828" className="font-semibold hover:underline">9945932828</a>
+                                </div>
+                            </div>
+                          </div>
                       </DialogContent>
                   </Dialog>
-                </>
-              )}
-               <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                          <HelpCircle className="mr-2 h-4 w-4" />
-                          Help & Support
-                      </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                      <DialogHeader>
-                      <DialogTitle>Help & Support</DialogTitle>
-                      <DialogDescription>
-                          Contact us for any questions or issues.
-                      </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4 py-4">
-                        <div className="flex items-center gap-4">
-                            <Mail className="h-5 w-5 text-muted-foreground" />
-                            <div className="flex flex-col">
-                                <span className="text-sm text-muted-foreground">Email</span>
-                                <a href="mailto:operationsupport@malpemeen.com" className="font-semibold hover:underline">operationsupport@malpemeen.com</a>
-                            </div>
-                        </div>
-                         <div className="flex items-center gap-4">
-                            <Phone className="h-5 w-5 text-muted-foreground" />
-                             <div className="flex flex-col">
-                                <span className="text-sm text-muted-foreground">Phone</span>
-                                <a href="tel:9945932828" className="font-semibold hover:underline">9945932828</a>
-                            </div>
-                        </div>
-                      </div>
-                  </DialogContent>
-              </Dialog>
-              <DropdownMenuItem asChild>
-                <a href="https://www.malpemeen.com/" target="_blank" rel="noopener noreferrer">
-                  <Info className="mr-2 h-4 w-4" />
-                  About
-                </a>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  <DropdownMenuItem asChild>
+                    <a href="https://www.malpemeen.com/" target="_blank" rel="noopener noreferrer">
+                      <Info className="mr-2 h-4 w-4" />
+                      About
+                    </a>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
         );
     }
 
