@@ -2,7 +2,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useUser, useAuth, useUserRole } from '@/firebase';
+import { useUser, useAuth, useUserRole, useSellerProfile } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { FishLogo } from '../fish-logo';
 import {
@@ -25,12 +25,14 @@ import {
 } from "@/components/ui/dialog"
 import { CustomerAccountForm } from '@/app/customer/dashboard/customer-account-form';
 import { SellerAccountForm } from '@/app/seller/dashboard/seller-account-form';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 
 export function Header() {
   const router = useRouter();
   const { user, isUserLoading } = useUser();
   const { role } = useUserRole();
+  const { profile: sellerProfile, isLoading: isSellerProfileLoading } = useSellerProfile();
   const auth = useAuth();
 
   const handleLogout = () => {
@@ -46,12 +48,26 @@ export function Header() {
     }
     
     if (user) {
+        const triggerContent =
+            role === 'seller' && sellerProfile?.logoUrl ? (
+                <Avatar className="h-9 w-9">
+                    <AvatarImage src={sellerProfile.logoUrl} alt={sellerProfile.name} />
+                    <AvatarFallback>
+                        <UserIcon className="h-4 w-4" />
+                    </AvatarFallback>
+                </Avatar>
+            ) : (
+                <>
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    Profile
+                </>
+            );
+
        return (
             <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost">
-                <UserIcon className="mr-2 h-4 w-4" />
-                Profile
+                {isSellerProfileLoading && role === 'seller' ? <Skeleton className="h-9 w-9 rounded-full" /> : triggerContent}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

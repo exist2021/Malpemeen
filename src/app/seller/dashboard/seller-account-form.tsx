@@ -1,6 +1,8 @@
+
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect, useTransition, useRef } from 'react';
+import Image from 'next/image';
 import { useSellerProfile } from '@/firebase/provider';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -9,21 +11,24 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { updateDoc, doc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
-import { Loader2 } from 'lucide-react';
+import { Loader2, User } from 'lucide-react';
 import type { Seller } from '@/app/types';
 import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export function SellerAccountForm() {
     const { profile, isLoading } = useSellerProfile();
     const { firestore } = useFirebase();
     const { toast } = useToast();
     const [isPending, startTransition] = useTransition();
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         phoneNumber: '',
         address: '',
+        logoUrl: '',
     });
 
     useEffect(() => {
@@ -33,6 +38,7 @@ export function SellerAccountForm() {
                 email: profile.email || '',
                 phoneNumber: profile.phoneNumber || '',
                 address: profile.address || '',
+                logoUrl: profile.logoUrl || '',
             });
         }
     }, [profile]);
@@ -42,6 +48,18 @@ export function SellerAccountForm() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData(prev => ({...prev, logoUrl: reader.result as string}));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!profile || !firestore) return;
@@ -50,6 +68,8 @@ export function SellerAccountForm() {
         if (formData.name !== profile.name) updatedData.name = formData.name;
         if (formData.phoneNumber !== profile.phoneNumber) updatedData.phoneNumber = formData.phoneNumber;
         if (formData.address !== profile.address) updatedData.address = formData.address;
+        if (formData.logoUrl !== profile.logoUrl) updatedData.logoUrl = formData.logoUrl;
+
 
         if (Object.keys(updatedData).length === 0) {
             toast({ title: 'No changes to save.' });
@@ -78,6 +98,9 @@ export function SellerAccountForm() {
     if (isLoading) {
         return (
             <div className="space-y-4">
+                 <div className="flex justify-center">
+                    <Skeleton className="h-24 w-24 rounded-full" />
+                </div>
                 <div className="space-y-2">
                     <Skeleton className="h-4 w-1/4" />
                     <Skeleton className="h-10 w-full" />
@@ -100,7 +123,28 @@ export function SellerAccountForm() {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+             <div className="flex flex-col items-center space-y-4">
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                    accept="image/*"
+                />
+                <Avatar 
+                    className="h-24 w-24 cursor-pointer relative group"
+                    onClick={() => fileInputRef.current?.click()}
+                >
+                    <AvatarImage src={formData.logoUrl} alt={formData.name} />
+                    <AvatarFallback>
+                        <User className="h-10 w-10" />
+                    </AvatarFallback>
+                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                        <span className="text-xs text-center">Change Logo</span>
+                    </div>
+                </Avatar>
+            </div>
             <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
                 <Input id="name" name="name" value={formData.name} onChange={handleInputChange} />

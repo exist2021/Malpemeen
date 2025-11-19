@@ -35,6 +35,10 @@
         "totalCalls": {
             "type": "number",
             "description": "Total number of call clicks across all of the seller's listings."
+        },
+        "logoUrl": {
+          "type": "string",
+          "description": "URL of the seller's business logo, stored as a data URI."
         }
       },
       "required": [

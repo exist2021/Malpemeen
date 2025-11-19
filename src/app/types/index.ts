@@ -7,6 +7,7 @@ export type Seller = {
     address?: string;
     totalViews?: number;
     totalCalls?: number;
+    logoUrl?: string;
 };
 
 export type Customer = {
@@ -38,6 +39,3 @@ export type FishListing = {
     viewCount?: number;
     callClickCount?: number;
 };
-
-
-
