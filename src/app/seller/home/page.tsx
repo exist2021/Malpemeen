@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -91,7 +92,7 @@ export default function SellerHomePage() {
       <main className="container mx-auto max-w-4xl py-12">
         <div className="text-center mb-12">
             <h1 className="text-4xl font-bold tracking-tight font-headline">Welcome, {seller?.name || 'Seller'}</h1>
-            <p className="mt-2 text-lg text-muted-foreground">What would you like to do today?</p>
+            <p className="mt-2 text-lg text-muted-foreground">Great to see you again! Your dashboard is updated and ready for new orders. Let’s make today productive.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
