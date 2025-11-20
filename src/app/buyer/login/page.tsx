@@ -55,14 +55,20 @@ export default function BuyerLoginPage() {
 
 
   useEffect(() => {
-    if (auth && !recaptchaVerifierRef.current && recaptchaContainerRef.current) {
-        // Ensure the container is empty before rendering
-        recaptchaContainerRef.current.innerHTML = '';
-        const verifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
-            'size': 'invisible',
-        });
-        recaptchaVerifierRef.current = verifier;
+    if (auth && recaptchaContainerRef.current) {
+        if (!recaptchaVerifierRef.current) {
+            recaptchaVerifierRef.current = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
+                'size': 'invisible',
+            });
+        }
     }
+    // Cleanup on component unmount
+    return () => {
+        if (recaptchaVerifierRef.current) {
+            recaptchaVerifierRef.current.clear();
+            recaptchaVerifierRef.current = null;
+        }
+    };
   }, [auth]);
 
 
@@ -123,7 +129,7 @@ export default function BuyerLoginPage() {
 
   const handlePhoneSignIn = async () => {
     if (!auth || !firestore || !recaptchaVerifierRef.current) {
-      toast({ variant: 'destructive', title: 'Firebase not initialized.' });
+      toast({ variant: 'destructive', title: 'Firebase not initialized or reCAPTCHA not ready.' });
       return;
     }
     if (!phone) {
@@ -239,7 +245,6 @@ export default function BuyerLoginPage() {
 
   return (
     <>
-    <div ref={recaptchaContainerRef}></div>
     <div className="flex min-h-screen">
        <div className="relative hidden lg:block lg:w-1/2">
         <Image
@@ -252,6 +257,7 @@ export default function BuyerLoginPage() {
         <div className="absolute inset-0 bg-black/50" />
       </div>
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 mx-auto relative">
+         <div ref={recaptchaContainerRef}></div>
          <Button variant="ghost" asChild className="absolute top-4 left-4">
             <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>
         </Button>
