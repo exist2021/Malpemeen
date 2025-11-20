@@ -10,16 +10,17 @@ import { Mic, MicOff, Loader2, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { parseListingDetails } from '@/ai/flows/parse-listing-details-flow';
 import { useRouter } from 'next/navigation';
+import type { FishListing } from '@/app/types';
 
 export default function SellPage() {
     const router = useRouter();
     // State for all form fields, lifted up from SellerForm
     const [productName, setProductName] = useState('');
     const [pricePerKg, setPricePerKg] = useState('');
-    const [portDetails, setPortDetails] = useState('');
+    const [portDetails, setPortDetails] = useState<FishListing['portDetails'] | ''>('');
     const [totalQuantityInTons, setTotalQuantityInTons] = useState('');
-    const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | '370-Boat' | ''>('');
-    const [brandName, setBrandName] = useState('Malpe Meen');
+    const [boatDetails, setBoatDetails] = useState<FishListing['boatDetails'] | ''>('');
+    const [brandName, setBrandName] = useState('Malpe Meen Pvt Ltd');
     const [description, setDescription] = useState('');
     const [mediaUrls, setMediaUrls] = useState<string[]>([]);
     

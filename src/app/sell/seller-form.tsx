@@ -36,9 +36,9 @@ interface SellerFormProps {
     formState: {
         productName: string;
         pricePerKg: string;
-        portDetails: string;
+        portDetails: FishListing['portDetails'] | '';
         totalQuantityInTons: string;
-        boatDetails: 'Ashok Leyland' | 'Persian Boat' | '370-Boat' | '';
+        boatDetails: FishListing['boatDetails'] | '';
         brandName: string;
         description: string;
         mediaUrls: string[];
@@ -46,9 +46,9 @@ interface SellerFormProps {
     setFormState: {
         setProductName: (value: string) => void;
         setPricePerKg: (value: string) => void;
-        setPortDetails: (value: string) => void;
+        setPortDetails: (value: FishListing['portDetails'] | '') => void;
         setTotalQuantityInTons: (value: string) => void;
-        setBoatDetails: (value: 'Ashok Leyland' | 'Persian Boat' | '370-Boat' | '') => void;
+        setBoatDetails: (value: FishListing['boatDetails'] | '') => void;
         setBrandName: (value: string) => void;
         setDescription: (value: string) => void;
         setMediaUrls: (value: string[] | ((prev: string[]) => string[])) => void;
@@ -214,7 +214,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         setPortDetails('');
         setTotalQuantityInTons('');
         setBoatDetails('');
-        setBrandName('Malpe Meen');
+        setBrandName('Malpe Meen Pvt Ltd');
         setDescription('');
         setMediaUrls([]);
     }
@@ -261,9 +261,9 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         const listingData = {
           productName,
           pricePerKg: pricePerKg ? Number(pricePerKg) : undefined,
-          portDetails,
+          portDetails: portDetails as FishListing['portDetails'],
           totalQuantityInTons: totalQuantityInTons ? Number(totalQuantityInTons) : undefined,
-          boatDetails: boatDetails as 'Ashok Leyland' | 'Persian Boat' | '370-Boat',
+          boatDetails: boatDetails as FishListing['boatDetails'],
           brandName,
           description,
           mediaUrls: mediaUrls,
@@ -332,7 +332,17 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         </div>
         <div className="space-y-2">
             <Label htmlFor="portDetails">Port Details</Label>
-            <Input id="portDetails" value={portDetails} onChange={(e) => setPortDetails(e.target.value)} placeholder="e.g., Malpe Port" required aria-describedby="portDetails-error" />
+            <Select value={portDetails} onValueChange={(value) => setPortDetails(value as any)} required>
+                <SelectTrigger id="portDetails" aria-describedby="portDetails-error">
+                    <SelectValue placeholder="Select a port" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="Malpe Port">Malpe Port</SelectItem>
+                    <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
+                    <SelectItem value="Kochi Port">Kochi Port</SelectItem>
+                    <SelectItem value="Hyderabad Port">Hyderabad Port</SelectItem>
+                </SelectContent>
+            </Select>
             <div id="portDetails-error" aria-live="polite" aria-atomic="true">
               {errors?.portDetails && <p className="text-sm font-medium text-destructive">{errors.portDetails}</p>}
             </div>
@@ -355,7 +365,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         </div>
          <div className="space-y-2">
             <Label htmlFor="brandName">Brand Name</Label>
-            <Input id="brandName" value={brandName} onChange={(e) => setBrandName(e.target.value)} placeholder="e.g., Malpe Meen" required />
+            <Input id="brandName" value={brandName} disabled />
         </div>
         <div className="space-y-2">
             <Label htmlFor="totalQuantityInTons">Total Quantity Available (Tons)</Label>

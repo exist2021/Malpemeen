@@ -25,10 +25,10 @@ export default function EditSellPage() {
     // State for all form fields, lifted up from SellerForm
     const [productName, setProductName] = useState('');
     const [pricePerKg, setPricePerKg] = useState('');
-    const [portDetails, setPortDetails] = useState('');
+    const [portDetails, setPortDetails] = useState<FishListing['portDetails'] | ''>('');
     const [totalQuantityInTons, setTotalQuantityInTons] = useState('');
-    const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | '370-Boat' | ''>('');
-    const [brandName, setBrandName] = useState('Malpe Meen');
+    const [boatDetails, setBoatDetails] = useState<FishListing['boatDetails'] | ''>('');
+    const [brandName, setBrandName] = useState('Malpe Meen Pvt Ltd');
     const [description, setDescription] = useState('');
     const [mediaUrls, setMediaUrls] = useState<string[]>([]);
 
@@ -40,11 +40,11 @@ export default function EditSellPage() {
             setListing(data);
             // Populate form state when listing is fetched
             setProductName(data.productName || '');
-            setPricePerKg(String(data.pricePerKg) || '');
+            setPricePerKg(String(data.pricePerKg || ''));
             setPortDetails(data.portDetails || '');
-            setTotalQuantityInTons(String(data.totalQuantityInTons) || '');
+            setTotalQuantityInTons(String(data.totalQuantityInTons || ''));
             setBoatDetails(data.boatDetails || '');
-            setBrandName(data.brandName || 'Malpe Meen');
+            setBrandName(data.brandName || 'Malpe Meen Pvt Ltd');
             setDescription(data.description || '');
             setMediaUrls(data.mediaUrls || []);
           } else {

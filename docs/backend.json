@@ -143,7 +143,8 @@
         },
         "portDetails": {
           "type": "string",
-          "description": "Details about the port of origin."
+          "description": "Details about the port of origin.",
+           "enum": ["Malpe Port", "Mangalore Port", "Kochi Port", "Hyderabad Port"]
         },
         "boatDetails": {
           "type": "string",
@@ -151,7 +152,7 @@
         },
         "brandName": {
           "type": "string",
-          "description": "Brand name for the product, e.g., 'Malpe Meen'."
+          "description": "Brand name for the product, fixed to 'Malpe Meen Pvt Ltd'."
         },
         "viewCount": {
             "type": "number",
