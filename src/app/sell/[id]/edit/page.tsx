@@ -24,9 +24,8 @@ export default function EditSellPage() {
 
     // State for all form fields, lifted up from SellerForm
     const [productName, setProductName] = useState('');
-    const [pricePerBox, setPricePerBox] = useState('');
+    const [pricePerKg, setPricePerKg] = useState('');
     const [portDetails, setPortDetails] = useState('');
-    const [caughtBy, setCaughtBy] = useState('');
     const [howCaught, setHowCaught] = useState('');
     const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | ''>('');
     const [owner, setOwner] = useState('');
@@ -42,9 +41,8 @@ export default function EditSellPage() {
             setListing(data);
             // Populate form state when listing is fetched
             setProductName(data.productName || '');
-            setPricePerBox(String(data.pricePerBox) || '');
+            setPricePerKg(String(data.pricePerKg) || '');
             setPortDetails(data.portDetails || '');
-            setCaughtBy(data.caughtBy || '');
             setHowCaught(data.howCaught || '');
             setBoatDetails(data.boatDetails || '');
             setOwner(data.owner || '');
@@ -147,9 +145,8 @@ export default function EditSellPage() {
             listing={listing}
             formState={{
               productName,
-              pricePerBox,
+              pricePerKg,
               portDetails,
-              caughtBy,
               howCaught,
               boatDetails,
               owner,
@@ -159,9 +156,8 @@ export default function EditSellPage() {
             }}
             setFormState={{
                 setProductName,
-                setPricePerBox,
+                setPricePerKg,
                 setPortDetails,
-                setCaughtBy,
                 setHowCaught,
                 setBoatDetails,
                 setOwner,

@@ -35,9 +35,8 @@ interface SellerFormProps {
     listing?: FishListing | null;
     formState: {
         productName: string;
-        pricePerBox: string;
+        pricePerKg: string;
         portDetails: string;
-        caughtBy: string;
         howCaught: string;
         boatDetails: 'Ashok Leyland' | 'Persian Boat' | '';
         owner: string;
@@ -47,9 +46,8 @@ interface SellerFormProps {
     };
     setFormState: {
         setProductName: (value: string) => void;
-        setPricePerBox: (value: string) => void;
+        setPricePerKg: (value: string) => void;
         setPortDetails: (value: string) => void;
-        setCaughtBy: (value: string) => void;
         setHowCaught: (value: string) => void;
         setBoatDetails: (value: 'Ashok Leyland' | 'Persian Boat' | '') => void;
         setOwner: (value: string) => void;
@@ -192,10 +190,10 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
 export function SellerForm({ listing, formState, setFormState }: SellerFormProps) {
   const { toast } = useToast();
   const {
-    productName, pricePerBox, portDetails, caughtBy, howCaught, boatDetails, owner, brandName, description, mediaUrls
+    productName, pricePerKg, portDetails, howCaught, boatDetails, owner, brandName, description, mediaUrls
   } = formState;
   const {
-    setProductName, setPricePerBox, setPortDetails, setCaughtBy, setHowCaught, setBoatDetails, setOwner, setBrandName, setDescription, setMediaUrls
+    setProductName, setPricePerKg, setPortDetails, setHowCaught, setBoatDetails, setOwner, setBrandName, setDescription, setMediaUrls
   } = setFormState;
 
   const [errors, setErrors] = useState<Partial<Record<keyof Omit<FishListing, 'id' | 'sellerId' | 'listedDate'>, string[]>>>({});
@@ -214,9 +212,8 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     
     if (!isEditMode) {
         setProductName('');
-        setPricePerBox('');
+        setPricePerKg('');
         setPortDetails('');
-        setCaughtBy('');
         setHowCaught('');
         setBoatDetails('');
         setOwner('');
@@ -225,7 +222,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         setMediaUrls([]);
     }
 
-  }, [user, isUserLoading, router, isEditMode, setProductName, setPricePerBox, setPortDetails, setCaughtBy, setHowCaught, setBoatDetails, setOwner, setBrandName, setDescription, setMediaUrls]);
+  }, [user, isUserLoading, router, isEditMode, setProductName, setPricePerKg, setPortDetails, setHowCaught, setBoatDetails, setOwner, setBrandName, setDescription, setMediaUrls]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -260,9 +257,8 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
 
     const newErrors: any = {};
     if (!productName) newErrors.productName = ['Product Name is required.'];
-    if (!pricePerBox || isNaN(Number(pricePerBox)) || Number(pricePerBox) <= 0) newErrors.pricePerBox = ['Please enter a valid price.'];
+    if (!pricePerKg || isNaN(Number(pricePerKg)) || Number(pricePerKg) <= 0) newErrors.pricePerKg = ['Please enter a valid price.'];
     if (!portDetails) newErrors.portDetails = ['Port Details are required.'];
-    if (!caughtBy) newErrors.caughtBy = ['"Who Caught" is required.'];
     if (!howCaught) newErrors.howCaught = ['"How Caught" is required.'];
     if (!boatDetails) newErrors.boatDetails = ['Please select a boat.'];
     if (!owner) newErrors.owner = ['Owner is required.'];
@@ -286,9 +282,8 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
       try {
         const listingData = {
           productName,
-          pricePerBox: Number(pricePerBox),
+          pricePerKg: Number(pricePerKg),
           portDetails,
-          caughtBy,
           howCaught,
           boatDetails: boatDetails as 'Ashok Leyland' | 'Persian Boat',
           owner,
@@ -359,10 +354,10 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             </div>
         </div>
         <div className="space-y-2">
-            <Label htmlFor="pricePerBox">Price per Box (₹)</Label>
-            <Input id="pricePerBox" type="number" value={pricePerBox} onChange={(e) => setPricePerBox(e.target.value)} placeholder="e.g., 9500" required aria-describedby="pricePerBox-error" />
-            <div id="pricePerBox-error" aria-live="polite" aria-atomic="true">
-              {errors?.pricePerBox && <p className="text-sm font-medium text-destructive">{errors.pricePerBox}</p>}
+            <Label htmlFor="pricePerKg">Price Per Kg (₹)</Label>
+            <Input id="pricePerKg" type="number" value={pricePerKg} onChange={(e) => setPricePerKg(e.target.value)} placeholder="e.g., 250" required aria-describedby="pricePerKg-error" />
+            <div id="pricePerKg-error" aria-live="polite" aria-atomic="true">
+              {errors?.pricePerKg && <p className="text-sm font-medium text-destructive">{errors.pricePerKg}</p>}
             </div>
         </div>
         <div className="space-y-2">
@@ -370,13 +365,6 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             <Input id="portDetails" value={portDetails} onChange={(e) => setPortDetails(e.target.value)} placeholder="e.g., Malpe Port" required aria-describedby="portDetails-error" />
             <div id="portDetails-error" aria-live="polite" aria-atomic="true">
               {errors?.portDetails && <p className="text-sm font-medium text-destructive">{errors.portDetails}</p>}
-            </div>
-        </div>
-        <div className="space-y-2">
-            <Label htmlFor="caughtBy">Who Caught</Label>
-            <Input id="caughtBy" value={caughtBy} onChange={(e) => setCaughtBy(e.target.value)} placeholder="e.g., Local Fishers" required aria-describedby="caughtBy-error" />
-            <div id="caughtBy-error" aria-live="polite" aria-atomic="true">
-              {errors?.caughtBy && <p className="text-sm font-medium text-destructive">{errors.caughtBy}</p>}
             </div>
         </div>
         <div className="space-y-2">
@@ -408,7 +396,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
               {errors?.owner && <p className="text-sm font-medium text-destructive">{errors.owner}</p>}
             </div>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 md:col-span-2">
             <Label htmlFor="brandName">Brand Name</Label>
             <Input id="brandName" value={brandName} onChange={(e) => setBrandName(e.target.value)} placeholder="e.g., Malpe Meen" required />
         </div>

@@ -137,17 +137,13 @@
           "type": "string",
           "description": "Name of the fish product."
         },
-        "pricePerBox": {
+        "pricePerKg": {
           "type": "number",
-          "description": "Selling price per box."
+          "description": "Selling price per Kg."
         },
         "portDetails": {
           "type": "string",
           "description": "Details about the port of origin."
-        },
-        "caughtBy": {
-          "type": "string",
-          "description": "Name of the person or group who caught the fish."
         },
         "howCaught": {
           "type": "string",
@@ -183,9 +179,8 @@
         "description",
         "listedDate",
         "productName",
-        "pricePerBox",
+        "pricePerKg",
         "portDetails",
-        "caughtBy",
         "howCaught",
         "boatDetails",
         "owner",

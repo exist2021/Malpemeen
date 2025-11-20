@@ -17,9 +17,8 @@ export type ParseListingDetailsInput = z.infer<typeof ParseListingDetailsInputSc
 
 const ParseListingDetailsOutputSchema = z.object({
   productName: z.string().optional().describe("The name of the fish product."),
-  pricePerBox: z.number().optional().describe("The selling price per box."),
+  pricePerKg: z.number().optional().describe("The selling price per Kg."),
   portDetails: z.string().optional().describe("Details about the port of origin."),
-  caughtBy: z.string().optional().describe("Name of the person or group who caught the fish."),
   howCaught: z.string().optional().describe("Method used to catch the fish."),
   boatDetails: z.enum(["Ashok Leyland", "Persian Boat"]).optional().describe("Type of boat used."),
   owner: z.string().optional().describe("Owner of the boat/catch."),
@@ -40,9 +39,8 @@ const prompt = ai.definePrompt({
 
 You need to identify keywords to map the speech to the correct field. Here are some examples:
 - "Product name is Fresh Tuna" -> productName: "Fresh Tuna"
-- "Set price to 5000" -> pricePerBox: 5000
+- "Set price to 5000" -> pricePerKg: 5000
 - "The port is Malpe" -> portDetails: "Malpe"
-- "Caught by local fishermen" -> caughtBy: "local fishermen"
 - "How it was caught is net fishing" -> howCaught: "net fishing"
 - "Boat is Persian Boat" -> boatDetails: "Persian Boat"
 - "Owner is John Doe" -> owner: "John Doe"

@@ -30,9 +30,8 @@ export type FishListing = {
     sellerPhone?: string;
     sellerAddress?: string;
     productName: string;
-    pricePerBox: number;
+    pricePerKg: number;
     portDetails: string;
-    caughtBy: string;
     howCaught: string;
     boatDetails: 'Ashok Leyland' | 'Persian Boat';
     owner: string;

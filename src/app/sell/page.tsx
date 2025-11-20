@@ -15,9 +15,8 @@ export default function SellPage() {
     const router = useRouter();
     // State for all form fields, lifted up from SellerForm
     const [productName, setProductName] = useState('');
-    const [pricePerBox, setPricePerBox] = useState('');
+    const [pricePerKg, setPricePerKg] = useState('');
     const [portDetails, setPortDetails] = useState('');
-    const [caughtBy, setCaughtBy] = useState('');
     const [howCaught, setHowCaught] = useState('');
     const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | ''>('');
     const [owner, setOwner] = useState('');
@@ -75,9 +74,8 @@ export default function SellPage() {
                 const parsedDetails = await parseListingDetails(text);
                 if (Object.keys(parsedDetails).length > 0) {
                     setProductName(prev => parsedDetails.productName || prev);
-                    setPricePerBox(prev => parsedDetails.pricePerBox ? String(parsedDetails.pricePerBox) : prev);
+                    setPricePerKg(prev => parsedDetails.pricePerKg ? String(parsedDetails.pricePerKg) : prev);
                     setPortDetails(prev => parsedDetails.portDetails || prev);
-                    setCaughtBy(prev => parsedDetails.caughtBy || prev);
                     setHowCaught(prev => parsedDetails.howCaught || prev);
                     setBoatDetails(prev => parsedDetails.boatDetails || prev);
                     setOwner(prev => parsedDetails.owner || prev);
@@ -149,9 +147,8 @@ export default function SellPage() {
             <SellerForm
                 formState={{
                     productName,
-                    pricePerBox,
+                    pricePerKg,
                     portDetails,
-                    caughtBy,
                     howCaught,
                     boatDetails,
                     owner,
@@ -161,9 +158,8 @@ export default function SellPage() {
                 }}
                 setFormState={{
                     setProductName,
-                    setPricePerBox,
+                    setPricePerKg,
                     setPortDetails,
-                    setCaughtBy,
                     setHowCaught,
                     setBoatDetails,
                     setOwner,

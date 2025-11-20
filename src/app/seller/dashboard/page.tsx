@@ -97,7 +97,7 @@ function SellerListings({ listings, setListings }: { listings: FishListing[], se
                             <div className="flex-grow min-w-0 text-center sm:text-left">
                                 <Link href={`/listings/${listing.id}`} className="font-semibold truncate hover:underline">{listing.productName}</Link>
                                 <p className="text-sm text-muted-foreground">
-                                    {listing.pricePerBox ? `₹${listing.pricePerBox.toLocaleString()} / box` : 'Price not set'}
+                                    {listing.pricePerKg ? `₹${listing.pricePerKg.toLocaleString()} / Kg` : 'Price not set'}
                                 </p>
                                 <p className="text-sm text-muted-foreground">Listed on {format(new Date(listing.listedDate), 'MMM d, yyyy')}</p>
                             </div>
@@ -226,7 +226,7 @@ export default function SellerDashboard() {
     );
   }
 
-  const totalValue = listings.reduce((acc, listing) => acc + (listing.pricePerBox || 0), 0);
+  const totalValue = listings.reduce((acc, listing) => acc + (listing.pricePerKg || 0), 0);
 
   return (
     <>
@@ -275,7 +275,7 @@ export default function SellerDashboard() {
             </Card>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Potential Value (per box)</CardTitle>
+                    <CardTitle className="text-sm font-medium">Potential Value (per Kg)</CardTitle>
                     <IndianRupee className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
