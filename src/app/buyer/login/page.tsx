@@ -340,6 +340,7 @@ export default function BuyerLoginPage() {
                         <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input id="phone" type="tel" placeholder="919876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="pl-10" />
                       </div>
+                      <p className="text-xs text-muted-foreground">Include country code (e.g., 91 for India)</p>
                     </div>
                     <Button type="submit" className="w-full h-12 text-base" disabled={isSendingOtp}>
                       {isSendingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
