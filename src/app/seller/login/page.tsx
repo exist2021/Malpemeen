@@ -13,6 +13,7 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   ConfirmationResult,
+  getDoc,
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
@@ -62,18 +63,23 @@ export default function SellerLoginPage() {
   useEffect(() => {
     if (!auth) return;
     
-    // Ensure this runs only on the client and after mount
-    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-      'size': 'invisible',
-    });
-    window.recaptchaVerifier = verifier;
+    if (!window.recaptchaVerifier) {
+      // Ensure this runs only on the client and after mount
+      const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible',
+      });
+      window.recaptchaVerifier = verifier;
+    }
 
     // Cleanup on component unmount
     return () => {
-        verifier.clear();
-        const recaptchaContainer = document.getElementById('recaptcha-container');
-        if (recaptchaContainer) {
-            recaptchaContainer.innerHTML = '';
+        if (window.recaptchaVerifier) {
+            window.recaptchaVerifier.clear();
+            const recaptchaContainer = document.getElementById('recaptcha-container');
+            if (recaptchaContainer) {
+                recaptchaContainer.innerHTML = '';
+            }
+            window.recaptchaVerifier = undefined;
         }
     };
   }, [auth]);
