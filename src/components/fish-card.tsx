@@ -71,12 +71,12 @@ export function FishCard({ listing }: FishCardProps) {
 
         <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-black/70 backdrop-blur-sm p-3 flex flex-col justify-between">
             <div className="space-y-1.5">
-                <CardDetail icon={User} text={listing.sellerName} />
-                <CardDetail icon={Anchor} text={listing.portDetails} />
-                <h3 className="font-bold text-base uppercase tracking-wide font-headline truncate flex items-center gap-1.5 pt-1">
-                    <Package className="h-4 w-4 flex-shrink-0" />
-                    {listing.productName || 'Fresh Fish'}
+                <h3 className="font-bold text-base uppercase tracking-wide font-headline truncate flex items-center gap-1.5">
+                    <User className="h-4 w-4 flex-shrink-0" />
+                    {listing.sellerName}
                 </h3>
+                 <CardDetail icon={Anchor} text={listing.portDetails} />
+                 <p className="font-semibold text-sm truncate pt-1">{listing.productName || 'Fresh Fish'}</p>
             </div>
              <div className="flex justify-between items-end text-xs font-medium">
                 <div className="flex items-center gap-1.5">

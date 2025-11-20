@@ -3,7 +3,7 @@
 
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import type { FishListing } from '@/app/types';
 import { getFishListings } from '@/app/lib/data';
 import { FishCard } from '@/components/fish-card';
@@ -23,13 +23,13 @@ function ListingsSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {Array.from({ length: 8 }).map((_, i) => (
-        <Skeleton key={i} className="h-64 w-full rounded-xl" />
+        <Skeleton key={i} className="h-80 w-full rounded-xl" />
       ))}
     </div>
   );
 }
 
-function FishListings({ portFilter }: { portFilter: string }) {
+function FishListings({ portFilter, sellerFilter }: { portFilter: string, sellerFilter: string }) {
   const [allListings, setAllListings] = useState<FishListing[]>([]);
   const [filteredListings, setFilteredListings] = useState<FishListing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,12 +45,18 @@ function FishListings({ portFilter }: { portFilter: string }) {
   }, []);
 
   useEffect(() => {
-    if (portFilter === 'all') {
-      setFilteredListings(allListings);
-    } else {
-      setFilteredListings(allListings.filter(listing => listing.portDetails === portFilter));
+    let listings = allListings;
+
+    if (portFilter !== 'all') {
+      listings = listings.filter(listing => listing.portDetails === portFilter);
     }
-  }, [portFilter, allListings]);
+
+    if (sellerFilter !== 'all') {
+      listings = listings.filter(listing => listing.sellerId === sellerFilter);
+    }
+
+    setFilteredListings(listings);
+  }, [portFilter, sellerFilter, allListings]);
 
 
   if (loading) {
@@ -58,7 +64,7 @@ function FishListings({ portFilter }: { portFilter: string }) {
   }
 
   if (!filteredListings || filteredListings.length === 0) {
-    return <p className="mt-8 text-center text-muted-foreground">No fish available for the selected port. Check back later!</p>;
+    return <p className="mt-8 text-center text-muted-foreground">No fish available for the selected filters. Check back later!</p>;
   }
 
   return (
@@ -75,30 +81,78 @@ export default function BuyerDashboard() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const [portFilter, setPortFilter] = useState('all');
+  const [sellerFilter, setSellerFilter] = useState('all');
+
+  // This state will hold all listings to derive sellers from
+  const [allListings, setAllListings] = useState<FishListing[]>([]);
   
+  useEffect(() => {
+    // We only need to fetch this once for the filter logic
+    getFishListings().then(setAllListings);
+  }, []);
+
+  // Memoize the calculation of available sellers
+  const availableSellers = useMemo(() => {
+    let listingsForSellers = allListings;
+    if (portFilter !== 'all') {
+        listingsForSellers = allListings.filter(l => l.portDetails === portFilter);
+    }
+    
+    const sellersMap = new Map<string, string>();
+    listingsForSellers.forEach(listing => {
+        if (listing.sellerId && listing.sellerName) {
+            sellersMap.set(listing.sellerId, listing.sellerName);
+        }
+    });
+
+    return Array.from(sellersMap.entries()).map(([id, name]) => ({ id, name }));
+  }, [portFilter, allListings]);
+
+  // When port filter changes, reset seller filter
+  const handlePortChange = (value: string) => {
+    setPortFilter(value);
+    setSellerFilter('all');
+  }
+
   return (
     <>
     <Header />
     <main className="p-4 sm:p-6 lg:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
             <h1 className="text-3xl font-bold tracking-tight">Available Listings</h1>
-            <div className="flex items-center gap-2">
-                <Label htmlFor="port-filter" className="text-sm font-medium">Filter by Port:</Label>
-                 <Select value={portFilter} onValueChange={setPortFilter}>
-                    <SelectTrigger id="port-filter" className="w-[180px]">
-                        <SelectValue placeholder="Select a port" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Ports</SelectItem>
-                        <SelectItem value="Malpe Port">Malpe Port</SelectItem>
-                        <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
-                        <SelectItem value="Kochi Port">Kochi Port</SelectItem>
-                        <SelectItem value="Hyderabad Port">Hyderabad Port</SelectItem>
-                    </SelectContent>
-                </Select>
+            <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2">
+                    <Label htmlFor="port-filter" className="text-sm font-medium">Filter by Port:</Label>
+                    <Select value={portFilter} onValueChange={handlePortChange}>
+                        <SelectTrigger id="port-filter" className="w-[180px]">
+                            <SelectValue placeholder="Select a port" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Ports</SelectItem>
+                            <SelectItem value="Malpe Port">Malpe Port</SelectItem>
+                            <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
+                            <SelectItem value="Kochi Port">Kochi Port</SelectItem>
+                            <SelectItem value="Hyderabad Port">Hyderabad Port</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                 <div className="flex items-center gap-2">
+                    <Label htmlFor="seller-filter" className="text-sm font-medium">Filter by Seller:</Label>
+                    <Select value={sellerFilter} onValueChange={setSellerFilter} disabled={availableSellers.length === 0}>
+                        <SelectTrigger id="seller-filter" className="w-[180px]">
+                            <SelectValue placeholder="Select a seller" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Sellers</SelectItem>
+                            {availableSellers.map(seller => (
+                                <SelectItem key={seller.id} value={seller.id}>{seller.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
         </div>
-        <FishListings portFilter={portFilter} />
+        <FishListings portFilter={portFilter} sellerFilter={sellerFilter} />
     </main>
     </>
   );
