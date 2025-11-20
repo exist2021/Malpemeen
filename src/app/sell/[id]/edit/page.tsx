@@ -26,7 +26,7 @@ export default function EditSellPage() {
     const [productName, setProductName] = useState('');
     const [pricePerKg, setPricePerKg] = useState('');
     const [portDetails, setPortDetails] = useState('');
-    const [howCaught, setHowCaught] = useState('');
+    const [totalQuantityInTons, setTotalQuantityInTons] = useState('');
     const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | '370-Boat' | ''>('');
     const [brandName, setBrandName] = useState('Malpe Meen');
     const [description, setDescription] = useState('');
@@ -42,7 +42,7 @@ export default function EditSellPage() {
             setProductName(data.productName || '');
             setPricePerKg(String(data.pricePerKg) || '');
             setPortDetails(data.portDetails || '');
-            setHowCaught(data.howCaught || '');
+            setTotalQuantityInTons(String(data.totalQuantityInTons) || '');
             setBoatDetails(data.boatDetails || '');
             setBrandName(data.brandName || 'Malpe Meen');
             setDescription(data.description || '');
@@ -145,7 +145,7 @@ export default function EditSellPage() {
               productName,
               pricePerKg,
               portDetails,
-              howCaught,
+              totalQuantityInTons,
               boatDetails,
               brandName,
               description,
@@ -155,7 +155,7 @@ export default function EditSellPage() {
                 setProductName,
                 setPricePerKg,
                 setPortDetails,
-                setHowCaught,
+                setTotalQuantityInTons,
                 setBoatDetails,
                 setBrandName,
                 setDescription,

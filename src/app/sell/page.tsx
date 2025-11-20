@@ -17,7 +17,7 @@ export default function SellPage() {
     const [productName, setProductName] = useState('');
     const [pricePerKg, setPricePerKg] = useState('');
     const [portDetails, setPortDetails] = useState('');
-    const [howCaught, setHowCaught] = useState('');
+    const [totalQuantityInTons, setTotalQuantityInTons] = useState('');
     const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | '370-Boat' | ''>('');
     const [brandName, setBrandName] = useState('Malpe Meen');
     const [description, setDescription] = useState('');
@@ -75,7 +75,7 @@ export default function SellPage() {
                     setProductName(prev => parsedDetails.productName || prev);
                     setPricePerKg(prev => parsedDetails.pricePerKg ? String(parsedDetails.pricePerKg) : prev);
                     setPortDetails(prev => parsedDetails.portDetails || prev);
-                    setHowCaught(prev => parsedDetails.howCaught || prev);
+                    setTotalQuantityInTons(prev => parsedDetails.totalQuantityInTons ? String(parsedDetails.totalQuantityInTons) : prev);
                     setBoatDetails(prev => parsedDetails.boatDetails || prev);
                     setDescription(prev => parsedDetails.description || prev);
                     toast({ title: "Fields Updated", description: "Your details have been updated by voice."});
@@ -147,7 +147,7 @@ export default function SellPage() {
                     productName,
                     pricePerKg,
                     portDetails,
-                    howCaught,
+                    totalQuantityInTons,
                     boatDetails,
                     brandName,
                     description,
@@ -157,7 +157,7 @@ export default function SellPage() {
                     setProductName,
                     setPricePerKg,
                     setPortDetails,
-                    setHowCaught,
+                    setTotalQuantityInTons,
                     setBoatDetails,
                     setBrandName,
                     setDescription,

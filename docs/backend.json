@@ -145,10 +145,6 @@
           "type": "string",
           "description": "Details about the port of origin."
         },
-        "howCaught": {
-          "type": "string",
-          "description": "Method used to catch the fish."
-        },
         "boatDetails": {
           "type": "string",
           "enum": ["Ashok Leyland", "Persian Boat", "370-Boat"]
@@ -164,6 +160,10 @@
         "callClickCount": {
             "type": "number",
             "description": "Number of times the call button has been clicked."
+        },
+        "totalQuantityInTons": {
+            "type": "number",
+            "description": "Total quantity of the product available, in tons."
         }
       },
       "required": [
@@ -176,7 +176,6 @@
         "listedDate",
         "productName",
         "portDetails",
-        "howCaught",
         "boatDetails",
         "brandName"
       ]
