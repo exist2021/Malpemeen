@@ -13,9 +13,8 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   ConfirmationResult,
-  getDoc,
 } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -57,31 +56,6 @@ export default function BuyerLoginPage() {
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
-
-  useEffect(() => {
-    if (!auth) return;
-
-    if (!window.recaptchaVerifier) {
-      // Ensure this runs only on the client and after mount
-      const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible',
-      });
-      window.recaptchaVerifier = verifier;
-    }
-
-
-    // Cleanup on component unmount
-    return () => {
-        if (window.recaptchaVerifier) {
-            window.recaptchaVerifier.clear();
-            const recaptchaContainer = document.getElementById('recaptcha-container');
-            if (recaptchaContainer) {
-                recaptchaContainer.innerHTML = '';
-            }
-            window.recaptchaVerifier = undefined;
-        }
-    };
-  }, [auth]);
 
   const handleEmailAuthAction = async () => {
     if (!auth || !firestore) {
@@ -139,7 +113,7 @@ export default function BuyerLoginPage() {
   };
 
   const handlePhoneSignIn = async () => {
-    if (!auth || !firestore || !window.recaptchaVerifier) {
+    if (!auth || !firestore) {
       toast({ variant: 'destructive', title: 'Firebase not initialized.' });
       return;
     }
@@ -150,7 +124,15 @@ export default function BuyerLoginPage() {
 
     setIsSendingOtp(true);
     try {
-      const appVerifier = window.recaptchaVerifier;
+      // Just-in-time initialization of RecaptchaVerifier
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+      }
+      const appVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible',
+      });
+      window.recaptchaVerifier = appVerifier;
+
       const result = await signInWithPhoneNumber(auth, `+91${phone}`, appVerifier);
       setConfirmationResult(result);
       toast({ title: 'OTP Sent', description: 'Please check your phone for the verification code.' });
@@ -452,5 +434,3 @@ export default function BuyerLoginPage() {
     </>
   );
 }
-
-    
