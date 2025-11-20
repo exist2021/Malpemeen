@@ -133,12 +133,21 @@ export default function BuyerLoginPage() {
       setConfirmationResult(result);
       toast({ title: 'OTP Sent', description: 'Please check your phone for the verification code.' });
     } catch (error: any) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'Failed to send OTP',
-        description: error.message || 'Please try again.',
-      });
+      if (error.code === 'auth/operation-not-allowed') {
+        toast({
+            variant: 'destructive',
+            title: 'Phone Sign-In Not Enabled',
+            description: "Please enable the Phone Number sign-in provider in your Firebase project's Authentication settings.",
+            duration: 9000,
+        });
+      } else {
+        console.error(error);
+        toast({
+          variant: 'destructive',
+          title: 'Failed to send OTP',
+          description: error.message || 'Please try again.',
+        });
+      }
     } finally {
       setIsSendingOtp(false);
     }
@@ -421,3 +430,5 @@ export default function BuyerLoginPage() {
     </>
   );
 }
+
+    
