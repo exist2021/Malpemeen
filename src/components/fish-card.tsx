@@ -1,9 +1,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Video } from 'lucide-react';
+import { ArrowRight, Video, User, Anchor, IndianRupee, Calendar, Package } from 'lucide-react';
 import type { FishListing } from '@/app/types';
 import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 interface FishCardProps {
   listing: FishListing;
@@ -16,6 +17,16 @@ const cardColors = [
     'from-teal-500 to-teal-700',
 ];
 
+function CardDetail({ icon: Icon, text }: { icon: React.ElementType, text: React.ReactNode }) {
+    if (!text) return null;
+    return (
+        <div className="flex items-center gap-1.5 text-xs font-medium">
+            <Icon className="h-3.5 w-3.5" />
+            <span className="truncate">{text}</span>
+        </div>
+    );
+}
+
 export function FishCard({ listing }: FishCardProps) {
   const hasMedia = listing.mediaUrls && Array.isArray(listing.mediaUrls) && listing.mediaUrls.length > 0;
   const firstMedia = hasMedia ? listing.mediaUrls[0] : null;
@@ -25,40 +36,59 @@ export function FishCard({ listing }: FishCardProps) {
   return (
     <Link href={`/listings/${listing.id}`} className="block group">
       <div className={cn(
-          "relative h-64 w-full rounded-xl overflow-hidden text-white transition-transform duration-300 group-hover:scale-105 group-hover:shadow-xl",
+          "relative h-80 w-full rounded-xl overflow-hidden text-white transition-transform duration-300 group-hover:scale-105 group-hover:shadow-xl",
           !firstMedia && cardColor
         )}>
-        {firstMedia ? (
-            isVideo ? (
-                 <video
-                    src={firstMedia}
-                    muted
-                    loop
-                    playsInline
-                    className="object-cover w-full h-full"
-                 />
-            ) : (
-                 <Image
-                    src={firstMedia}
-                    alt={listing.productName}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    data-ai-hint="fish"
-                />
-            )
-        ) : null}
+        <div className="relative h-2/3 w-full">
+            {firstMedia ? (
+                isVideo ? (
+                    <video
+                        src={firstMedia}
+                        muted
+                        loop
+                        playsInline
+                        className="object-cover w-full h-full"
+                    />
+                ) : (
+                    <Image
+                        src={firstMedia}
+                        alt={listing.productName}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        data-ai-hint="fish"
+                    />
+                )
+            ) : null}
 
-        <div className={cn(
-          "absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4 flex flex-col justify-end",
-           hasMedia ? "" : `bg-gradient-to-br ${cardColor}`
-        )}>
-          {isVideo && <Video className="absolute top-4 right-4 h-6 w-6 text-white" />}
-          <div className="space-y-1">
-            <h3 className="font-bold text-xl uppercase tracking-wide font-headline">{listing.productName || 'Fresh Fish'}</h3>
-            <p className="text-base line-clamp-2 font-normal font-body pt-1">{listing.description}</p>
-          </div>
-          <ArrowRight className="absolute bottom-4 right-4 h-6 w-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <div className={cn(
+            "absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent",
+            !firstMedia && `bg-gradient-to-br ${cardColor}`
+            )}>
+                 {isVideo && <Video className="absolute top-2 right-2 h-5 w-5 text-white" />}
+            </div>
+        </div>
+
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-black/70 backdrop-blur-sm p-3 flex flex-col justify-between">
+            <div className="space-y-1.5">
+                <CardDetail icon={User} text={listing.sellerName} />
+                <CardDetail icon={Anchor} text={listing.portDetails} />
+                <h3 className="font-bold text-base uppercase tracking-wide font-headline truncate flex items-center gap-1.5 pt-1">
+                    <Package className="h-4 w-4 flex-shrink-0" />
+                    {listing.productName || 'Fresh Fish'}
+                </h3>
+            </div>
+             <div className="flex justify-between items-end text-xs font-medium">
+                <div className="flex items-center gap-1.5">
+                    <IndianRupee className="h-3.5 w-3.5" />
+                    <span>{listing.pricePerKg ? `₹${listing.pricePerKg.toLocaleString()}` : 'Nil'}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5" />
+                    <span>{listing.listedDate ? format(new Date(listing.listedDate), 'MMM d') : ''}</span>
+                </div>
+            </div>
+          <ArrowRight className="absolute bottom-3 right-3 h-5 w-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         </div>
       </div>
     </Link>
