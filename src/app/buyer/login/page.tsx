@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -32,6 +32,12 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
+declare global {
+    interface Window {
+        recaptchaVerifier?: RecaptchaVerifier;
+    }
+}
+
 export default function BuyerLoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -53,12 +59,21 @@ export default function BuyerLoginPage() {
 
   useEffect(() => {
     if (!auth) return;
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+
+    // Ensure this runs only on the client and after mount
+    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
       'size': 'invisible',
-      'callback': (response: any) => {
-        // reCAPTCHA solved, allow signInWithPhoneNumber.
-      }
     });
+    window.recaptchaVerifier = verifier;
+
+    // Cleanup on component unmount
+    return () => {
+        verifier.clear();
+        const recaptchaContainer = document.getElementById('recaptcha-container');
+        if (recaptchaContainer) {
+            recaptchaContainer.innerHTML = '';
+        }
+    };
   }, [auth]);
 
   const handleEmailAuthAction = async () => {
@@ -117,7 +132,7 @@ export default function BuyerLoginPage() {
   };
 
   const handlePhoneSignIn = async () => {
-    if (!auth || !firestore) {
+    if (!auth || !firestore || !window.recaptchaVerifier) {
       toast({ variant: 'destructive', title: 'Firebase not initialized.' });
       return;
     }
@@ -154,7 +169,7 @@ export default function BuyerLoginPage() {
   };
 
   const handleVerifyOtp = async () => {
-    if (!confirmationResult || !otp) return;
+    if (!confirmationResult || !otp || !firestore) return;
     setIsVerifyingOtp(true);
     try {
       const userCredential = await confirmationResult.confirm(otp);
@@ -162,7 +177,7 @@ export default function BuyerLoginPage() {
 
       // Check if user is new, then create a document.
       const userRef = doc(firestore, 'buyers', user.uid);
-      const userDoc = await userRef.get();
+      const userDoc = await getDoc(userRef);
       if (!userDoc.exists()) {
           const buyerData = {
               id: user.uid,

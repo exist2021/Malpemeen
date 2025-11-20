@@ -35,7 +35,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 declare global {
     interface Window {
-        recaptchaVerifier: RecaptchaVerifier;
+        recaptchaVerifier?: RecaptchaVerifier;
     }
 }
 
@@ -61,13 +61,21 @@ export default function SellerLoginPage() {
 
   useEffect(() => {
     if (!auth) return;
-    if (window.recaptchaVerifier) return;
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+    
+    // Ensure this runs only on the client and after mount
+    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
       'size': 'invisible',
-      'callback': (response: any) => {
-        // reCAPTCHA solved, allow signInWithPhoneNumber.
-      }
     });
+    window.recaptchaVerifier = verifier;
+
+    // Cleanup on component unmount
+    return () => {
+        verifier.clear();
+        const recaptchaContainer = document.getElementById('recaptcha-container');
+        if (recaptchaContainer) {
+            recaptchaContainer.innerHTML = '';
+        }
+    };
   }, [auth]);
 
 
@@ -127,7 +135,7 @@ export default function SellerLoginPage() {
   };
 
   const handlePhoneSignIn = async () => {
-    if (!auth || !firestore) {
+    if (!auth || !firestore || !window.recaptchaVerifier) {
       toast({ variant: 'destructive', title: 'Firebase not initialized.' });
       return;
     }
@@ -164,14 +172,14 @@ export default function SellerLoginPage() {
   };
 
   const handleVerifyOtp = async () => {
-    if (!confirmationResult || !otp) return;
+    if (!confirmationResult || !otp || !firestore) return;
     setIsVerifyingOtp(true);
     try {
       const userCredential = await confirmationResult.confirm(otp);
       const user = userCredential.user;
 
       const userRef = doc(firestore, 'sellers', user.uid);
-      const userDoc = await userRef.get();
+      const userDoc = await getDoc(userRef);
       if (!userDoc.exists()) {
           const sellerData = {
               id: user.uid,
