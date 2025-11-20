@@ -51,6 +51,7 @@ export function Header() {
     if (user) {
         let triggerContent;
         const isLoading = isSellerProfileLoading || isBuyerProfileLoading;
+        const profileName = role === 'seller' ? sellerProfile?.name : buyerProfile?.name;
 
         if (isLoading) {
             triggerContent = <Skeleton className="h-9 w-9 rounded-full" />;
@@ -70,7 +71,7 @@ export function Header() {
             );
         } else {
              triggerContent = (
-                <div className="h-9 w-9 flex items-center justify-center">
+                <div className="h-9 w-9 flex items-center justify-center rounded-full bg-muted">
                     <UserIcon className="h-5 w-5" />
                 </div>
             );
@@ -86,8 +87,9 @@ export function Header() {
               )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="rounded-full h-9 w-9 p-0">
+                  <Button variant="ghost" className="flex items-center gap-2 rounded-full p-0 pl-2">
                     {triggerContent}
+                    <span className="hidden sm:inline-block font-medium pr-2">{profileName}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
