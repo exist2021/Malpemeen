@@ -144,7 +144,7 @@
         "portDetails": {
           "type": "string",
           "description": "Details about the port of origin.",
-           "enum": ["Malpe Port", "Mangalore Port", "Kochi Port", "Hyderabad Port"]
+           "enum": ["Malpe Port", "Mangalore Port", "Kochi Port", "Hyderabad Port", "None"]
         },
         "boatDetails": {
           "type": "string",

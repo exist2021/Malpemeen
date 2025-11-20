@@ -18,7 +18,7 @@ export type ParseListingDetailsInput = z.infer<typeof ParseListingDetailsInputSc
 const ParseListingDetailsOutputSchema = z.object({
   productName: z.string().optional().describe("The name of the fish product."),
   pricePerKg: z.number().optional().describe("The selling price per Kg."),
-  portDetails: z.enum(["Malpe Port", "Mangalore Port", "Kochi Port", "Hyderabad Port"]).optional().describe("Details about the port of origin."),
+  portDetails: z.enum(["Malpe Port", "Mangalore Port", "Kochi Port", "Hyderabad Port", "None"]).optional().describe("Details about the port of origin."),
   boatDetails: z.enum(["Ashok Leyland", "Persian Boat", "370-Boat"]).optional().describe("Type of boat used."),
   description: z.string().optional().describe("A general description of the fish, its size, quality, etc."),
   totalQuantityInTons: z.number().optional().describe("The total quantity available in tons."),
@@ -40,6 +40,7 @@ You need to identify keywords to map the speech to the correct field. Here are s
 - "Product name is Fresh Tuna" -> productName: "Fresh Tuna"
 - "Set price to 5000" -> pricePerKg: 5000
 - "The port is Malpe" -> portDetails: "Malpe Port"
+- "The port is none" -> portDetails: "None"
 - "Boat is Persian Boat" -> boatDetails: "Persian Boat"
 - "Total quantity is 10 tons" -> totalQuantityInTons: 10
 - "Description is This is a high-quality fresh fish, caught this morning." -> description: "This is a high-quality fresh fish, caught this morning."
