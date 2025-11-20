@@ -79,7 +79,6 @@ export function Header() {
             <div className="flex items-center gap-2">
               {role === 'seller' && (
                 <Button variant="ghost" onClick={() => router.push('/seller/home')}>
-                  <LayoutDashboard className="mr-2 h-4 w-4" />
                   Home
                 </Button>
               )}
