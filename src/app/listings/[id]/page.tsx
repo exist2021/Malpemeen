@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/layout/header';
 import { format } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
+import { useUser } from '@/firebase';
 
 function ListingDetailSkeleton() {
   return (
@@ -75,6 +76,7 @@ function DetailItem({ icon: Icon, label, value }: { icon: React.ElementType, lab
 export default function ListingDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useUser();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const [listing, setListing] = useState<FishListing | null>(null);
   const [loading, setLoading] = useState(true);
@@ -129,6 +131,7 @@ export default function ListingDetailPage() {
   }
   
   const hasMedia = listing.mediaUrls && Array.isArray(listing.mediaUrls) && listing.mediaUrls.length > 0;
+  const isOwner = user?.uid === listing.sellerId;
 
   return (
     <>
@@ -211,14 +214,16 @@ export default function ListingDetailPage() {
                         </>
                     )}
                 </CardContent>
-                <CardFooter className="px-0 pb-0 mt-6">
-                    <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90 h-12 text-lg" onClick={handleCallClick}>
-                        <a href={`tel:${listing.sellerPhone}`}>
-                            <Phone className="mr-2 h-5 w-5" />
-                            Call Seller
-                        </a>
-                    </Button>
-                </CardFooter>
+                {!isOwner && (
+                    <CardFooter className="px-0 pb-0 mt-6">
+                        <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90 h-12 text-lg" onClick={handleCallClick}>
+                            <a href={`tel:${listing.sellerPhone}`}>
+                                <Phone className="mr-2 h-5 w-5" />
+                                Call Seller
+                            </a>
+                        </Button>
+                    </CardFooter>
+                )}
             </div>
 
           </div>
