@@ -70,7 +70,9 @@ export function Header() {
             );
         } else {
              triggerContent = (
-                <UserIcon className="h-5 w-5" />
+                <div className="h-9 w-9 flex items-center justify-center">
+                    <UserIcon className="h-5 w-5" />
+                </div>
             );
         }
 
