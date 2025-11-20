@@ -7,7 +7,7 @@ import { Firestore, doc, getDoc, DocumentReference } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { useDoc, type WithId } from './firestore/use-doc';
-import type { Customer, Seller } from '@/app/types';
+import type { Buyer, Seller } from '@/app/types';
 
 interface FirebaseProviderProps {
   children: ReactNode;
@@ -52,15 +52,15 @@ export interface UserHookResult { // Renamed from UserAuthHookResult for consist
   userError: Error | null;
 }
 
-export type UserRole = 'seller' | 'customer' | null;
+export type UserRole = 'seller' | 'buyer' | null;
 
 export interface UserRoleHookResult {
     role: UserRole;
     isRoleLoading: boolean;
 }
 
-export interface CustomerProfileResult {
-    profile: WithId<Customer> | null;
+export interface BuyerProfileResult {
+    profile: WithId<Buyer> | null;
     isLoading: boolean;
 }
 
@@ -224,10 +224,10 @@ export const useUserRole = (): UserRoleHookResult => {
                 return;
             }
 
-            const customerRef = doc(firestore, 'customers', user.uid);
-            const customerSnap = await getDoc(customerRef);
-            if (customerSnap.exists()) {
-                setRole('customer');
+            const buyerRef = doc(firestore, 'buyers', user.uid);
+            const buyerSnap = await getDoc(buyerRef);
+            if (buyerSnap.exists()) {
+                setRole('buyer');
                 setIsRoleLoading(false);
                 return;
             }
@@ -242,16 +242,16 @@ export const useUserRole = (): UserRoleHookResult => {
     return { role, isRoleLoading };
 };
 
-export const useCustomerProfile = (): CustomerProfileResult => {
+export const useBuyerProfile = (): BuyerProfileResult => {
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
     
     const docRef = useMemoFirebase(() => {
         if (!user || !firestore) return null;
-        return doc(firestore, 'customers', user.uid) as DocumentReference<Customer>;
+        return doc(firestore, 'buyers', user.uid) as DocumentReference<Buyer>;
     }, [user, firestore]);
 
-    const { data: profile, isLoading } = useDoc<Customer>(docRef);
+    const { data: profile, isLoading } = useDoc<Buyer>(docRef);
 
     return { profile, isLoading: isUserLoading || isLoading };
 };

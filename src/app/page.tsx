@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -19,7 +20,7 @@ export default function RoleSelectionPage() {
 
       <div className="relative z-10 text-center mb-12">
         <h1 className="text-4xl font-bold tracking-tight mt-6 font-headline">Welcome to Malpe Meen</h1>
-        <p className="mt-2 text-lg text-muted-foreground">Connecting sellers with customers, seamlessly.</p>
+        <p className="mt-2 text-lg text-muted-foreground">Connecting sellers with buyers, seamlessly.</p>
       </div>
 
       <div className="relative z-10 w-full max-w-4xl mx-auto">
@@ -27,11 +28,11 @@ export default function RoleSelectionPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card className="flex flex-col text-center hover:shadow-lg transition-shadow bg-card">
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold">I'm a Customer</CardTitle>
+                    <CardTitle className="text-2xl font-bold">I'm a Buyer</CardTitle>
                     <CardDescription>Browse and buy the freshest catch directly from the source.</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow flex items-end justify-center">
-                    <Button onClick={() => router.push('/customer/login')} className="w-full">
+                    <Button onClick={() => router.push('/buyer/login')} className="w-full">
                         Browse Listings <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                 </CardContent>
@@ -40,7 +41,7 @@ export default function RoleSelectionPage() {
             <Card className="flex flex-col text-center hover:shadow-lg transition-shadow bg-card">
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold">I'm a Seller</CardTitle>
-                    <CardDescription>List your products and reach a wider market of customers.</CardDescription>
+                    <CardDescription>List your products and reach a wider market of buyers.</CardDescription>
                 </CardHeader>
                  <CardContent className="flex-grow flex items-end justify-center">
                      <Button onClick={() => router.push('/seller/login')} className="w-full">

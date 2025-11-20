@@ -48,40 +48,40 @@
         "email"
       ]
     },
-    "Customer": {
+    "Buyer": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Customer",
+      "title": "Buyer",
       "type": "object",
-      "description": "Represents a customer in the AquaLink app.",
+      "description": "Represents a buyer in the AquaLink app.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the Customer entity."
+          "description": "Unique identifier for the Buyer entity."
         },
         "phoneNumber": {
           "type": "string",
-          "description": "Customer's contact phone number."
+          "description": "Buyer's contact phone number."
         },
         "name": {
           "type": "string",
-          "description": "Customer's name."
+          "description": "Buyer's name."
         },
         "email": {
             "type": "string",
             "format": "email",
-            "description": "Customer's email address."
+            "description": "Buyer's email address."
         },
         "place": {
             "type": "string",
-            "description": "The city or locality of the customer."
+            "description": "The city or locality of the buyer."
         },
         "address": {
             "type": "string",
-            "description": "The detailed address of the customer."
+            "description": "The detailed address of the buyer."
         },
         "photoUrl": {
           "type": "string",
-          "description": "URL of the customer's profile photo, stored as a data URI."
+          "description": "URL of the buyer's profile photo, stored as a data URI."
         }
       },
       "required": [
@@ -218,17 +218,17 @@
         }
       },
       {
-        "path": "/customers/{customerId}",
+        "path": "/buyers/{buyerId}",
         "definition": {
-          "entityName": "Customer",
+          "entityName": "Buyer",
           "schema": {
-            "$ref": "#/backend/entities/Customer"
+            "$ref": "#/backend/entities/Buyer"
           },
-          "description": "Stores customer profiles. Customer ID is the Firebase auth UID.",
+          "description": "Stores buyer profiles. Buyer ID is the Firebase auth UID.",
           "params": [
             {
-              "name": "customerId",
-              "description": "The Firebase auth UID of the customer."
+              "name": "buyerId",
+              "description": "The Firebase auth UID of the buyer."
             }
           ]
         }
@@ -250,6 +250,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to support separate login pages for customers and sellers. It provides secure and scalable storage for customer and seller profiles, as well as fish listings. A top-level `fishListings` collection is used to allow for public, unauthenticated listing queries, which is a common pattern for marketplace apps. FishListing documents contain denormalized seller information (name, phone) to avoid costly and complex joins in client-side code and security rules."
+    "reasoning": "The Firestore structure is designed to support separate login pages for buyers and sellers. It provides secure and scalable storage for buyer and seller profiles, as well as fish listings. A top-level `fishListings` collection is used to allow for public, unauthenticated listing queries, which is a common pattern for marketplace apps. FishListing documents contain denormalized seller information (name, phone) to avoid costly and complex joins in client-side code and security rules."
   }
 }

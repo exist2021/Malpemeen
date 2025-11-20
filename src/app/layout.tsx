@@ -13,7 +13,7 @@ const fontSans = FontSans({
 
 export const metadata: Metadata = {
   title: 'Malpe Meen Pvt Ltd',
-  description: 'Connecting fish sellers and customers.',
+  description: 'Connecting fish sellers and buyers.',
 };
 
 export default function RootLayout({

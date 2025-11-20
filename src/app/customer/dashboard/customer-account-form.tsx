@@ -1,170 +1,100 @@
+/**
+ * @fileOverview Firestore Security Rules for AquaLink App
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for seller and buyer profiles.
+ * It uses a top-level `fishListings` collection for public reads and owner-only writes.
+ * It leverages Firebase Authentication to verify user identity and authorize access to data.
+ *
+ * Data Structure:
+ * - /sellers/{sellerId}: Stores seller profiles, where {sellerId} is the Firebase auth UID.
+ * - /buyers/{buyerId}: Stores buyer profiles, where {buyerId} is the Firebase auth UID.
+ * - /fishListings/{fishListingId}: Stores all fish listings. Publicly readable.
+ *
+ * Key Security Decisions:
+ * - Only authenticated users can create seller or buyer profiles.
+ * - Users can only read, update, or delete their own profiles.
+ * - Sellers can only create, update, or delete their own fish listings.
+ * - The `fishListings` collection is publicly readable to allow anonymous users to browse.
+ * - All write operations require authentication.
+ *
+ * Denormalization for Authorization:
+ * The `FishListing` documents contain a `sellerId` field, which is a denormalized copy of the
+ * seller's UID. This allows for simple and efficient ownership checks on writes.
+ *
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
 
-'use client';
-
-import { useState, useEffect, useTransition, useRef } from 'react';
-import { useCustomerProfile } from '@/firebase/provider';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/hooks/use-toast';
-import { updateDoc, doc } from 'firebase/firestore';
-import { useFirebase } from '@/firebase';
-import { Loader2, User } from 'lucide-react';
-import type { Customer } from '@/app/types';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
-
-export function CustomerAccountForm() {
-    const { profile, isLoading } = useCustomerProfile();
-    const { firestore } = useFirebase();
-    const { toast } = useToast();
-    const [isPending, startTransition] = useTransition();
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phoneNumber: '',
-        place: '',
-        address: '',
-        photoUrl: '',
-    });
-
-    useEffect(() => {
-        if (profile) {
-            setFormData({
-                name: profile.name || '',
-                email: profile.email || '',
-                phoneNumber: profile.phoneNumber || '',
-                place: profile.place || '',
-                address: profile.address || '',
-                photoUrl: profile.photoUrl || '',
-            });
-        }
-    }, [profile]);
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFormData(prev => ({...prev, photoUrl: reader.result as string}));
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (!profile || !firestore) return;
-
-        const updatedData: Partial<Customer> = {};
-        if (formData.name !== profile.name) updatedData.name = formData.name;
-        if (formData.phoneNumber !== profile.phoneNumber) updatedData.phoneNumber = formData.phoneNumber;
-        if (formData.place !== profile.place) updatedData.place = formData.place;
-        if (formData.address !== profile.address) updatedData.address = formData.address;
-        if (formData.photoUrl !== profile.photoUrl) updatedData.photoUrl = formData.photoUrl;
-
-        if (Object.keys(updatedData).length === 0) {
-            toast({ title: 'No changes to save.' });
-            return;
-        }
-        
-        startTransition(async () => {
-            try {
-                const docRef = doc(firestore, 'customers', profile.id);
-                await updateDoc(docRef, updatedData);
-                toast({
-                    title: 'Profile Updated',
-                    description: 'Your account information has been successfully updated.',
-                });
-            } catch (error) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Update Failed',
-                    description: 'Could not update your profile. Please try again.',
-                });
-            }
-        });
-    };
-
-
-    if (isLoading) {
-        return (
-            <div className="space-y-4">
-                <div className="flex justify-center">
-                    <Skeleton className="h-24 w-24 rounded-full" />
-                </div>
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-1/4" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-1/4" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-1/4" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-                <Skeleton className="h-10 w-full" />
-            </div>
-        );
+    /**
+     * @description Checks if the request is made by an authenticated user.
+     * @returns {boolean} True if the user is signed in, false otherwise.
+     */
+    function isSignedIn() {
+      return request.auth != null;
     }
 
-    return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex flex-col items-center space-y-4">
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept="image/*"
-                />
-                <Avatar 
-                    className="h-24 w-24 cursor-pointer relative group"
-                    onClick={() => fileInputRef.current?.click()}
-                >
-                    <AvatarImage src={formData.photoUrl} alt={formData.name} />
-                    <AvatarFallback>
-                        <User className="h-10 w-10" />
-                    </AvatarFallback>
-                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                        <span className="text-xs text-center">Change Photo</span>
-                    </div>
-                </Avatar>
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" name="name" value={formData.name} onChange={handleInputChange} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" value={formData.email} disabled />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="phoneNumber">Contact Number</Label>
-                <Input id="phoneNumber" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="place">Place</Label>
-                <Input id="place" name="place" placeholder="e.g., City, State" value={formData.place} onChange={handleInputChange} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Input id="address" name="address" placeholder="e.g., 123 Main St" value={formData.address} onChange={handleInputChange} />
-            </div>
-            <Button type="submit" className="w-full" disabled={isPending}>
-                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save Changes
-            </Button>
-        </form>
-    );
+    /**
+     * @description Checks if the authenticated user's UID matches the provided user ID.
+     * @param {string} userId The user ID to compare against the authenticated user's UID.
+     * @returns {boolean} True if the user is signed in and the UID matches, false otherwise.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the authenticated user owns the resource and the resource exists.
+     *              This is used for update and delete operations to ensure the document exists.
+     * @param {string} userId The user ID to compare against the authenticated user's UID.
+     * @returns {boolean} True if the user is signed in, the UID matches, and the resource exists.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+    
+    /**
+     * @description Checks if the incoming data for a fish listing has the correct seller ID.
+     */
+    function isCorrectSeller(sellerId) {
+      return request.resource.data.sellerId == sellerId;
+    }
+
+    /**
+     * @description Rules for the /sellers/{sellerId} collection.
+     */
+    match /sellers/{sellerId} {
+      allow get: if isOwner(sellerId);
+      allow list: if false; // Sellers list is not public
+
+      allow create: if isOwner(sellerId) && request.resource.data.id == sellerId;
+      allow update: if isExistingOwner(sellerId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(sellerId);
+    }
+
+    /**
+     * @description Rules for the /buyers/{buyerId} collection.
+     */
+    match /buyers/{buyerId} {
+      allow get: if isOwner(buyerId);
+      allow list: if false;
+
+      allow create: if isOwner(buyerId) && request.resource.data.id == buyerId;
+      allow update: if isExistingOwner(buyerId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(buyerId);
+    }
+
+    /**
+     * @description Rules for the /fishListings/{fishListingId} collection.
+     */
+    match /fishListings/{fishListingId} {
+      allow get: if true;
+      allow list: if true;
+
+      allow create: if isOwner(request.resource.data.sellerId);
+      allow update: if isOwner(resource.data.sellerId) && isCorrectSeller(resource.data.sellerId);
+      allow delete: if isOwner(resource.data.sellerId);
+    }
+  }
 }

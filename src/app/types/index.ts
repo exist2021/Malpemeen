@@ -10,7 +10,7 @@ export type Seller = {
     logoUrl?: string;
 };
 
-export type Customer = {
+export type Buyer = {
     id: string;
     phoneNumber: string;
     name: string;

@@ -1,18 +1,19 @@
+
 /**
  * @fileOverview Firestore Security Rules for AquaLink App
  *
  * Core Philosophy:
- * This ruleset enforces a strict user-ownership model for seller and customer profiles.
+ * This ruleset enforces a strict user-ownership model for seller and buyer profiles.
  * It uses a top-level `fishListings` collection for public reads and owner-only writes.
  * It leverages Firebase Authentication to verify user identity and authorize access to data.
  *
  * Data Structure:
  * - /sellers/{sellerId}: Stores seller profiles, where {sellerId} is the Firebase auth UID.
- * - /customers/{customerId}: Stores customer profiles, where {customerId} is the Firebase auth UID.
+ * - /buyers/{buyerId}: Stores buyer profiles, where {buyerId} is the Firebase auth UID.
  * - /fishListings/{fishListingId}: Stores all fish listings. Publicly readable.
  *
  * Key Security Decisions:
- * - Only authenticated users can create seller or customer profiles.
+ * - Only authenticated users can create seller or buyer profiles.
  * - Users can only read, update, or delete their own profiles.
  * - Sellers can only create, update, or delete their own fish listings.
  * - The `fishListings` collection is publicly readable to allow anonymous users to browse.
@@ -74,15 +75,15 @@ service cloud.firestore {
     }
 
     /**
-     * @description Rules for the /customers/{customerId} collection.
+     * @description Rules for the /buyers/{buyerId} collection.
      */
-    match /customers/{customerId} {
-      allow get: if isOwner(customerId);
+    match /buyers/{buyerId} {
+      allow get: if isOwner(buyerId);
       allow list: if false;
 
-      allow create: if isOwner(customerId) && request.resource.data.id == customerId;
-      allow update: if isExistingOwner(customerId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(customerId);
+      allow create: if isOwner(buyerId) && request.resource.data.id == buyerId;
+      allow update: if isExistingOwner(buyerId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(buyerId);
     }
 
     /**

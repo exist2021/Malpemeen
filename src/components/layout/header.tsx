@@ -2,7 +2,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useUser, useAuth, useUserRole, useSellerProfile, useCustomerProfile } from '@/firebase';
+import { useUser, useAuth, useUserRole, useSellerProfile, useBuyerProfile } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { FishLogo } from '../fish-logo';
 import {
@@ -23,7 +23,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { CustomerAccountForm } from '@/app/customer/dashboard/customer-account-form';
+import { BuyerAccountForm } from '@/app/buyer/dashboard/buyer-account-form';
 import { SellerAccountForm } from '@/app/seller/dashboard/seller-account-form';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
@@ -33,7 +33,7 @@ export function Header() {
   const { user, isUserLoading } = useUser();
   const { role } = useUserRole();
   const { profile: sellerProfile, isLoading: isSellerProfileLoading } = useSellerProfile();
-  const { profile: customerProfile, isLoading: isCustomerProfileLoading } = useCustomerProfile();
+  const { profile: buyerProfile, isLoading: isBuyerProfileLoading } = useBuyerProfile();
   const auth = useAuth();
 
   const handleLogout = () => {
@@ -50,7 +50,7 @@ export function Header() {
     
     if (user) {
         let triggerContent;
-        const isLoading = isSellerProfileLoading || isCustomerProfileLoading;
+        const isLoading = isSellerProfileLoading || isBuyerProfileLoading;
 
         if (isLoading) {
             triggerContent = <Skeleton className="h-9 w-9 rounded-full" />;
@@ -61,10 +61,10 @@ export function Header() {
                     <AvatarFallback><UserIcon className="h-4 w-4" /></AvatarFallback>
                 </Avatar>
             );
-        } else if (role === 'customer' && customerProfile?.photoUrl) {
+        } else if (role === 'buyer' && buyerProfile?.photoUrl) {
             triggerContent = (
                 <Avatar className="h-9 w-9">
-                    <AvatarImage src={customerProfile.photoUrl} alt={customerProfile.name} />
+                    <AvatarImage src={buyerProfile.photoUrl} alt={buyerProfile.name} />
                     <AvatarFallback><UserIcon className="h-4 w-4" /></AvatarFallback>
                 </Avatar>
             );
@@ -92,7 +92,7 @@ export function Header() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {role === 'customer' && (
+                  {role === 'buyer' && (
                     <Dialog>
                         <DialogTrigger asChild>
                           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -107,7 +107,7 @@ export function Header() {
                                 View and update your personal information.
                             </DialogDescription>
                             </DialogHeader>
-                            <CustomerAccountForm />
+                            <BuyerAccountForm />
                         </DialogContent>
                     </Dialog>
                   )}
@@ -186,8 +186,8 @@ export function Header() {
             <Button variant="ghost" onClick={() => router.push('/seller/login')}>
                 Sell Fish
             </Button>
-            <Button onClick={() => router.push('/customer/login')}>
-                Customer Login
+            <Button onClick={() => router.push('/buyer/login')}>
+                Buyer Login
             </Button>
         </div>
     );

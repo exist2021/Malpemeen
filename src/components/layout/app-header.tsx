@@ -22,7 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { CustomerAccountForm } from '@/app/customer/dashboard/customer-account-form';
+import { BuyerAccountForm } from '@/app/buyer/dashboard/buyer-account-form';
 import { SidebarTrigger } from '../ui/sidebar';
 import { Input } from '../ui/input';
 
@@ -57,7 +57,7 @@ export function AppHeader() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-               {role === 'customer' && (
+               {role === 'buyer' && (
                 <Dialog>
                     <DialogTrigger asChild>
                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -72,7 +72,7 @@ export function AppHeader() {
                             View and update your personal information.
                         </DialogDescription>
                         </DialogHeader>
-                        <CustomerAccountForm />
+                        <BuyerAccountForm />
                     </DialogContent>
                 </Dialog>
                )}
@@ -88,7 +88,7 @@ export function AppHeader() {
     }
 
     return (
-        <Button onClick={() => router.push('/customer/login')}>
+        <Button onClick={() => router.push('/buyer/login')}>
             Login
         </Button>
     )

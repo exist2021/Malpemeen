@@ -73,17 +73,19 @@ export default function SellPage() {
         startProcessingVoice(async () => {
             try {
                 const parsedDetails = await parseListingDetails(text);
-                if (parsedDetails.productName) setProductName(parsedDetails.productName);
-                if (parsedDetails.pricePerBox) setPricePerBox(String(parsedDetails.pricePerBox));
-                if (parsedDetails.portDetails) setPortDetails(parsedDetails.portDetails);
-                if (parsedDetails.caughtBy) setCaughtBy(parsedDetails.caughtBy);
-                if (parsedDetails.howCaught) setHowCaught(parsedDetails.howCaught);
-                if (parsedDetails.boatDetails) setBoatDetails(parsedDetails.boatDetails);
-                if (parsedDetails.owner) setOwner(parsedDetails.owner);
-                if (parsedDetails.description) setDescription(parsedDetails.description);
-                
-                toast({ title: "Fields Updated", description: "Your details have been updated by voice."});
-
+                if (Object.keys(parsedDetails).length > 0) {
+                    setProductName(prev => parsedDetails.productName || prev);
+                    setPricePerBox(prev => parsedDetails.pricePerBox ? String(parsedDetails.pricePerBox) : prev);
+                    setPortDetails(prev => parsedDetails.portDetails || prev);
+                    setCaughtBy(prev => parsedDetails.caughtBy || prev);
+                    setHowCaught(prev => parsedDetails.howCaught || prev);
+                    setBoatDetails(prev => parsedDetails.boatDetails || prev);
+                    setOwner(prev => parsedDetails.owner || prev);
+                    setDescription(prev => parsedDetails.description || prev);
+                    toast({ title: "Fields Updated", description: "Your details have been updated by voice."});
+                } else {
+                     toast({ title: "No details understood", description: "Couldn't extract any details from your speech. Please try again."});
+                }
             } catch (e: any) {
                 console.error("Failed to parse voice input", e);
                 let description = "Could not understand the details.";
@@ -128,7 +130,7 @@ export default function SellPage() {
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold tracking-tight font-headline">List Your Fish</CardTitle>
             <CardDescription className="pt-2">
-              Fill out the form below to list your catch. Your listing will be visible to customers immediately.
+              Fill out the form below to list your catch. Your listing will be visible to buyers immediately.
             </CardDescription>
              <div className="flex justify-end pt-2">
                 <Button

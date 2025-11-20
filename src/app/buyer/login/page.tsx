@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { FishLogo } from '@/components/fish-logo';
 import {
   Dialog,
@@ -28,7 +28,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 
-export default function SellerLoginPage() {
+export default function BuyerLoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -50,44 +50,44 @@ export default function SellerLoginPage() {
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        const sellerData = {
-            id: user.uid,
-            name: name,
-            phoneNumber: phone,
-            email: user.email,
+        const buyerData = {
+          id: user.uid,
+          name: name,
+          phoneNumber: phone,
+          email: user.email,
         };
-        const docRef = doc(firestore, 'sellers', user.uid);
-
-        await setDoc(docRef, sellerData);
+        const docRef = doc(firestore, 'buyers', user.uid);
         
+        await setDoc(docRef, buyerData);
+
         toast({ title: 'Sign up successful! Redirecting...' });
-        router.push('/seller/home');
+        router.push('/buyer/dashboard');
 
       } catch (error: any) {
-          let description = error.message;
-          if (error.code === 'auth/email-already-in-use') {
-              description = "This email is already in use. Please log in or use a different email.";
-          } else if (error.name === 'FirebaseError' && error.message.includes('permission-denied')) {
-              // This is a Firestore security rule error after user creation.
-              // Let's create a more contextual error.
-              const sellerData = { id: auth.currentUser?.uid, name, phoneNumber: phone, email };
-              const docRef = doc(firestore, 'sellers', auth.currentUser!.uid);
-              const contextualError = new FirestorePermissionError({
-                  path: docRef.path,
-                  operation: 'create',
-                  requestResourceData: sellerData,
-              });
-              errorEmitter.emit('permission-error', contextualError);
-              // We don't show a toast here because the global listener will throw
-              return; 
-          }
-          toast({ variant: 'destructive', title: 'Sign Up Failed', description });
+        let description = error.message;
+        if (error.code === 'auth/email-already-in-use') {
+            description = "This email is already in use. Please log in or use a different email.";
+        } else if (error.name === 'FirebaseError' && error.message.includes('permission-denied')) {
+            // This is a Firestore security rule error after user creation.
+            // Let's create a more contextual error.
+            const buyerData = { id: auth.currentUser?.uid, name, phoneNumber: phone, email };
+            const docRef = doc(firestore, 'buyers', auth.currentUser!.uid);
+            const contextualError = new FirestorePermissionError({
+                path: docRef.path,
+                operation: 'create',
+                requestResourceData: buyerData,
+            });
+            errorEmitter.emit('permission-error', contextualError);
+            // We don't show a toast here because the global listener will throw
+            return; 
+        }
+        toast({ variant: 'destructive', title: 'Sign Up Failed', description });
       }
     } else {
         signInWithEmailAndPassword(auth, email, password)
             .then(() => {
                 toast({ title: 'Login successful! Redirecting...' });
-                router.push('/seller/home');
+                router.push('/buyer/dashboard');
             })
             .catch(error => {
                 let description = error.message;
@@ -137,18 +137,28 @@ export default function SellerLoginPage() {
   return (
     <>
     <div className="flex min-h-screen">
+       <div className="relative hidden lg:block lg:w-1/2">
+        <Image
+          src="https://images.unsplash.com/photo-1599056024921-b3d551c89b88?q=80&w=1974&auto=format&fit=crop"
+          alt="Fresh fish at a market"
+          fill
+          className="object-cover"
+          data-ai-hint="fish market"
+        />
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 mx-auto relative">
          <Button variant="ghost" asChild className="absolute top-4 left-4">
             <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>
         </Button>
         <div className="w-full max-w-sm">
-         <div className="text-center mb-8">
+          <div className="text-center mb-8">
             <FishLogo className="h-16 w-16 text-primary mx-auto"/>
-            <h2 className="text-3xl font-bold tracking-tight mt-4">{isSignUp ? 'Create a Seller Account' : 'Seller Login'}</h2>
+            <h2 className="text-3xl font-bold tracking-tight mt-4">{isSignUp ? 'Create a Buyer Account' : 'Buyer Login'}</h2>
             <p className="mt-2 text-muted-foreground">
-                {isSignUp ? 'Join our network to reach more buyers and grow your business.' : 'Welcome back! Let\'s get your products to market.'}
+                {isSignUp ? 'Join our community to find and purchase the freshest catch directly from local sellers.' : 'Welcome back! Ready to find the freshest catch from Malpe?'}
             </p>
-         </div>
+          </div>
           
           <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleAuthAction(); }}>
             {isSignUp && (
@@ -233,23 +243,13 @@ export default function SellerLoginPage() {
               {isSignUp ? 'Login' : 'Sign Up'}
             </button>
           </p>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Not a seller?{' '}
-            <Link href="/buyer/login" className="font-semibold text-primary hover:underline">
-               Buyer Login
+           <p className="mt-4 text-center text-sm text-muted-foreground">
+            Not a buyer?{' '}
+            <Link href="/seller/login" className="font-semibold text-primary hover:underline">
+               Seller Login
             </Link>
           </p>
         </div>
-      </div>
-      <div className="relative hidden lg:block lg:w-1/2">
-        <Image
-          src="https://images.unsplash.com/photo-1574636904128-97036a439a9c?q=80&w=1974&auto=format&fit=crop"
-          alt="Fishing boat at sea"
-          fill
-          className="object-cover"
-          data-ai-hint="fishing boat"
-        />
-        <div className="absolute inset-0 bg-black/50" />
       </div>
     </div>
     <Dialog open={isForgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
@@ -261,31 +261,31 @@ export default function SellerLoginPage() {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={(e) => { e.preventDefault(); handlePasswordReset(); }}>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="reset-email">
-                  Email
-                </Label>
-                <Input
-                  id="reset-email"
-                  value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  required
-                  type="email"
-                />
-              </div>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="reset-email">
+                Email
+              </Label>
+              <Input
+                id="reset-email"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                placeholder="name@example.com"
+                required
+                type="email"
+              />
             </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button type="button" variant="secondary">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <Button type="submit">
-                Send Reset Link
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Cancel
               </Button>
-            </DialogFooter>
+            </DialogClose>
+            <Button type="submit">
+              Send Reset Link
+            </Button>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
