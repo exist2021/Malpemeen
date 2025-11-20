@@ -35,6 +35,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 declare global {
     interface Window {
         recaptchaVerifier?: RecaptchaVerifier;
+        confirmationResult?: ConfirmationResult;
     }
 }
 
@@ -56,6 +57,17 @@ export default function BuyerLoginPage() {
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
+
+
+  useEffect(() => {
+    if (auth && !recaptchaVerifierRef.current) {
+        recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
+            'size': 'invisible',
+        });
+    }
+  }, [auth]);
+
 
   const handleEmailAuthAction = async () => {
     if (!auth || !firestore) {
@@ -113,7 +125,7 @@ export default function BuyerLoginPage() {
   };
 
   const handlePhoneSignIn = async () => {
-    if (!auth || !firestore) {
+    if (!auth || !firestore || !recaptchaVerifierRef.current) {
       toast({ variant: 'destructive', title: 'Firebase not initialized.' });
       return;
     }
@@ -123,16 +135,9 @@ export default function BuyerLoginPage() {
     }
 
     setIsSendingOtp(true);
+    const appVerifier = recaptchaVerifierRef.current;
+    
     try {
-      // Just-in-time initialization of RecaptchaVerifier
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
-      }
-      const appVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible',
-      });
-      window.recaptchaVerifier = appVerifier;
-
       const result = await signInWithPhoneNumber(auth, `+91${phone}`, appVerifier);
       setConfirmationResult(result);
       toast({ title: 'OTP Sent', description: 'Please check your phone for the verification code.' });
@@ -230,6 +235,7 @@ export default function BuyerLoginPage() {
 
   return (
     <>
+    <div id="recaptcha-container"></div>
     <div className="flex min-h-screen">
        <div className="relative hidden lg:block lg:w-1/2">
         <Image
@@ -376,8 +382,6 @@ export default function BuyerLoginPage() {
               </div>
             </TabsContent>
           </Tabs>
-
-          <div id="recaptcha-container"></div>
           
           <p className="mt-8 text-center text-sm text-muted-foreground">
             {isSignUp ? 'Already have an account? ' : "Don't have an account? "}

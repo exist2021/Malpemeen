@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -36,6 +36,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 declare global {
     interface Window {
         recaptchaVerifier?: RecaptchaVerifier;
+        confirmationResult?: ConfirmationResult;
     }
 }
 
@@ -57,6 +58,16 @@ export default function SellerLoginPage() {
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
+
+
+  useEffect(() => {
+    if (auth && !recaptchaVerifierRef.current) {
+        recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
+            'size': 'invisible',
+        });
+    }
+  }, [auth]);
 
 
   const handleEmailAuthAction = async () => {
@@ -115,7 +126,7 @@ export default function SellerLoginPage() {
   };
 
   const handlePhoneSignIn = async () => {
-    if (!auth || !firestore) {
+    if (!auth || !firestore || !recaptchaVerifierRef.current) {
       toast({ variant: 'destructive', title: 'Firebase not initialized.' });
       return;
     }
@@ -125,16 +136,9 @@ export default function SellerLoginPage() {
     }
 
     setIsSendingOtp(true);
-    try {
-      // Just-in-time initialization of RecaptchaVerifier
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
-      }
-      const appVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible',
-      });
-      window.recaptchaVerifier = appVerifier;
+    const appVerifier = recaptchaVerifierRef.current;
 
+    try {
       const result = await signInWithPhoneNumber(auth, `+91${phone}`, appVerifier);
       setConfirmationResult(result);
       toast({ title: 'OTP Sent', description: 'Please check your phone for the verification code.' });
@@ -232,6 +236,7 @@ export default function SellerLoginPage() {
 
   return (
     <>
+    <div id="recaptcha-container"></div>
     <div className="flex min-h-screen">
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 mx-auto relative">
          <Button variant="ghost" asChild className="absolute top-4 left-4">
@@ -367,8 +372,6 @@ export default function SellerLoginPage() {
               </div>
             </TabsContent>
           </Tabs>
-
-          <div id="recaptcha-container"></div>
           
           <p className="mt-8 text-center text-sm text-muted-foreground">
             {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
