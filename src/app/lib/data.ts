@@ -88,7 +88,7 @@ export async function getFishListingById(id: string): Promise<FishListing | null
 }
 
 
-export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDate' | 'sellerName' | 'sellerPhone' | 'sellerAddress'>): Promise<DocumentReference> {
+export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDate' | 'sellerName' | 'sellerPhone' | 'sellerAddress' | 'owner'>): Promise<DocumentReference> {
   const { firestore } = initializeFirebase();
   
   const sellerRef = doc(firestore, 'sellers', listing.sellerId);
@@ -106,7 +106,7 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
 
   const fishListingsRef = collection(firestore, `fishListings`);
   
-  const data: Omit<FishListing, 'id'> = {
+  const data: Omit<FishListing, 'id' | 'owner'> = {
     ...listing,
     sellerName: sellerData.name,
     sellerPhone: sellerData.phoneNumber,

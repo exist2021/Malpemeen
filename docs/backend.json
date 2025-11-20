@@ -151,11 +151,7 @@
         },
         "boatDetails": {
           "type": "string",
-          "enum": ["Ashok Leyland", "Persian Boat"]
-        },
-        "owner": {
-          "type": "string",
-          "description": "Owner of the boat/catch."
+          "enum": ["Ashok Leyland", "Persian Boat", "370-Boat"]
         },
         "brandName": {
           "type": "string",
@@ -179,11 +175,9 @@
         "description",
         "listedDate",
         "productName",
-        "pricePerKg",
         "portDetails",
         "howCaught",
         "boatDetails",
-        "owner",
         "brandName"
       ]
     }

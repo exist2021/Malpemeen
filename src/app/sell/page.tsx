@@ -18,8 +18,7 @@ export default function SellPage() {
     const [pricePerKg, setPricePerKg] = useState('');
     const [portDetails, setPortDetails] = useState('');
     const [howCaught, setHowCaught] = useState('');
-    const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | ''>('');
-    const [owner, setOwner] = useState('');
+    const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | '370-Boat' | ''>('');
     const [brandName, setBrandName] = useState('Malpe Meen');
     const [description, setDescription] = useState('');
     const [mediaUrls, setMediaUrls] = useState<string[]>([]);
@@ -78,7 +77,6 @@ export default function SellPage() {
                     setPortDetails(prev => parsedDetails.portDetails || prev);
                     setHowCaught(prev => parsedDetails.howCaught || prev);
                     setBoatDetails(prev => parsedDetails.boatDetails || prev);
-                    setOwner(prev => parsedDetails.owner || prev);
                     setDescription(prev => parsedDetails.description || prev);
                     toast({ title: "Fields Updated", description: "Your details have been updated by voice."});
                 } else {
@@ -151,7 +149,6 @@ export default function SellPage() {
                     portDetails,
                     howCaught,
                     boatDetails,
-                    owner,
                     brandName,
                     description,
                     mediaUrls,
@@ -162,7 +159,6 @@ export default function SellPage() {
                     setPortDetails,
                     setHowCaught,
                     setBoatDetails,
-                    setOwner,
                     setBrandName,
                     setDescription,
                     setMediaUrls,

@@ -20,8 +20,7 @@ const ParseListingDetailsOutputSchema = z.object({
   pricePerKg: z.number().optional().describe("The selling price per Kg."),
   portDetails: z.string().optional().describe("Details about the port of origin."),
   howCaught: z.string().optional().describe("Method used to catch the fish."),
-  boatDetails: z.enum(["Ashok Leyland", "Persian Boat"]).optional().describe("Type of boat used."),
-  owner: z.string().optional().describe("Owner of the boat/catch."),
+  boatDetails: z.enum(["Ashok Leyland", "Persian Boat", "370-Boat"]).optional().describe("Type of boat used."),
   description: z.string().optional().describe("A general description of the fish, its size, quality, etc."),
 });
 
@@ -43,7 +42,6 @@ You need to identify keywords to map the speech to the correct field. Here are s
 - "The port is Malpe" -> portDetails: "Malpe"
 - "How it was caught is net fishing" -> howCaught: "net fishing"
 - "Boat is Persian Boat" -> boatDetails: "Persian Boat"
-- "Owner is John Doe" -> owner: "John Doe"
 - "Description is This is a high-quality fresh fish, caught this morning." -> description: "This is a high-quality fresh fish, caught this morning."
 
 If a field is not mentioned, do not include it in the output. If multiple fields are mentioned, extract all of them. The user might provide a full sentence or just a phrase.

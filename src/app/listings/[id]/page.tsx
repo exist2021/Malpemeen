@@ -9,7 +9,7 @@ import type { FishListing } from '@/app/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Button } from '@/components/ui/button';
-import { Phone, Calendar, User, ArrowLeft, Anchor, UserCheck, Ship, Info, Tag, Copyright, IndianRupee, MapPin } from 'lucide-react';
+import { Phone, Calendar, User, ArrowLeft, Anchor, Ship, Info, Tag, Copyright, IndianRupee, MapPin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/layout/header';
 import { format } from 'date-fns';
@@ -200,7 +200,6 @@ export default function ListingDetailPage() {
                         <DetailItem icon={IndianRupee} label="Price Per Kg" value={listing.pricePerKg ? `₹${listing.pricePerKg.toLocaleString()}` : 'N/A'} />
                         <DetailItem icon={Calendar} label="Listed Date" value={listing.listedDate ? format(new Date(listing.listedDate), 'MMMM d, yyyy') : 'N/A'} />
                         <DetailItem icon={User} label="Seller" value={listing.sellerName} />
-                        <DetailItem icon={UserCheck} label="Owner" value={listing.owner} />
                         <DetailItem icon={Anchor} label="Port Details" value={listing.portDetails} />
                         <DetailItem icon={Info} label="How Caught" value={listing.howCaught} />
                         <DetailItem icon={Ship} label="Boat" value={listing.boatDetails} />

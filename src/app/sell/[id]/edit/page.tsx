@@ -27,8 +27,7 @@ export default function EditSellPage() {
     const [pricePerKg, setPricePerKg] = useState('');
     const [portDetails, setPortDetails] = useState('');
     const [howCaught, setHowCaught] = useState('');
-    const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | ''>('');
-    const [owner, setOwner] = useState('');
+    const [boatDetails, setBoatDetails] = useState<'Ashok Leyland' | 'Persian Boat' | '370-Boat' | ''>('');
     const [brandName, setBrandName] = useState('Malpe Meen');
     const [description, setDescription] = useState('');
     const [mediaUrls, setMediaUrls] = useState<string[]>([]);
@@ -45,7 +44,6 @@ export default function EditSellPage() {
             setPortDetails(data.portDetails || '');
             setHowCaught(data.howCaught || '');
             setBoatDetails(data.boatDetails || '');
-            setOwner(data.owner || '');
             setBrandName(data.brandName || 'Malpe Meen');
             setDescription(data.description || '');
             setMediaUrls(data.mediaUrls || []);
@@ -149,7 +147,6 @@ export default function EditSellPage() {
               portDetails,
               howCaught,
               boatDetails,
-              owner,
               brandName,
               description,
               mediaUrls,
@@ -160,7 +157,6 @@ export default function EditSellPage() {
                 setPortDetails,
                 setHowCaught,
                 setBoatDetails,
-                setOwner,
                 setBrandName,
                 setDescription,
                 setMediaUrls,

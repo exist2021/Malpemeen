@@ -30,11 +30,10 @@ export type FishListing = {
     sellerPhone?: string;
     sellerAddress?: string;
     productName: string;
-    pricePerKg: number;
+    pricePerKg?: number;
     portDetails: string;
     howCaught: string;
-    boatDetails: 'Ashok Leyland' | 'Persian Boat';
-    owner: string;
+    boatDetails: 'Ashok Leyland' | 'Persian Boat' | '370-Boat';
     brandName: string;
     viewCount?: number;
     callClickCount?: number;
