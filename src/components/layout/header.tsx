@@ -115,25 +115,23 @@ export function Header() {
                     </Dialog>
                   )}
                   {role === 'seller' && (
-                    <>
-                      <Dialog>
-                          <DialogTrigger asChild>
-                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                  <Settings className="mr-2 h-4 w-4" />
-                                  Account Settings
-                              </DropdownMenuItem>
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-[425px]">
-                              <DialogHeader>
-                              <DialogTitle>Seller Details</DialogTitle>
-                              <DialogDescription>
-                                  View and update your seller information.
-                              </DialogDescription>
-                              </DialogHeader>
-                              <SellerAccountForm />
-                          </DialogContent>
-                      </Dialog>
-                    </>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <Settings className="mr-2 h-4 w-4" />
+                                Account Settings
+                            </DropdownMenuItem>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                            <DialogTitle>Seller Details</DialogTitle>
+                            <DialogDescription>
+                                View and update your seller information.
+                            </DialogDescription>
+                            </DialogHeader>
+                            <SellerAccountForm />
+                        </DialogContent>
+                    </Dialog>
                   )}
                   <Dialog>
                       <DialogTrigger asChild>
@@ -212,3 +210,5 @@ export function Header() {
     </header>
   );
 }
+
+    
