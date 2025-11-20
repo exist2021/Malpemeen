@@ -32,14 +32,6 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-
-declare global {
-    interface Window {
-        recaptchaVerifier?: RecaptchaVerifier;
-        confirmationResult?: ConfirmationResult;
-    }
-}
-
 export default function SellerLoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -59,13 +51,16 @@ export default function SellerLoginPage() {
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
+  const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
 
   useEffect(() => {
-    if (auth && !recaptchaVerifierRef.current) {
-        recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
+    if (auth && !recaptchaVerifierRef.current && recaptchaContainerRef.current) {
+        recaptchaContainerRef.current.innerHTML = '';
+        const verifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
             'size': 'invisible',
         });
+        recaptchaVerifierRef.current = verifier;
     }
   }, [auth]);
 
@@ -148,6 +143,13 @@ export default function SellerLoginPage() {
             variant: 'destructive',
             title: 'Phone Sign-In Not Enabled',
             description: "Please enable the Phone Number sign-in provider in your Firebase project's Authentication settings.",
+            duration: 9000,
+        });
+      } else if (error.code === 'auth/billing-not-enabled') {
+        toast({
+            variant: 'destructive',
+            title: 'Billing Not Enabled',
+            description: "The free quota for phone auth has been exceeded. Please enable billing on your Firebase project to continue.",
             duration: 9000,
         });
       } else {
@@ -236,7 +238,7 @@ export default function SellerLoginPage() {
 
   return (
     <>
-    <div id="recaptcha-container"></div>
+    <div ref={recaptchaContainerRef}></div>
     <div className="flex min-h-screen">
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 mx-auto relative">
          <Button variant="ghost" asChild className="absolute top-4 left-4">
@@ -438,3 +440,5 @@ export default function SellerLoginPage() {
     </>
   );
 }
+
+    

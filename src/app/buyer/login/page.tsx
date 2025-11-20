@@ -32,13 +32,6 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-declare global {
-    interface Window {
-        recaptchaVerifier?: RecaptchaVerifier;
-        confirmationResult?: ConfirmationResult;
-    }
-}
-
 export default function BuyerLoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -58,13 +51,17 @@ export default function BuyerLoginPage() {
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
+  const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
 
   useEffect(() => {
-    if (auth && !recaptchaVerifierRef.current) {
-        recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
+    if (auth && !recaptchaVerifierRef.current && recaptchaContainerRef.current) {
+        // Ensure the container is empty before rendering
+        recaptchaContainerRef.current.innerHTML = '';
+        const verifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
             'size': 'invisible',
         });
+        recaptchaVerifierRef.current = verifier;
     }
   }, [auth]);
 
@@ -147,6 +144,13 @@ export default function BuyerLoginPage() {
             variant: 'destructive',
             title: 'Phone Sign-In Not Enabled',
             description: "Please enable the Phone Number sign-in provider in your Firebase project's Authentication settings.",
+            duration: 9000,
+        });
+      } else if (error.code === 'auth/billing-not-enabled') {
+        toast({
+            variant: 'destructive',
+            title: 'Billing Not Enabled',
+            description: "The free quota for phone auth has been exceeded. Please enable billing on your Firebase project to continue.",
             duration: 9000,
         });
       } else {
@@ -235,7 +239,7 @@ export default function BuyerLoginPage() {
 
   return (
     <>
-    <div id="recaptcha-container"></div>
+    <div ref={recaptchaContainerRef}></div>
     <div className="flex min-h-screen">
        <div className="relative hidden lg:block lg:w-1/2">
         <Image
@@ -438,3 +442,5 @@ export default function BuyerLoginPage() {
     </>
   );
 }
+
+    
