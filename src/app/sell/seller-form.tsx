@@ -337,7 +337,6 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
                     <SelectValue placeholder="Select a port" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="None">None</SelectItem>
                     <SelectItem value="Malpe Port">Malpe Port</SelectItem>
                     <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
                     <SelectItem value="Kochi Port">Kochi Port</SelectItem>

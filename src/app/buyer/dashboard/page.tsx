@@ -94,7 +94,6 @@ export default function BuyerDashboard() {
                         <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
                         <SelectItem value="Kochi Port">Kochi Port</SelectItem>
                         <SelectItem value="Hyderabad Port">Hyderabad Port</SelectItem>
-                        <SelectItem value="None">None</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
