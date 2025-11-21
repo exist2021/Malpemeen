@@ -91,7 +91,7 @@ export default function SellerHomePage() {
       <Header />
       <main className="container mx-auto max-w-4xl py-12">
         <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold tracking-tight font-headline">Welcome, {seller?.name || 'Seller'}</h1>
+            <h1 className="text-4xl font-bold tracking-tight font-headline">Welcome, {seller?.contactName || 'Seller'}</h1>
             <p className="mt-2 text-lg text-muted-foreground">Great to see you again! Your dashboard is updated and ready for new orders. Let’s make today productive.</p>
         </div>
 

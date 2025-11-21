@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { updateDoc, doc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
-import { Loader2, User } from 'lucide-react';
+import { Loader2, User, Building } from 'lucide-react';
 import type { Seller } from '@/app/types';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,7 +24,8 @@ export function SellerAccountForm() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState({
-        name: '',
+        contactName: '',
+        companyName: '',
         email: '',
         phoneNumber: '',
         address: '',
@@ -34,7 +35,8 @@ export function SellerAccountForm() {
     useEffect(() => {
         if (profile) {
             setFormData({
-                name: profile.name || '',
+                contactName: profile.contactName || '',
+                companyName: profile.companyName || '',
                 email: profile.email || '',
                 phoneNumber: profile.phoneNumber || '',
                 address: profile.address || '',
@@ -65,7 +67,8 @@ export function SellerAccountForm() {
         if (!profile || !firestore) return;
 
         const updatedData: Partial<Seller> = {};
-        if (formData.name !== profile.name) updatedData.name = formData.name;
+        if (formData.contactName !== profile.contactName) updatedData.contactName = formData.contactName;
+        if (formData.companyName !== profile.companyName) updatedData.companyName = formData.companyName;
         if (formData.phoneNumber !== profile.phoneNumber) updatedData.phoneNumber = formData.phoneNumber;
         if (formData.address !== profile.address) updatedData.address = formData.address;
         if (formData.logoUrl !== profile.logoUrl) updatedData.logoUrl = formData.logoUrl;
@@ -136,9 +139,9 @@ export function SellerAccountForm() {
                     className="h-24 w-24 cursor-pointer relative group"
                     onClick={() => fileInputRef.current?.click()}
                 >
-                    <AvatarImage src={formData.logoUrl} alt={formData.name} />
+                    <AvatarImage src={formData.logoUrl} alt={formData.companyName} />
                     <AvatarFallback>
-                        <User className="h-10 w-10" />
+                        <Building className="h-10 w-10" />
                     </AvatarFallback>
                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
                         <span className="text-xs text-center">Change Logo</span>
@@ -146,8 +149,12 @@ export function SellerAccountForm() {
                 </Avatar>
             </div>
             <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" name="name" value={formData.name} onChange={handleInputChange} />
+                <Label htmlFor="contactName">Contact Name</Label>
+                <Input id="contactName" name="contactName" value={formData.contactName} onChange={handleInputChange} />
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="companyName">Company Name</Label>
+                <Input id="companyName" name="companyName" value={formData.companyName} onChange={handleInputChange} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>

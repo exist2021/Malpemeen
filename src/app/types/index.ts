@@ -2,7 +2,8 @@
 export type Seller = {
     id: string;
     phoneNumber: string;
-    name: string;
+    contactName: string;
+    companyName: string;
     email: string;
     address?: string;
     totalViews?: number;

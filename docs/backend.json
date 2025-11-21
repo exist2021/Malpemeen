@@ -15,9 +15,13 @@
           "type": "string",
           "description": "Seller's contact phone number."
         },
-        "name": {
+        "contactName": {
           "type": "string",
-          "description": "Seller's name."
+          "description": "The name of the primary contact person for the seller."
+        },
+        "companyName": {
+          "type": "string",
+          "description": "The registered name of the seller's company."
         },
         "email": {
             "type": "string",
@@ -44,7 +48,8 @@
       "required": [
         "id",
         "phoneNumber",
-        "name",
+        "contactName",
+        "companyName",
         "email"
       ]
     },
@@ -107,7 +112,7 @@
         },
         "sellerName": {
             "type": "string",
-            "description": "Denormalized seller name for display."
+            "description": "Denormalized seller company name for display."
         },
         "sellerPhone": {
             "type": "string",
@@ -240,6 +245,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to support separate login pages for buyers and sellers. It provides secure and scalable storage for buyer and seller profiles, as well as fish listings. A top-level `fishListings` collection is used to allow for public, unauthenticated listing queries, which is a common pattern for marketplace apps. FishListing documents contain denormalized seller information (name, phone) to avoid costly and complex joins in client-side code and security rules."
+    "reasoning": "The Firestore structure is designed to support separate login pages for buyers and sellers. It provides secure and scalable storage for buyer and seller profiles, as well as fish listings. A top-level `fishListings` collection is used to allow for public, unauthenticated listing queries, which is a common pattern for marketplace apps. FishListing documents contain denormalized seller information (company name, phone) to avoid costly and complex joins in client-side code and security rules."
   }
 }

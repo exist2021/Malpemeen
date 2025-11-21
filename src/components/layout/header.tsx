@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, HelpCircle, Mail, Phone, Info } from 'lucide-react';
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, HelpCircle, Mail, Phone, Info, Building } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import {
   Dialog,
@@ -51,15 +51,15 @@ export function Header() {
     if (user) {
         let triggerContent;
         const isLoading = isSellerProfileLoading || isBuyerProfileLoading;
-        const profileName = role === 'seller' ? sellerProfile?.name : buyerProfile?.name;
+        const profileName = role === 'seller' ? sellerProfile?.companyName : buyerProfile?.name;
 
         if (isLoading) {
             triggerContent = <Skeleton className="h-9 w-9 rounded-full" />;
         } else if (role === 'seller' && sellerProfile?.logoUrl) {
             triggerContent = (
                 <Avatar className="h-9 w-9">
-                    <AvatarImage src={sellerProfile.logoUrl} alt={sellerProfile.name} />
-                    <AvatarFallback><UserIcon className="h-4 w-4" /></AvatarFallback>
+                    <AvatarImage src={sellerProfile.logoUrl} alt={sellerProfile.companyName} />
+                    <AvatarFallback><Building className="h-4 w-4" /></AvatarFallback>
                 </Avatar>
             );
         } else if (role === 'buyer' && buyerProfile?.photoUrl) {
@@ -72,7 +72,7 @@ export function Header() {
         } else {
              triggerContent = (
                 <div className="h-9 w-9 flex items-center justify-center rounded-full bg-muted">
-                    <UserIcon className="h-5 w-5" />
+                   {role === 'seller' ? <Building className="h-5 w-5" /> : <UserIcon className="h-5 w-5" />}
                 </div>
             );
         }

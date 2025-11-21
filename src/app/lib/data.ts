@@ -45,7 +45,7 @@ export async function getSellerFishListings(sellerId: string): Promise<FishListi
   try {
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FishListing));
-  } catch (e: any) {
+  } catch (e: any) => {
     if (e.code === 'permission-denied') {
       const contextualError = new FirestorePermissionError({
         path: `fishListings`,
@@ -100,15 +100,15 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
   
   const sellerData = sellerSnap.data() as Seller;
 
-  if (!sellerData.name || !sellerData.phoneNumber) {
-      throw new Error("Seller profile is incomplete. Name and phone number are required.");
+  if (!sellerData.companyName || !sellerData.phoneNumber) {
+      throw new Error("Seller profile is incomplete. Company name and phone number are required.");
   }
 
   const fishListingsRef = collection(firestore, `fishListings`);
   
   const data: Omit<FishListing, 'id'> = {
     ...listing,
-    sellerName: sellerData.name,
+    sellerName: sellerData.companyName,
     sellerPhone: sellerData.phoneNumber,
     sellerAddress: sellerData.address || '',
     listedDate: new Date().toISOString(),

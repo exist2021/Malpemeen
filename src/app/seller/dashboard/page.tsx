@@ -233,7 +233,7 @@ export default function SellerDashboard() {
       <Header />
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">{seller?.name || 'Seller Dashboard'}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{seller?.companyName || 'Seller Dashboard'}</h1>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">

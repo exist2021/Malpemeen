@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff, Phone as PhoneIcon, Loader2, User } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, Eye, EyeOff, Phone as PhoneIcon, Loader2, User, Building, MapPin } from 'lucide-react';
 import { FishLogo } from '@/components/fish-logo';
 import {
   Dialog,
@@ -31,12 +31,15 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from '@/components/ui/textarea';
 
 export default function SellerLoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [contactName, setContactName] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
@@ -96,7 +99,9 @@ export default function SellerLoginPage() {
         const user = userCredential.user;
         const sellerData = {
             id: user.uid,
-            name: name,
+            contactName: contactName,
+            companyName: companyName,
+            address: address,
             phoneNumber: `+91${phone}`,
             email: user.email,
         };
@@ -112,7 +117,7 @@ export default function SellerLoginPage() {
           if (error.code === 'auth/email-already-in-use') {
               description = "This email is already in use. Please log in or use a different email.";
           } else if (error.name === 'FirebaseError' && error.message.includes('permission-denied')) {
-              const sellerData = { id: auth.currentUser?.uid, name, phoneNumber: phone, email };
+              const sellerData = { id: auth.currentUser?.uid, contactName, companyName, address, phoneNumber: phone, email };
               const docRef = doc(firestore, 'sellers', auth.currentUser!.uid);
               const contextualError = new FirestorePermissionError({
                   path: docRef.path,
@@ -261,12 +266,26 @@ export default function SellerLoginPage() {
          </div>
           
           {isSignUp ? (
-            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleSignUp(); }}>
+            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSignUp(); }}>
                  <div className="space-y-2">
-                    <Label htmlFor="signup-name">Name</Label>
+                    <Label htmlFor="signup-contact-name">Contact Name</Label>
                     <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input id="signup-name" type="text" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required className="pl-10"/>
+                        <Input id="signup-contact-name" type="text" placeholder="John Doe" value={contactName} onChange={(e) => setContactName(e.target.value)} required className="pl-10"/>
+                    </div>
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="signup-company-name">Company Name</Label>
+                    <div className="relative">
+                        <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input id="signup-company-name" type="text" placeholder="Malpe Meen Pvt Ltd" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required className="pl-10"/>
+                    </div>
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="signup-address">Address</Label>
+                    <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Textarea id="signup-address" placeholder="Your business address" value={address} onChange={(e) => setAddress(e.target.value)} required className="pl-10"/>
                     </div>
                 </div>
                 <div className="space-y-2">
