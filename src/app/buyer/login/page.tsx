@@ -55,20 +55,14 @@ export default function BuyerLoginPage() {
 
 
   useEffect(() => {
-    if (auth && recaptchaContainerRef.current) {
-        if (!recaptchaVerifierRef.current) {
-            recaptchaVerifierRef.current = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
-                'size': 'invisible',
-            });
-        }
+    if (auth && recaptchaContainerRef.current && !recaptchaVerifierRef.current) {
+        recaptchaVerifierRef.current = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
+            'size': 'invisible',
+            'callback': () => {
+                // reCAPTCHA solved, allow signInWithPhoneNumber.
+            }
+        });
     }
-    // Cleanup on component unmount
-    return () => {
-        if (recaptchaVerifierRef.current) {
-            recaptchaVerifierRef.current.clear();
-            recaptchaVerifierRef.current = null;
-        }
-    };
   }, [auth]);
 
 
@@ -179,19 +173,34 @@ export default function BuyerLoginPage() {
       const userCredential = await confirmationResult.confirm(otp);
       const user = userCredential.user;
 
-      // Check if user is new, then create a document.
       const userRef = doc(firestore, 'buyers', user.uid);
       const userDoc = await getDoc(userRef);
+      
       if (!userDoc.exists()) {
-          const buyerData = {
-              id: user.uid,
-              name: name || `User ${user.uid.slice(0, 5)}`,
-              phoneNumber: user.phoneNumber,
-              email: user.email, // This will be null for phone auth
-          };
-          await setDoc(userRef, buyerData);
-          toast({ title: 'Account Created!', description: 'Welcome to Malpe Meen!' });
+        if (isSignUp) {
+            // User is signing up, so create their profile
+            const buyerData = {
+                id: user.uid,
+                name: name || `User ${user.uid.slice(0, 5)}`,
+                phoneNumber: user.phoneNumber,
+                email: user.email, // This will be null for phone auth
+            };
+            await setDoc(userRef, buyerData);
+            toast({ title: 'Account Created!', description: 'Welcome to Malpe Meen!' });
+        } else {
+            // User is logging in, but doesn't exist. Prompt to sign up.
+            toast({
+                variant: 'destructive',
+                title: 'Not Registered',
+                description: 'This phone number is not registered. Please sign up first.',
+            });
+            setConfirmationResult(null); // Reset OTP state
+            setIsSignUp(true); // Switch to sign up view
+            setIsVerifyingOtp(false);
+            return; // Stop the login process
+        }
       } else {
+        // User exists, log them in
         toast({ title: 'Login Successful!', description: 'Welcome back!' });
       }
       
@@ -384,7 +393,7 @@ export default function BuyerLoginPage() {
                     </div>
                     <Button type="submit" className="w-full h-12 text-base" disabled={isVerifyingOtp}>
                       {isVerifyingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                      Verify OTP & Login
+                      Verify OTP & {isSignUp ? 'Sign Up' : 'Login'}
                     </Button>
                      <Button variant="link" onClick={() => setConfirmationResult(null)}>Back</Button>
                   </form>
@@ -448,5 +457,3 @@ export default function BuyerLoginPage() {
     </>
   );
 }
-
-    
