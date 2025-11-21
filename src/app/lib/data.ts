@@ -7,7 +7,6 @@ import { initializeFirebase } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { getAuth } from 'firebase/auth';
-import { incrementCounts } from '@/ai/flows/increment-counts-flow';
 
 
 export async function getFishListings(): Promise<FishListing[]> {
@@ -80,7 +79,7 @@ export async function getFishListingById(id: string): Promise<FishListing | null
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             const listingData = { id: docSnap.id, ...docSnap.data() } as FishListing;
-            // Fire-and-forget view count increment
+            // Fire-and-forget view count increment directly on the client
             incrementListingViewCount(id, listingData.sellerId);
             return listingData;
         } else {
@@ -175,17 +174,21 @@ export async function deleteFishListing(id: string) {
 }
 
 export function incrementListingViewCount(listingId: string, sellerId: string) {
-    // This is a fire-and-forget operation. We don't await it.
-    incrementCounts({ listingId, sellerId, type: 'view' }).catch(error => {
-        // Log the error but don't block the UI
-        console.warn("Could not increment view count via flow:", error);
-    });
+    const { firestore } = initializeFirebase();
+    const listingRef = doc(firestore, 'fishListings', listingId);
+    const sellerRef = doc(firestore, 'sellers', sellerId);
+
+    // This is a fire-and-forget operation.
+    updateDoc(listingRef, { viewCount: increment(1) }).catch(console.warn);
+    updateDoc(sellerRef, { totalViews: increment(1) }).catch(console.warn);
 }
 
 export function incrementListingCallCount(listingId: string, sellerId: string) {
+    const { firestore } = initializeFirebase();
+    const listingRef = doc(firestore, 'fishListings', listingId);
+    const sellerRef = doc(firestore, 'sellers', sellerId);
+    
     // This is a fire-and-forget operation.
-    incrementCounts({ listingId, sellerId, type: 'call' }).catch(error => {
-        // Log the error but don't block the UI
-        console.warn("Could not increment call count via flow:", error);
-    });
+    updateDoc(listingRef, { callClickCount: increment(1) }).catch(console.warn);
+    updateDoc(sellerRef, { totalCalls: increment(1) }).catch(console.warn);
 }
