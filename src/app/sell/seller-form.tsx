@@ -60,23 +60,18 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const [hasCameraPermission, setHasCameraPermission] = useState(true);
     const [isRecording, setIsRecording] = useState(false);
-    const [stream, setStream] = useState<MediaStream | null>(null);
     const { toast } = useToast();
 
     useEffect(() => {
+        let stream: MediaStream | null = null;
+        
         const getCameraPermission = async () => {
-            if (!open) {
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                }
-                return;
-            }
+            if (!open) return;
             try {
-                const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                setStream(mediaStream);
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 setHasCameraPermission(true);
                 if (videoRef.current) {
-                    videoRef.current.srcObject = mediaStream;
+                    videoRef.current.srcObject = stream;
                 }
             } catch (error) {
                 console.error('Error accessing camera:', error);
@@ -96,7 +91,7 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
                 stream.getTracks().forEach(track => track.stop());
             }
         };
-    }, [open, stream, toast]);
+    }, [open, toast]);
 
     const handleCapturePhoto = () => {
         if (videoRef.current) {
@@ -113,7 +108,8 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
     };
 
     const handleStartRecording = () => {
-        if (stream) {
+        if (videoRef.current && videoRef.current.srcObject) {
+            const stream = videoRef.current.srcObject as MediaStream;
             const chunks: Blob[] = [];
             mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'video/webm' });
             mediaRecorderRef.current.ondataavailable = (event) => {
