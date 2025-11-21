@@ -10,20 +10,6 @@
           "order": "DESCENDING"
         }
       ]
-    },
-     {
-      "collectionGroup": "fishListings",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "sellerId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "listedDate",
-          "order": "ASCENDING"
-        }
-      ]
     }
   ]
 }

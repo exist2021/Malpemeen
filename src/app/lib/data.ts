@@ -45,18 +45,19 @@ export async function getSellerFishListings(sellerId: string): Promise<FishListi
   const { firestore } = initializeFirebase();
   const listingsCol = collection(firestore, 'fishListings');
   
-  const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
+  const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
 
-  const q = query(listingsCol, 
-    where("sellerId", "==", sellerId),
-    where('listedDate', '>', twelveHoursAgo)
-    // No orderBy('listedDate') here to avoid needing another composite index.
-    // Client-side sorting is sufficient for the seller's own dashboard.
-  );
+  // Simplified query: Only fetch by sellerId to avoid composite index issues.
+  const q = query(listingsCol, where("sellerId", "==", sellerId));
 
   try {
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FishListing));
+    const allListings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FishListing));
+    
+    // Filter by date on the client-side.
+    const filteredListings = allListings.filter(listing => new Date(listing.listedDate) > twelveHoursAgo);
+
+    return filteredListings;
   } catch (e: any) {
     if (e.code === 'permission-denied') {
       const contextualError = new FirestorePermissionError({
