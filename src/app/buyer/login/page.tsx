@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, Lock, Eye, EyeOff, ArrowLeft, Phone as PhoneIcon, Loader2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowLeft, Phone as PhoneIcon, Loader2, User } from 'lucide-react';
 import { FishLogo } from '@/components/fish-logo';
 import {
   Dialog,
@@ -71,14 +71,34 @@ export default function BuyerLoginPage() {
         toast({ variant: 'destructive', title: 'Firebase not initialized.'});
         return;
     };
-    if (isSignUp) {
-      try {
+
+    signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+            toast({ title: 'Login successful! Redirecting...' });
+            router.push('/buyer/dashboard');
+        })
+        .catch(error => {
+            let description = error.message;
+            if (error.code === 'auth/invalid-credential') {
+                description = "Invalid email or password. Please try again.";
+            }
+            toast({ variant: 'destructive', title: 'Login Failed', description });
+        });
+  };
+
+  const handleSignUp = async () => {
+    if (!auth || !firestore) {
+        toast({ variant: 'destructive', title: 'Firebase not initialized.'});
+        return;
+    };
+
+     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         const buyerData = {
           id: user.uid,
           name: name,
-          phoneNumber: phone,
+          phoneNumber: `+91${phone}`,
           email: user.email,
         };
         const docRef = doc(firestore, 'buyers', user.uid);
@@ -105,21 +125,8 @@ export default function BuyerLoginPage() {
         }
         toast({ variant: 'destructive', title: 'Sign Up Failed', description });
       }
-    } else {
-        signInWithEmailAndPassword(auth, email, password)
-            .then(() => {
-                toast({ title: 'Login successful! Redirecting...' });
-                router.push('/buyer/dashboard');
-            })
-            .catch(error => {
-                let description = error.message;
-                if (error.code === 'auth/invalid-credential') {
-                    description = "Invalid email or password. Please try again.";
-                }
-                toast({ variant: 'destructive', title: 'Login Failed', description });
-            });
-    }
-  };
+  }
+
 
   const handlePhoneSignIn = async () => {
     if (!auth || !firestore || !recaptchaVerifierRef.current) {
@@ -128,10 +135,6 @@ export default function BuyerLoginPage() {
     }
     if (!phone) {
         toast({ variant: 'destructive', title: 'Phone number is required.' });
-        return;
-    }
-     if (isSignUp && !name) {
-        toast({ variant: 'destructive', title: 'Name is required for sign up.' });
         return;
     }
 
@@ -181,37 +184,22 @@ export default function BuyerLoginPage() {
       const userDoc = await getDoc(userRef);
       
       if (!userDoc.exists()) {
-        if (isSignUp) {
-            // User is signing up, so create their profile
-            const buyerData = {
-                id: user.uid,
-                name: name,
-                phoneNumber: user.phoneNumber,
-                email: user.email, // This will be null for phone auth
-            };
-            await setDoc(userRef, buyerData);
-            toast({ title: 'Account Created!', description: 'Welcome to Malpe Meen!' });
-        } else {
-            // User is logging in, but doesn't exist. Prompt to sign up.
-            // We sign them out to prevent a dangling auth session
-            auth.signOut();
-            toast({
-                variant: 'destructive',
-                title: 'Not Registered',
-                description: 'This phone number is not registered. Please sign up first.',
-            });
-            setConfirmationResult(null); // Reset OTP state
-            setOtp('');
-            setIsSignUp(true); // Switch to sign up view
-            setIsVerifyingOtp(false);
-            return; // Stop the login process
-        }
+        // User does not exist, so sign them out and prompt to register.
+        await auth.signOut();
+        toast({
+            variant: 'destructive',
+            title: 'Not Registered',
+            description: 'This phone number is not registered. Please sign up first.',
+        });
+        setConfirmationResult(null);
+        setOtp('');
+        setIsSignUp(true);
+        setLoginMethod('email'); // Default to email for sign up view
       } else {
         // User exists, log them in
         toast({ title: 'Login Successful!', description: 'Welcome back!' });
+        router.push('/buyer/dashboard');
       }
-      
-      router.push('/buyer/dashboard');
 
     } catch (error: any) {
       toast({
@@ -286,99 +274,78 @@ export default function BuyerLoginPage() {
             </p>
           </div>
 
-          <Tabs value={loginMethod} onValueChange={setLoginMethod} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="email">Email</TabsTrigger>
-              <TabsTrigger value="phone">Phone</TabsTrigger>
-            </TabsList>
-            <TabsContent value="email">
-              <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleEmailAuthAction(); }}>
-                {isSignUp && (
-                  <>
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-name">Name</Label>
-                      <Input
-                        id="signup-name"
-                        type="text"
-                        placeholder="John Doe"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                      />
+          {isSignUp ? (
+            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleSignUp(); }}>
+                 <div className="space-y-2">
+                    <Label htmlFor="signup-name">Name</Label>
+                    <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input id="signup-name" type="text" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required className="pl-10"/>
                     </div>
-                     <div className="space-y-2">
-                      <Label htmlFor="signup-phone-email">Phone Number</Label>
-                      <Input
-                        id="signup-phone-email"
-                        type="tel"
-                        placeholder="123-456-7890"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </>
-                )}
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="m@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="pl-10"
-                    />
-                  </div>
                 </div>
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    {!isSignUp && (
+                  <Label htmlFor="signup-email">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input id="signup-email" type="email" placeholder="m@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10" />
+                  </div>
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="signup-phone">Phone Number</Label>
+                    <div className="relative">
+                        <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input id="signup-phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="pl-10" />
+                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">+91</span>
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="signup-password">Password</Label>
+                    <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input id="signup-password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 pr-10" />
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2">
+                        {showPassword ? <EyeOff className="h-5 w-5 text-muted-foreground" /> : <Eye className="h-5 w-5 text-muted-foreground" />}
+                        </button>
+                    </div>
+                </div>
+                <Button type="submit" className="w-full h-12 text-base">Sign Up</Button>
+            </form>
+          ) : (
+            <Tabs value={loginMethod} onValueChange={setLoginMethod} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="email">Email</TabsTrigger>
+                <TabsTrigger value="phone">Phone</TabsTrigger>
+              </TabsList>
+              <TabsContent value="email">
+                <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleEmailAuthAction(); }}>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                      <Input id="email" type="email" placeholder="m@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10"/>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password">Password</Label>
                       <button type="button" onClick={() => setForgotPasswordOpen(true)} className="text-sm font-medium text-primary hover:underline">
                         Forgot Password?
                       </button>
-                    )}
+                    </div>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                      <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 pr-10"/>
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2">
+                        {showPassword ? <EyeOff className="h-5 w-5 text-muted-foreground" /> : <Eye className="h-5 w-5 text-muted-foreground" />}
+                      </button>
+                    </div>
                   </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="pl-10 pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2"
-                    >
-                      {showPassword ? <EyeOff className="h-5 w-5 text-muted-foreground" /> : <Eye className="h-5 w-5 text-muted-foreground" />}
-                    </button>
-                  </div>
-                </div>
-                
-                <Button type="submit" className="w-full h-12 text-base">
-                  {isSignUp ? 'Sign Up' : 'Login'}
-                </Button>
-                
-              </form>
-            </TabsContent>
-            <TabsContent value="phone">
-               <div className="space-y-6">
+                  <Button type="submit" className="w-full h-12 text-base">Login</Button>
+                </form>
+              </TabsContent>
+              <TabsContent value="phone">
                 {!confirmationResult ? (
                   <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handlePhoneSignIn(); }}>
-                    {isSignUp && 
-                    <div className="space-y-2">
-                        <Label htmlFor="signup-name-phone">Name</Label>
-                        <Input id="signup-name-phone" type="text" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required />
-                    </div>
-                    }
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone Number</Label>
                       <div className="relative">
@@ -389,7 +356,7 @@ export default function BuyerLoginPage() {
                     </div>
                     <Button type="submit" className="w-full h-12 text-base" disabled={isSendingOtp}>
                       {isSendingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                      {isSignUp ? 'Send OTP' : 'Send OTP'}
+                      Send OTP
                     </Button>
                   </form>
                 ) : (
@@ -400,14 +367,14 @@ export default function BuyerLoginPage() {
                     </div>
                     <Button type="submit" className="w-full h-12 text-base" disabled={isVerifyingOtp}>
                       {isVerifyingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                      Verify OTP & {isSignUp ? 'Sign Up' : 'Login'}
+                      Verify OTP & Login
                     </Button>
                      <Button variant="link" onClick={() => setConfirmationResult(null)}>Back</Button>
                   </form>
                 )}
-              </div>
-            </TabsContent>
-          </Tabs>
+              </TabsContent>
+            </Tabs>
+          )}
           
           <p className="mt-8 text-center text-sm text-muted-foreground">
             {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
