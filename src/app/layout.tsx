@@ -29,7 +29,6 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-cyan-200 via-purple-300 to-pink-300 -z-10" />
         <FirebaseClientProvider>
           {children}
         </FirebaseClientProvider>
