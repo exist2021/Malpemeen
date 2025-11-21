@@ -70,7 +70,9 @@ service cloud.firestore {
       allow list: if false; // Sellers list is not public
 
       allow create: if isOwner(sellerId) && request.resource.data.id == sellerId;
-      allow update: if isExistingOwner(sellerId) && request.resource.data.id == resource.data.id;
+      // Allow any authenticated user to update the totalViews and totalCalls fields.
+      allow update: if (isExistingOwner(sellerId) && request.resource.data.id == resource.data.id) || 
+                       (isSignedIn() && request.resource.data.keys().hasOnly(['totalViews', 'totalCalls']));
       allow delete: if isExistingOwner(sellerId);
     }
 
@@ -94,7 +96,9 @@ service cloud.firestore {
       allow list: if true;
 
       allow create: if isOwner(request.resource.data.sellerId);
-      allow update: if isOwner(resource.data.sellerId) && isCorrectSeller(resource.data.sellerId);
+      // Allow any signed-in user to update view/call counts, but only owner can change other details.
+      allow update: if (isOwner(resource.data.sellerId) && isCorrectSeller(resource.data.sellerId)) ||
+                       (isSignedIn() && request.resource.data.keys().hasOnly(['viewCount', 'callClickCount']));
       allow delete: if isOwner(resource.data.sellerId);
     }
   }

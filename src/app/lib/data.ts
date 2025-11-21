@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { FishListing, Seller } from '@/app/types';
@@ -183,11 +184,27 @@ export function incrementListingViewCount(listingId: string, sellerId: string) {
     const listingRef = doc(firestore, 'fishListings', listingId);
     const sellerRef = doc(firestore, 'sellers', sellerId);
 
-    // This is a fire-and-forget operation.
-    // We don't wait for it to complete to not block the UI.
-    // We add a simple console warning to log if it fails for any reason (e.g. offline).
-    updateDoc(listingRef, { viewCount: increment(1) }).catch(console.warn);
-    updateDoc(sellerRef, { totalViews: increment(1) }).catch(console.warn);
+    const listingUpdateData = { viewCount: increment(1) };
+    updateDoc(listingRef, listingUpdateData)
+      .catch(error => {
+        const contextualError = new FirestorePermissionError({
+            path: listingRef.path,
+            operation: 'update',
+            requestResourceData: listingUpdateData,
+        });
+        errorEmitter.emit('permission-error', contextualError);
+      });
+
+    const sellerUpdateData = { totalViews: increment(1) };
+    updateDoc(sellerRef, sellerUpdateData)
+      .catch(error => {
+          const contextualError = new FirestorePermissionError({
+              path: sellerRef.path,
+              operation: 'update',
+              requestResourceData: sellerUpdateData,
+          });
+          errorEmitter.emit('permission-error', contextualError);
+      });
 }
 
 export function incrementListingCallCount(listingId: string, sellerId: string) {
@@ -197,7 +214,26 @@ export function incrementListingCallCount(listingId: string, sellerId: string) {
     const listingRef = doc(firestore, 'fishListings', listingId);
     const sellerRef = doc(firestore, 'sellers', sellerId);
     
-    // This is a fire-and-forget operation.
-    updateDoc(listingRef, { callClickCount: increment(1) }).catch(console.warn);
-    updateDoc(sellerRef, { totalCalls: increment(1) }).catch(console.warn);
+    const listingUpdateData = { callClickCount: increment(1) };
+    updateDoc(listingRef, listingUpdateData)
+      .catch(error => {
+        const contextualError = new FirestorePermissionError({
+            path: listingRef.path,
+            operation: 'update',
+            requestResourceData: listingUpdateData,
+        });
+        errorEmitter.emit('permission-error', contextualError);
+      });
+
+    const sellerUpdateData = { totalCalls: increment(1) };
+    updateDoc(sellerRef, sellerUpdateData)
+      .catch(error => {
+        const contextualError = new FirestorePermissionError({
+            path: sellerRef.path,
+            operation: 'update',
+            requestResourceData: sellerUpdateData,
+        });
+        errorEmitter.emit('permission-error', contextualError);
+      });
 }
+
