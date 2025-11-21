@@ -21,7 +21,7 @@
         },
         {
           "fieldPath": "listedDate",
-          "order": "DESCENDING"
+          "order": "ASCENDING"
         }
       ]
     }
