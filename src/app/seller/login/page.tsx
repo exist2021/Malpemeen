@@ -284,7 +284,7 @@ export default function SellerLoginPage() {
                  <div className="space-y-2">
                     <Label htmlFor="signup-address">Address</Label>
                     <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                         <Textarea id="signup-address" placeholder="Your business address" value={address} onChange={(e) => setAddress(e.target.value)} required className="pl-10"/>
                     </div>
                 </div>
@@ -295,13 +295,10 @@ export default function SellerLoginPage() {
                     <Input id="signup-email" type="email" placeholder="m@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10" />
                   </div>
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="signup-phone">Phone Number</Label>
-                    <div className="flex h-10 w-full items-center rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                        <PhoneIcon className="h-5 w-5 text-muted-foreground" />
-                        <span className="pl-2 pr-2 text-muted-foreground">+91</span>
-                        <Input id="signup-phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"/>
-                    </div>
+                 <div className="flex h-10 w-full items-center rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                    <PhoneIcon className="h-5 w-5 text-muted-foreground" />
+                    <span className="pl-2 pr-2 text-muted-foreground">+91</span>
+                    <Input id="signup-phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"/>
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
