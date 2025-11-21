@@ -45,7 +45,7 @@ export async function getSellerFishListings(sellerId: string): Promise<FishListi
   try {
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FishListing));
-  } catch (e: any) => {
+  } catch (e: any) {
     if (e.code === 'permission-denied') {
       const contextualError = new FirestorePermissionError({
         path: `fishListings`,
