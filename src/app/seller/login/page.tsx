@@ -130,6 +130,10 @@ export default function SellerLoginPage() {
         toast({ variant: 'destructive', title: 'Phone number is required.' });
         return;
     }
+     if (isSignUp && !name) {
+        toast({ variant: 'destructive', title: 'Name is required for sign up.' });
+        return;
+    }
 
     setIsSendingOtp(true);
     const appVerifier = recaptchaVerifierRef.current;
@@ -181,7 +185,7 @@ export default function SellerLoginPage() {
             // User is signing up, create the profile.
             const sellerData = {
                 id: user.uid,
-                name: name || `User ${user.uid.slice(0, 5)}`,
+                name: name,
                 phoneNumber: user.phoneNumber,
                 email: user.email, 
             };
@@ -189,12 +193,14 @@ export default function SellerLoginPage() {
             toast({ title: 'Account Created!', description: 'Welcome to Malpe Meen!' });
         } else {
             // User is logging in, but doesn't exist. Prompt to sign up.
+            auth.signOut();
             toast({
                 variant: 'destructive',
                 title: 'Not Registered',
                 description: 'This phone number is not registered. Please sign up first.',
             });
             setConfirmationResult(null); // Reset OTP state
+            setOtp('');
             setIsSignUp(true); // Switch to sign up view
             setIsVerifyingOtp(false);
             return; // Stop the login process
@@ -372,7 +378,7 @@ export default function SellerLoginPage() {
                     </div>
                     <Button type="submit" className="w-full h-12 text-base" disabled={isSendingOtp}>
                       {isSendingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                      Send OTP
+                      {isSignUp ? 'Send OTP' : 'Send OTP'}
                     </Button>
                   </form>
                 ) : (
