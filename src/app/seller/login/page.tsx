@@ -182,7 +182,6 @@ export default function SellerLoginPage() {
       const userDoc = await getDoc(userRef);
 
        if (!userDoc.exists()) {
-        // User does not exist, so sign them out and prompt to register.
         await auth.signOut();
         toast({
             variant: 'destructive',
@@ -192,9 +191,7 @@ export default function SellerLoginPage() {
         setConfirmationResult(null);
         setOtp('');
         setIsSignUp(true);
-        setLoginMethod('email'); // Default to email for sign up view
       } else {
-        // User exists, log them in.
         toast({ title: 'Login Successful!', description: 'Welcome back!' });
          router.push('/seller/home');
       }
@@ -281,10 +278,10 @@ export default function SellerLoginPage() {
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="signup-phone">Phone Number</Label>
-                    <div className="relative">
+                    <div className="relative flex items-center">
                         <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input id="signup-phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="pl-10" />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">+91</span>
+                        <span className="pl-10 text-sm text-muted-foreground">+91</span>
+                        <Input id="signup-phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="pl-4" />
                     </div>
                 </div>
                 <div className="space-y-2">
@@ -356,11 +353,12 @@ export default function SellerLoginPage() {
                     <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handlePhoneSignIn(); }}>
                         <div className="space-y-2">
                         <Label htmlFor="phone">Phone Number</Label>
-                        <div className="relative">
+                        <div className="relative flex items-center">
                             <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input id="phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="pl-10" />
+                            <span className="pl-10 text-sm text-muted-foreground">+91</span>
+                            <Input id="phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="pl-4" />
                         </div>
-                        <p className="text-xs text-muted-foreground">Country code (+91) is automatically added.</p>
+                        <p className="text-xs text-muted-foreground">Country code (+91) is automatically used.</p>
                         </div>
                         <Button type="submit" className="w-full h-12 text-base" disabled={isSendingOtp}>
                         {isSendingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
