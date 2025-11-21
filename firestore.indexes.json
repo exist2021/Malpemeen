@@ -1,6 +1,17 @@
+
 {
   "indexes": [
     {
+      "collectionGroup": "fishListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "listedDate",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+     {
       "collectionGroup": "fishListings",
       "queryScope": "COLLECTION",
       "fields": [

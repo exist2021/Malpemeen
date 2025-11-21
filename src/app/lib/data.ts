@@ -13,7 +13,12 @@ import { incrementCounts } from '@/ai/flows/increment-counts-flow';
 export async function getFishListings(): Promise<FishListing[]> {
   const { firestore } = initializeFirebase();
   const listingsCol = collection(firestore, 'fishListings');
-  const q = query(listingsCol, orderBy('listedDate', 'desc'));
+  
+  // Calculate the timestamp for 12 hours ago
+  const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
+
+  // Query for listings created after the calculated timestamp
+  const q = query(listingsCol, where('listedDate', '>', twelveHoursAgo), orderBy('listedDate', 'desc'));
 
   try {
     const querySnapshot = await getDocs(q);
@@ -39,8 +44,15 @@ export async function getFishListings(): Promise<FishListing[]> {
 export async function getSellerFishListings(sellerId: string): Promise<FishListing[]> {
   const { firestore } = initializeFirebase();
   const listingsCol = collection(firestore, 'fishListings');
-  // Removed orderBy to avoid needing a composite index. Sorting is now done on the client.
-  const q = query(listingsCol, where("sellerId", "==", sellerId));
+  
+  const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
+
+  const q = query(listingsCol, 
+    where("sellerId", "==", sellerId),
+    where('listedDate', '>', twelveHoursAgo)
+    // No orderBy('listedDate') here to avoid needing another composite index.
+    // Client-side sorting is sufficient for the seller's own dashboard.
+  );
 
   try {
     const querySnapshot = await getDocs(q);
