@@ -48,13 +48,11 @@ const incrementCountsFlow = ai.defineFlow(
     const batch = db.batch();
 
     if (type === 'view') {
-      // Use set with merge to handle cases where the field might not exist yet.
-      batch.set(listingRef, { viewCount: FieldValue.increment(1) }, { merge: true });
-      batch.set(sellerRef, { totalViews: FieldValue.increment(1) }, { merge: true });
+      batch.update(listingRef, { viewCount: FieldValue.increment(1) });
+      batch.update(sellerRef, { totalViews: FieldValue.increment(1) });
     } else if (type === 'call') {
-      // Use set with merge for robustness.
-      batch.set(listingRef, { callClickCount: FieldValue.increment(1) }, { merge: true });
-      batch.set(sellerRef, { totalCalls: FieldValue.increment(1) }, { merge: true });
+      batch.update(listingRef, { callClickCount: FieldValue.increment(1) });
+      batch.update(sellerRef, { totalCalls: FieldValue.increment(1) });
     }
 
     try {
