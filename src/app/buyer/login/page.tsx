@@ -267,7 +267,7 @@ export default function BuyerLoginPage() {
             <FishLogo className="h-16 w-16 text-primary mx-auto"/>
             <h2 className="text-3xl font-bold tracking-tight mt-4">{isSignUp ? 'Create a Buyer Account' : 'Buyer Login'}</h2>
             <p className="mt-2 text-muted-foreground">
-                {isSignUp ? 'Join our community to find and purchase the freshest catch directly from local sellers.' : 'Welcome back! Ready to find the freshest catch from Malpe?'}
+                {isSignUp ? 'Join our community to find and purchase the freshest catch directly from local sellers.' : 'Ready to find the freshest catch from Malpe?'}
             </p>
           </div>
 
@@ -289,10 +289,10 @@ export default function BuyerLoginPage() {
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="signup-phone">Phone Number</Label>
-                    <div className="relative flex items-center">
-                        <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <span className="pl-10 text-sm text-muted-foreground">+91</span>
-                        <Input id="signup-phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="pl-4"/>
+                    <div className="flex h-10 w-full items-center rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                        <PhoneIcon className="h-5 w-5 text-muted-foreground" />
+                        <span className="pl-2 pr-2 text-muted-foreground">+91</span>
+                        <Input id="signup-phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"/>
                     </div>
                 </div>
                 <div className="space-y-2">
@@ -345,10 +345,10 @@ export default function BuyerLoginPage() {
                   <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handlePhoneSignIn(); }}>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone Number</Label>
-                       <div className="relative flex items-center">
-                        <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <span className="pl-10 text-sm text-muted-foreground">+91</span>
-                        <Input id="phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="pl-4"/>
+                       <div className="flex h-10 w-full items-center rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                        <PhoneIcon className="h-5 w-5 text-muted-foreground" />
+                        <span className="pl-2 pr-2 text-muted-foreground">+91</span>
+                        <Input id="phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"/>
                       </div>
                       <p className="text-xs text-muted-foreground">Country code (+91) is automatically used.</p>
                     </div>
