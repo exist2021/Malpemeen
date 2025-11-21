@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useUser, useSellerProfile } from '@/firebase';
@@ -196,8 +195,7 @@ export default function SellerDashboard() {
         setIsListingsLoading(true);
         const fetchListings = async () => {
             const data = await getSellerFishListings(user.uid);
-            const sortedData = data.sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
-            setListings(sortedData);
+            setListings(data);
             setIsListingsLoading(false);
         }
         fetchListings();
@@ -213,7 +211,8 @@ export default function SellerDashboard() {
     );
   }
 
-  const totalValue = listings.reduce((acc, listing) => acc + (listing.pricePerKg || 0), 0);
+  const totalValue = listings.reduce((acc, listing) => acc + ((listing.pricePerKg || 0) * (listing.totalQuantityInTons || 0) * 1000), 0);
+
 
   return (
     <>
@@ -226,13 +225,13 @@ export default function SellerDashboard() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Listings</CardTitle>
+                    <CardTitle className="text-sm font-medium">Active Listings</CardTitle>
                     <List className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{listings.length}</div>
                     <p className="text-xs text-muted-foreground">
-                        All your active listings
+                        Your currently active listings
                     </p>
                 </CardContent>
             </Card>
@@ -262,13 +261,13 @@ export default function SellerDashboard() {
             </Card>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Potential Value (per Kg)</CardTitle>
+                    <CardTitle className="text-sm font-medium">Total Stock Value</CardTitle>
                     <IndianRupee className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">₹{totalValue.toLocaleString()}</div>
                      <p className="text-xs text-muted-foreground">
-                        Total value of all listings
+                        Estimated value of all listings
                     </p>
                 </CardContent>
             </Card>

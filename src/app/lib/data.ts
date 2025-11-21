@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { FishListing, Seller } from '@/app/types';
@@ -56,7 +55,11 @@ export async function getSellerFishListings(sellerId: string): Promise<FishListi
     // Filter by date on the client-side.
     const filteredListings = allListings.filter(listing => new Date(listing.listedDate) > twelveHoursAgo);
 
-    return filteredListings;
+    // Sort by date on the client-side to ensure newest are first.
+    const sortedListings = filteredListings.sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
+
+
+    return sortedListings;
   } catch (e: any) {
     if (e.code === 'permission-denied') {
       const contextualError = new FirestorePermissionError({
@@ -175,16 +178,22 @@ export async function deleteFishListing(id: string) {
 
 export function incrementListingViewCount(listingId: string, sellerId: string) {
     const { firestore } = initializeFirebase();
+    if (!firestore || !listingId || !sellerId) return;
+    
     const listingRef = doc(firestore, 'fishListings', listingId);
     const sellerRef = doc(firestore, 'sellers', sellerId);
 
     // This is a fire-and-forget operation.
+    // We don't wait for it to complete to not block the UI.
+    // We add a simple console warning to log if it fails for any reason (e.g. offline).
     updateDoc(listingRef, { viewCount: increment(1) }).catch(console.warn);
     updateDoc(sellerRef, { totalViews: increment(1) }).catch(console.warn);
 }
 
 export function incrementListingCallCount(listingId: string, sellerId: string) {
     const { firestore } = initializeFirebase();
+    if (!firestore || !listingId || !sellerId) return;
+
     const listingRef = doc(firestore, 'fishListings', listingId);
     const sellerRef = doc(firestore, 'sellers', sellerId);
     

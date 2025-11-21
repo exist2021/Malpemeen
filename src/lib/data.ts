@@ -7,13 +7,17 @@ import { initializeFirebase } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { getAuth } from 'firebase/auth';
-import { incrementCounts } from '@/ai/flows/increment-counts-flow';
 
 
 export async function getFishListings(): Promise<FishListing[]> {
   const { firestore } = initializeFirebase();
   const listingsCol = collection(firestore, 'fishListings');
-  const q = query(listingsCol, orderBy('listedDate', 'desc'));
+  
+  // Calculate the timestamp for 12 hours ago
+  const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
+
+  // Query for listings created after the calculated timestamp
+  const q = query(listingsCol, where('listedDate', '>', twelveHoursAgo), orderBy('listedDate', 'desc'));
 
   try {
     const querySnapshot = await getDocs(q);
@@ -39,12 +43,20 @@ export async function getFishListings(): Promise<FishListing[]> {
 export async function getSellerFishListings(sellerId: string): Promise<FishListing[]> {
   const { firestore } = initializeFirebase();
   const listingsCol = collection(firestore, 'fishListings');
-  // Removed orderBy to avoid needing a composite index. Sorting is now done on the client.
+  
+  const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
+
+  // Simplified query: Only fetch by sellerId to avoid composite index issues.
   const q = query(listingsCol, where("sellerId", "==", sellerId));
 
   try {
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FishListing));
+    const allListings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FishListing));
+    
+    // Filter by date on the client-side.
+    const filteredListings = allListings.filter(listing => new Date(listing.listedDate) > twelveHoursAgo);
+
+    return filteredListings;
   } catch (e: any) {
     if (e.code === 'permission-denied') {
       const contextualError = new FirestorePermissionError({
@@ -67,7 +79,7 @@ export async function getFishListingById(id: string): Promise<FishListing | null
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             const listingData = { id: docSnap.id, ...docSnap.data() } as FishListing;
-            // Fire-and-forget view count increment
+            // Fire-and-forget view count increment directly on the client
             incrementListingViewCount(id, listingData.sellerId);
             return listingData;
         } else {
@@ -100,16 +112,15 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
   
   const sellerData = sellerSnap.data() as Seller;
 
-  if (!sellerData.name || !sellerData.phoneNumber) {
-      throw new Error("Seller profile is incomplete. Name and phone number are required.");
+  if (!sellerData.companyName || !sellerData.phoneNumber) {
+      throw new Error("Seller profile is incomplete. Company name and phone number are required.");
   }
 
   const fishListingsRef = collection(firestore, `fishListings`);
   
   const data: Omit<FishListing, 'id'> = {
     ...listing,
-    brandName: "Malpe Meen Pvt Ltd", // Always set the brand name
-    sellerName: sellerData.name,
+    sellerName: sellerData.companyName,
     sellerPhone: sellerData.phoneNumber,
     sellerAddress: sellerData.address || '',
     listedDate: new Date().toISOString(),
@@ -132,22 +143,17 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
   }
 }
 
-export async function updateFishListing(id: string, data: Partial<Omit<FishListing, 'id' | 'brandName'>>) {
+export async function updateFishListing(id: string, data: Partial<Omit<FishListing, 'id'>>) {
     const { firestore } = initializeFirebase();
     const docRef = doc(firestore, 'fishListings', id);
 
-    const updateData = {
-        ...data,
-        brandName: "Malpe Meen Pvt Ltd"
-    };
-
     try {
-        await updateDoc(docRef, updateData);
+        await updateDoc(docRef, data);
     } catch(error) {
         const contextualError = new FirestorePermissionError({
             path: docRef.path,
             operation: 'update',
-            requestResourceData: updateData,
+            requestResourceData: data,
         });
         errorEmitter.emit('permission-error', contextualError);
         throw error;
@@ -168,17 +174,21 @@ export async function deleteFishListing(id: string) {
 }
 
 export function incrementListingViewCount(listingId: string, sellerId: string) {
-    // This is a fire-and-forget operation. We don't await it.
-    incrementCounts({ listingId, sellerId, type: 'view' }).catch(error => {
-        // Log the error but don't block the UI
-        console.warn("Could not increment view count via flow:", error);
-    });
+    const { firestore } = initializeFirebase();
+    const listingRef = doc(firestore, 'fishListings', listingId);
+    const sellerRef = doc(firestore, 'sellers', sellerId);
+
+    // This is a fire-and-forget operation.
+    updateDoc(listingRef, { viewCount: increment(1) }).catch(console.warn);
+    updateDoc(sellerRef, { totalViews: increment(1) }).catch(console.warn);
 }
 
 export function incrementListingCallCount(listingId: string, sellerId: string) {
+    const { firestore } = initializeFirebase();
+    const listingRef = doc(firestore, 'fishListings', listingId);
+    const sellerRef = doc(firestore, 'sellers', sellerId);
+    
     // This is a fire-and-forget operation.
-    incrementCounts({ listingId, sellerId, type: 'call' }).catch(error => {
-        // Log the error but don't block the UI
-        console.warn("Could not increment call count via flow:", error);
-    });
+    updateDoc(listingRef, { callClickCount: increment(1) }).catch(console.warn);
+    updateDoc(sellerRef, { totalCalls: increment(1) }).catch(console.warn);
 }
