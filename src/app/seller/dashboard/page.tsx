@@ -1,14 +1,14 @@
 
 'use client';
 
-import { useUser } from '@/firebase';
+import { useUser, useSellerProfile } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { getSellerFishListings, deleteFishListing } from '@/app/lib/data';
-import type { FishListing, Seller } from '@/app/types';
+import type { FishListing } from '@/app/types';
 import Image from 'next/image';
 import { Pencil, Video, Trash2, Loader2, PlusCircle, List, IndianRupee, Package, Eye, Phone } from 'lucide-react';
 import { Header } from '@/components/layout/header';
@@ -25,8 +25,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { format } from 'date-fns';
-import { doc, getDoc } from 'firebase/firestore';
-import { useFirestore } from '@/firebase/provider';
 
 function SellerListings({ listings, setListings }: { listings: FishListing[], setListings: React.Dispatch<React.SetStateAction<FishListing[]>> }) {
     const { toast } = useToast();
@@ -182,11 +180,10 @@ function DashboardSkeleton() {
 
 export default function SellerDashboard() {
   const { user, isUserLoading } = useUser();
-  const firestore = useFirestore();
+  const { profile: seller, isLoading: isSellerLoading } = useSellerProfile();
   const router = useRouter();
   const [listings, setListings] = useState<FishListing[]>([]);
-  const [seller, setSeller] = useState<Seller | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isListingsLoading, setIsListingsLoading] = useState(true);
   
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -195,29 +192,19 @@ export default function SellerDashboard() {
   }, [user, isUserLoading, router]);
 
   useEffect(() => {
-    if (user && firestore) {
-        setLoading(true);
-        const fetchSellerData = async () => {
-            const sellerRef = doc(firestore, 'sellers', user.uid);
-            const sellerSnap = await getDoc(sellerRef);
-            if(sellerSnap.exists()){
-                setSeller(sellerSnap.data() as Seller);
-            }
-        }
-        
+    if (user) {
+        setIsListingsLoading(true);
         const fetchListings = async () => {
             const data = await getSellerFishListings(user.uid);
             const sortedData = data.sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
             setListings(sortedData);
+            setIsListingsLoading(false);
         }
-
-        Promise.all([fetchSellerData(), fetchListings()]).finally(() => {
-            setLoading(false);
-        });
+        fetchListings();
     }
-  }, [user, firestore]);
+  }, [user]);
 
-  if (isUserLoading || loading) {
+  if (isUserLoading || isSellerLoading || isListingsLoading) {
     return (
       <>
         <Header />
