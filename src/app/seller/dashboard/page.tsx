@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useUser, useSellerProfile } from '@/firebase';
@@ -9,7 +10,7 @@ import Link from 'next/link';
 import { getSellerFishListings, deleteFishListing } from '@/app/lib/data';
 import type { FishListing } from '@/app/types';
 import Image from 'next/image';
-import { Pencil, Video, Trash2, Loader2, PlusCircle, List, IndianRupee, Package, Eye, Phone } from 'lucide-react';
+import { Pencil, Video, Trash2, Loader2, PlusCircle, List, IndianRupee, Package } from 'lucide-react';
 import { Header } from '@/components/layout/header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -98,16 +99,6 @@ function SellerListings({ listings, setListings }: { listings: FishListing[], se
                                 </p>
                                 <p className="text-sm text-muted-foreground">Listed on {format(new Date(listing.listedDate), 'MMM d, yyyy')}</p>
                             </div>
-                             <div className="flex-grow min-w-0 text-center sm:text-left flex items-center gap-4 text-sm text-muted-foreground">
-                                <div className="flex items-center gap-1">
-                                    <Eye className="h-4 w-4" />
-                                    <span>{listing.viewCount || 0}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <Phone className="h-4 w-4" />
-                                    <span>{listing.callClickCount || 0}</span>
-                                </div>
-                            </div>
                             <div className="flex gap-2 flex-shrink-0 mt-4 sm:mt-0">
                                 <Button asChild variant="outline" size="icon">
                                     <Link href={`/sell/${listing.id}/edit`}>
@@ -153,9 +144,7 @@ function DashboardSkeleton() {
              <div className="flex items-center justify-between mb-8">
                 <Skeleton className="h-9 w-48" />
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
+            <div className="grid gap-4 md:grid-cols-2 mb-8">
                 <Skeleton className="h-32 w-full" />
                 <Skeleton className="h-32 w-full" />
             </div>
@@ -222,7 +211,7 @@ export default function SellerDashboard() {
           <h1 className="text-3xl font-bold tracking-tight">{seller?.companyName || 'Seller Dashboard'}</h1>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid gap-4 md:grid-cols-2 mb-8">
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Active Listings</CardTitle>
@@ -232,30 +221,6 @@ export default function SellerDashboard() {
                     <div className="text-2xl font-bold">{listings.length}</div>
                     <p className="text-xs text-muted-foreground">
                         Your currently active listings
-                    </p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Views</CardTitle>
-                    <Eye className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{seller?.totalViews?.toLocaleString() || 0}</div>
-                     <p className="text-xs text-muted-foreground">
-                        Across all your listings
-                    </p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Calls</CardTitle>
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{seller?.totalCalls?.toLocaleString() || 0}</div>
-                     <p className="text-xs text-muted-foreground">
-                        Number of call button clicks
                     </p>
                 </CardContent>
             </Card>
