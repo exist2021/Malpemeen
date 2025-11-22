@@ -95,7 +95,7 @@ service cloud.firestore {
       allow get: if true;
       allow list: if true;
 
-      allow create: if isOwner(request.resource.data.sellerId);
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.sellerId;
       // Allow any signed-in user to update view/call counts, but only owner can change other details.
       allow update: if (isOwner(resource.data.sellerId) && isCorrectSeller(resource.data.sellerId)) ||
                        (isSignedIn() && request.resource.data.keys().hasOnly(['viewCount', 'callClickCount']));
