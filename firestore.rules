@@ -52,7 +52,7 @@ service cloud.firestore {
      * @returns {boolean} True if the user is signed in, the UID matches, and the resource exists.
      */
     function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
+      return isOwner(userId) && exists(/databases/$(database)/documents/sellers/$(userId));
     }
     
     /**
@@ -71,7 +71,7 @@ service cloud.firestore {
 
       allow create: if isOwner(sellerId) && request.resource.data.id == sellerId;
       // Allow any authenticated user to update the totalViews and totalCalls fields.
-      allow update: if (isExistingOwner(sellerId) && request.resource.data.id == resource.data.id) || 
+      allow update: if (isExistingOwner(sellerId)) || 
                        (isSignedIn() && request.resource.data.keys().hasOnly(['totalViews', 'totalCalls']));
       allow delete: if isExistingOwner(sellerId);
     }
