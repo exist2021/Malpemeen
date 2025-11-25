@@ -6,7 +6,6 @@ import { FirebaseApp } from 'firebase/app';
 import { Firestore, doc, getDoc, DocumentReference } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
-import { useDoc, type WithId } from './firestore/use-doc';
 import type { Buyer, Seller } from '@/app/types';
 
 interface FirebaseProviderProps {
@@ -60,12 +59,12 @@ export interface UserRoleHookResult {
 }
 
 export interface BuyerProfileResult {
-    profile: WithId<Buyer> | null;
+    profile: Buyer | null;
     isLoading: boolean;
 }
 
 export interface SellerProfileResult {
-    profile: WithId<Seller> | null;
+    profile: Seller | null;
     isLoading: boolean;
 }
 
@@ -245,13 +244,22 @@ export const useUserRole = (): UserRoleHookResult => {
 export const useBuyerProfile = (): BuyerProfileResult => {
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
+    const [profile, setProfile] = useState<Buyer | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     
-    const docRef = useMemoFirebase(() => {
-        if (!user || !firestore) return null;
-        return doc(firestore, 'buyers', user.uid) as DocumentReference<Buyer>;
-    }, [user, firestore]);
-
-    const { data: profile, isLoading } = useDoc<Buyer>(docRef);
+    useEffect(() => {
+        if (user && firestore) {
+            const docRef = doc(firestore, 'buyers', user.uid);
+            getDoc(docRef).then(docSnap => {
+                if (docSnap.exists()) {
+                    setProfile(docSnap.data() as Buyer);
+                }
+                setIsLoading(false);
+            }).catch(() => setIsLoading(false));
+        } else if (!isUserLoading) {
+            setIsLoading(false);
+        }
+    }, [user, firestore, isUserLoading]);
 
     return { profile, isLoading: isUserLoading || isLoading };
 };
@@ -259,13 +267,23 @@ export const useBuyerProfile = (): BuyerProfileResult => {
 export const useSellerProfile = (): SellerProfileResult => {
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
-    
-    const docRef = useMemoFirebase(() => {
-        if (!user || !firestore) return null;
-        return doc(firestore, 'sellers', user.uid) as DocumentReference<Seller>;
-    }, [user, firestore]);
+    const [profile, setProfile] = useState<Seller | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const { data: profile, isLoading } = useDoc<Seller>(docRef);
+    useEffect(() => {
+        if (user && firestore) {
+            const docRef = doc(firestore, 'sellers', user.uid);
+            getDoc(docRef).then(docSnap => {
+                if (docSnap.exists()) {
+                    setProfile(docSnap.data() as Seller);
+                }
+                setIsLoading(false);
+            }).catch(() => setIsLoading(false));
+        } else if (!isUserLoading) {
+            setIsLoading(false);
+        }
+    }, [user, firestore, isUserLoading]);
+
 
     return { profile, isLoading: isUserLoading || isLoading };
 };
