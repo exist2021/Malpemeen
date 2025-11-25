@@ -240,7 +240,7 @@ export default function SellerLoginPage() {
       </div>
       <div className="relative hidden lg:block lg:w-1/2">
         <Image
-          src="https://images.unsplash.com/photo-1574636904128-97036a439a9c?q=80&w=1974&auto=format&fit=crop"
+          src="https://images.unsplash.com/photo-1620485998613-33e4d84c1f54?q=80&w=1974&auto=format&fit=crop"
           alt="Fishing boat at sea"
           fill
           className="object-cover"
