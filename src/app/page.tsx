@@ -27,7 +27,7 @@ export default function WelcomePage() {
   ];
 
   return (
-    <main className="relative flex flex-col items-center justify-center min-h-screen p-4 sm:p-8 overflow-hidden">
+    <main className="relative flex flex-col items-center justify-center min-h-screen p-4 sm:p-8 overflow-hidden bg-white">
       <div className="text-center mb-12 relative z-10">
         <FishLogo className="h-28 w-28 text-primary mx-auto"/>
         <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mt-6 font-headline text-foreground">
@@ -40,7 +40,7 @@ export default function WelcomePage() {
       
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
         {userRoles.map((role) => (
-          <Card key={role.title} className="text-center hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+          <Card key={role.title} className="text-center hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 bg-card">
             <CardHeader>
               <CardTitle className="text-2xl font-bold">{role.title}</CardTitle>
               <CardDescription className="pt-2 min-h-[40px]">{role.description}</CardDescription>
