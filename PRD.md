@@ -1,5 +1,5 @@
 
-# Product Requirements Document: AquaLink (Malpe Meen)
+# Product Requirements Document: Malpe Meen Pvt Ltd
 
 **Version:** 2.0
 **Date:** 2024-11-25
@@ -11,7 +11,7 @@
 ## 1. Introduction
 
 ### 1.1. Executive Summary
-AquaLink is a mobile-first web application designed to digitize the wholesale seafood trade, starting with the fisheries of Malpe, India. Under the brand "Malpe Meen Pvt Ltd," the platform will connect local fish suppliers (sellers) directly with commercial buyers, such as restaurants and retailers. By providing a centralized digital marketplace, AquaLink aims to solve inefficiencies in the traditional, fragmented fish market, creating greater market access for sellers and a more reliable supply chain for buyers. The core of the platform is built on simplicity, using phone-based OTP authentication to ensure ease of use for all parties.
+Malpe Meen Pvt Ltd is a mobile-first web application designed to digitize the wholesale seafood trade, starting with the fisheries of Malpe, India. Under the brand "Malpe Meen Pvt Ltd," the platform will connect local fish suppliers (sellers) directly with commercial buyers, such as restaurants and retailers. By providing a centralized digital marketplace, Malpe Meen Pvt Ltd aims to solve inefficiencies in the traditional, fragmented fish market, creating greater market access for sellers and a more reliable supply chain for buyers. The core of the platform is built on simplicity, using phone-based OTP authentication to ensure ease of use for all parties.
 
 ### 1.2. Problem Statement
 The traditional wholesale fish market in regions like Malpe is characterized by fragmentation, opacity, and a reliance on offline, relationship-based transactions. 

@@ -5,7 +5,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Seller",
       "type": "object",
-      "description": "Represents a fish seller in the AquaLink app.",
+      "description": "Represents a fish seller in the Malpe Meen Pvt Ltd app.",
       "properties": {
         "id": {
           "type": "string",
@@ -56,7 +56,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Buyer",
       "type": "object",
-      "description": "Represents a buyer in the AquaLink app.",
+      "description": "Represents a buyer in the Malpe Meen Pvt Ltd app.",
       "properties": {
         "id": {
           "type": "string",
