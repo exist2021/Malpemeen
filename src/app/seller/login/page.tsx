@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -240,7 +241,7 @@ export default function SellerLoginPage() {
       </div>
       <div className="relative hidden lg:block lg:w-1/2">
         <Image
-          src="https://images.unsplash.com/photo-1620485998613-33e4d84c1f54?q=80&w=1974&auto=format&fit=crop"
+          src="https://cdn.pixabay.com/photo/2018/01/05/02/47/fishing-3062034_1280.jpg"
           alt="Fishing boat at sea"
           fill
           className="object-cover"
@@ -252,3 +253,5 @@ export default function SellerLoginPage() {
     </>
   );
 }
+
+    
