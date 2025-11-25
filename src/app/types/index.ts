@@ -4,7 +4,7 @@ export type Seller = {
     phoneNumber: string;
     contactName: string;
     companyName: string;
-    email: string;
+    email?: string;
     address?: string;
     totalViews?: number;
     totalCalls?: number;
@@ -15,7 +15,7 @@ export type Buyer = {
     id: string;
     phoneNumber: string;
     name: string;
-    email: string;
+    email?: string;
     place?: string;
     address?: string;
     photoUrl?: string;
