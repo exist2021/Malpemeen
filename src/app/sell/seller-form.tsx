@@ -57,9 +57,7 @@ interface SellerFormProps {
 
 function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: boolean, onOpenChange: (open: boolean) => void, onMediaCaptured: (url: string) => void }) {
     const videoRef = useRef<HTMLVideoElement>(null);
-    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const [hasCameraPermission, setHasCameraPermission] = useState(true);
-    const [isRecording, setIsRecording] = useState(false);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -68,7 +66,7 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
         const getCameraPermission = async () => {
             if (!open) return;
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 setHasCameraPermission(true);
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
@@ -107,49 +105,18 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
         }
     };
 
-    const handleStartRecording = () => {
-        if (videoRef.current && videoRef.current.srcObject) {
-            const stream = videoRef.current.srcObject as MediaStream;
-            const chunks: Blob[] = [];
-            mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'video/webm' });
-            mediaRecorderRef.current.ondataavailable = (event) => {
-                chunks.push(event.data);
-            };
-            mediaRecorderRef.current.onstop = () => {
-                const blob = new Blob(chunks, { type: 'video/webm' });
-                 const reader = new FileReader();
-                 reader.onloadend = () => {
-                     onMediaCaptured(reader.result as string);
-                 };
-                 reader.readAsDataURL(blob);
-            };
-            mediaRecorderRef.current.start();
-            setIsRecording(true);
-        }
-    };
-
-    const handleStopRecording = () => {
-        if (mediaRecorderRef.current && isRecording) {
-            mediaRecorderRef.current.stop();
-            setIsRecording(false);
-            onOpenChange(false);
-        }
-    };
-
-
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[625px]">
                 <DialogHeader>
                     <DialogTitle>Live Capture</DialogTitle>
                     <DialogDescription>
-                        Capture a photo or record a short video of your product.
+                        Capture a photo of your product.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="relative w-full aspect-video bg-black rounded-md overflow-hidden">
                        <video ref={videoRef} className="w-full h-full" autoPlay muted playsInline />
-                       {isRecording && <Circle className="h-4 w-4 text-red-500 absolute top-2 right-2 animate-pulse" fill="red" />}
                     </div>
                     {!hasCameraPermission && (
                         <Alert variant="destructive">
@@ -162,18 +129,9 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
                 </div>
                 <DialogFooter>
                      <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                    <Button type="button" onClick={handleCapturePhoto} disabled={!hasCameraPermission || isRecording}>
+                    <Button type="button" onClick={handleCapturePhoto} disabled={!hasCameraPermission}>
                         <CameraIcon className="mr-2 h-4 w-4" /> Capture Photo
                     </Button>
-                    {!isRecording ? (
-                        <Button type="button" onClick={handleStartRecording} disabled={!hasCameraPermission}>
-                            <Video className="mr-2 h-4 w-4" /> Start Recording
-                        </Button>
-                    ) : (
-                         <Button type="button" variant="destructive" onClick={handleStopRecording}>
-                            <Check className="mr-2 h-4 w-4" /> Finish Recording
-                        </Button>
-                    )}
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -315,6 +273,19 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     }
   };
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setMediaUrls(prev => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="mt-2 space-y-8">
        <CameraCaptureDialog open={isCameraOpen} onOpenChange={setCameraOpen} onMediaCaptured={handleMediaCaptured} />
@@ -392,23 +363,19 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         </div>
 
       <div className="space-y-4">
-        <Label>Product Media (Photos & Videos)</Label>
+        <Label>Product Media (Photos)</Label>
         
         <div className="grid grid-cols-3 gap-4">
             {mediaUrls.map((url, index) => (
                 <div key={`${url}-${index}`} className="relative aspect-square">
-                    {url.startsWith('data:video') ? (
-                       <video src={url} className="rounded-md object-cover w-full h-full" controls />
-                    ) : (
-                       <Image src={url} alt="Product media" fill className="rounded-md object-cover" data-ai-hint="fish"/>
-                    )}
+                   <Image src={url} alt="Product media" fill className="rounded-md object-cover" data-ai-hint="fish"/>
 
                     <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeMedia(url)}>
                         <X className="h-4 w-4" />
                     </Button>
                 </div>
             ))}
-             {mediaUrls.length === 0 && (
+             {(mediaUrls.length === 0) && (
                 <div className="relative aspect-square">
                     <Image src="https://images.unsplash.com/photo-1559106037-5435fac0c497?q=80&w=2070&auto=format&fit=crop" alt="Placeholder fish" fill className="rounded-md object-cover" data-ai-hint="fish market"/>
                 </div>
@@ -416,6 +383,18 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            className="hidden"
+            accept="image/*"
+            multiple
+          />
+          <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+            <Upload className="mr-2 h-4 w-4" />
+            Upload Photos
+          </Button>
           <Button type="button" variant="outline" onClick={() => setCameraOpen(true)}>
             <Camera className="mr-2 h-4 w-4" />
             Use Camera
@@ -433,3 +412,5 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     </form>
   );
 }
+
+    

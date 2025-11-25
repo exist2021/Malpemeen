@@ -1,7 +1,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Video, User, Anchor, IndianRupee, Calendar, Package } from 'lucide-react';
+import { ArrowRight, User, Anchor, IndianRupee, Calendar, Package, Camera } from 'lucide-react';
 import type { FishListing } from '@/app/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -25,37 +25,27 @@ function CardDetail({ icon: Icon, text }: { icon: React.ElementType, text: React
 export function FishCard({ listing }: FishCardProps) {
   const hasMedia = listing.mediaUrls && Array.isArray(listing.mediaUrls) && listing.mediaUrls.length > 0;
   const firstMedia = hasMedia ? listing.mediaUrls[0] : null;
-  const isVideo = firstMedia?.startsWith('data:video');
 
   return (
     <Link href={`/listings/${listing.id}`} className="block group">
       <Card className="h-80 w-full overflow-hidden transition-transform duration-300 group-hover:scale-105 group-hover:shadow-xl">
-        <div className="relative h-2/3 w-full bg-muted">
+        <div className="relative h-2/3 w-full bg-muted flex items-center justify-center">
             {firstMedia ? (
-                isVideo ? (
-                    <video
-                        src={firstMedia}
-                        muted
-                        loop
-                        playsInline
-                        className="object-cover w-full h-full"
-                    />
-                ) : (
-                    <Image
-                        src={firstMedia}
-                        alt={listing.productName}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        data-ai-hint="fish"
-                    />
-                )
-            ) : null}
+                <Image
+                    src={firstMedia}
+                    alt={listing.productName}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    data-ai-hint="fish"
+                />
+            ) : (
+                <Camera className="h-12 w-12 text-muted-foreground" />
+            )}
 
             <div className={cn(
             "absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"
             )}>
-                 {isVideo && <Video className="absolute top-2 right-2 h-5 w-5 text-white" />}
             </div>
         </div>
 
@@ -82,3 +72,5 @@ export function FishCard({ listing }: FishCardProps) {
     </Link>
   );
 }
+
+    

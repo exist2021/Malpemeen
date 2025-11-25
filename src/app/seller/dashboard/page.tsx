@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { getSellerFishListings, deleteFishListing } from '@/app/lib/data';
 import type { FishListing } from '@/app/types';
 import Image from 'next/image';
-import { Pencil, Video, Trash2, Loader2, PlusCircle, List, IndianRupee, Package } from 'lucide-react';
+import { Pencil, Trash2, Loader2, PlusCircle, List, IndianRupee, Package, Camera } from 'lucide-react';
 import { Header } from '@/components/layout/header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -77,19 +77,14 @@ function SellerListings({ listings, setListings }: { listings: FishListing[], se
             <div className="space-y-4">
                 {listings.map(listing => {
                     const firstMediaUrl = listing.mediaUrls && listing.mediaUrls.length > 0 ? listing.mediaUrls[0] : null;
-                    const isVideo = firstMediaUrl && firstMediaUrl.startsWith('data:video');
 
                     return (
                         <Card key={listing.id} className="flex flex-col sm:flex-row items-center p-4 gap-4 hover:shadow-md transition-shadow">
                             <div className="relative h-24 w-24 rounded-md overflow-hidden bg-muted flex-shrink-0 flex items-center justify-center">
                                 {firstMediaUrl ? (
-                                    isVideo ? (
-                                        <Video className="h-8 w-8 text-muted-foreground" />
-                                    ) : (
-                                        <Image src={firstMediaUrl} alt={listing.productName} layout="fill" className="object-cover" />
-                                    )
+                                    <Image src={firstMediaUrl} alt={listing.productName} layout="fill" className="object-cover" />
                                 ): (
-                                    <div className="text-xs text-muted-foreground">No Media</div>
+                                    <Camera className="h-8 w-8 text-muted-foreground" />
                                 )}
                             </div>
                             <div className="flex-grow min-w-0 text-center sm:text-left">
@@ -256,3 +251,5 @@ export default function SellerDashboard() {
     </>
   );
 }
+
+    

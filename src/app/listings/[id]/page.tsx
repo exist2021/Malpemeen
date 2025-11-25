@@ -152,13 +152,6 @@ export default function ListingDetailPage() {
                     listing.mediaUrls.map((url, index) => (
                       <CarouselItem key={index}>
                         <div className="relative aspect-square w-full">
-                           {url.startsWith('data:video') ? (
-                            <video
-                                src={url}
-                                controls
-                                className="w-full h-full object-cover rounded-lg"
-                            />
-                            ) : (
                             <Image
                                 src={url}
                                 alt={`Media ${index + 1} of ${listing.productName}`}
@@ -167,7 +160,6 @@ export default function ListingDetailPage() {
                                 sizes="(max-width: 768px) 100vw, 50vw"
                                 data-ai-hint="fish"
                             />
-                            )}
                         </div>
                       </CarouselItem>
                     ))
@@ -232,3 +224,5 @@ export default function ListingDetailPage() {
     </>
   );
 }
+
+    
