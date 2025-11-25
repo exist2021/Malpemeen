@@ -79,7 +79,7 @@ export function Header() {
 
 
        return (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               {role === 'seller' && (
                 <Button variant="ghost" onClick={() => router.push('/seller/home')}>
                   Home
@@ -87,9 +87,9 @@ export function Header() {
               )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2 rounded-full p-0 pl-2">
+                  <Button variant="ghost" className="flex items-center gap-2">
                     {triggerContent}
-                    <span className="hidden sm:inline-block font-medium pr-2">{profileName}</span>
+                    <span className="font-medium">{profileName || 'Account'}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -210,5 +210,3 @@ export function Header() {
     </header>
   );
 }
-
-    

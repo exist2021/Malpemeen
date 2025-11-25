@@ -91,29 +91,29 @@ export default function SellerHomePage() {
       <Header />
       <main className="container mx-auto max-w-4xl py-12">
         <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold tracking-tight font-headline">Welcome, {seller?.contactName || 'Seller'}</h1>
+            <h1 className="text-4xl font-bold tracking-tight">Welcome, {seller?.contactName || 'Seller'}</h1>
             <p className="mt-2 text-lg text-muted-foreground">Great to see you again! Your dashboard is updated and ready for new orders. Let’s make today productive.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card className="flex flex-col text-center hover:shadow-lg transition-shadow bg-card">
-                <CardHeader>
+            <Card className="flex flex-col text-center hover:shadow-lg transition-shadow bg-card p-6">
+                <CardHeader className="p-0 mb-4">
                     <CardTitle className="text-2xl font-bold">List a New Product</CardTitle>
-                    <CardDescription>Create a new listing for your fresh catch and make it available to customers right away.</CardDescription>
+                    <CardDescription className="mt-2">Create a new listing for your fresh catch and make it available to customers right away.</CardDescription>
                 </CardHeader>
-                <CardContent className="flex-grow flex items-end justify-center">
+                <CardContent className="flex-grow flex items-end justify-center p-0">
                     <Button onClick={() => router.push('/sell')} className="w-full">
                         <PlusCircle className="mr-2 h-4 w-4" /> Create New Listing
                     </Button>
                 </CardContent>
             </Card>
 
-            <Card className="flex flex-col text-center hover:shadow-lg transition-shadow bg-card">
-                <CardHeader>
+            <Card className="flex flex-col text-center hover:shadow-lg transition-shadow bg-card p-6">
+                <CardHeader className="p-0 mb-4">
                     <CardTitle className="text-2xl font-bold">View Dashboard</CardTitle>
-                    <CardDescription>See your sales analytics, manage your existing listings, and track your performance.</CardDescription>
+                    <CardDescription className="mt-2">See your sales analytics, manage your existing listings, and track your performance.</CardDescription>
                 </CardHeader>
-                 <CardContent className="flex-grow flex items-end justify-center">
+                 <CardContent className="flex-grow flex items-end justify-center p-0">
                      <Button onClick={() => router.push('/seller/dashboard')} className="w-full">
                         <LayoutDashboard className="mr-2 h-4 w-4" /> Go to Dashboard
                     </Button>
