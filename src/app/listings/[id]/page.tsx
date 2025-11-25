@@ -182,7 +182,7 @@ export default function ListingDetailPage() {
             
             <div className="md:col-span-3 p-6 flex flex-col">
                 <CardHeader className="px-0 pt-0">
-                     <CardTitle className="text-3xl font-bold font-headline">{listing.productName}</CardTitle>
+                     <CardTitle className="text-3xl font-bold">{listing.productName}</CardTitle>
                     <CardDescription className="flex items-center gap-2 pt-2">
                         <Copyright className="h-4 w-4" />
                         <span>{listing.brandName}</span>

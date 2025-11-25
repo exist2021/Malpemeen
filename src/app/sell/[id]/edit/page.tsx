@@ -133,7 +133,7 @@ export default function EditSellPage() {
         </div>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold tracking-tight font-headline">Edit Your Listing</CardTitle>
+          <CardTitle className="text-3xl font-bold tracking-tight">Edit Your Listing</CardTitle>
           <CardDescription className="pt-2">
             Update the details for your fish listing below.
           </CardDescription>

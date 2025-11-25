@@ -30,7 +30,7 @@ export default function WelcomePage() {
     <main className="relative flex flex-col items-center justify-center min-h-screen p-4 sm:p-8 overflow-hidden bg-white">
       <div className="text-center mb-12 relative z-10">
         <FishLogo className="h-28 w-28 text-primary mx-auto"/>
-        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mt-6 font-headline text-foreground">
+        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mt-6 text-foreground">
           Welcome to Malpe Meen
         </h1>
         <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
