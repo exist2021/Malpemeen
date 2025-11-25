@@ -43,6 +43,13 @@ export function Header() {
     }
   };
 
+  const getHomeLink = () => {
+    if (!user) return "/";
+    if (role === 'buyer') return "/buyer/dashboard";
+    if (role === 'seller') return "/seller/home";
+    return "/";
+  }
+
   const renderUserActions = () => {
     if (isUserLoading) {
       return <Skeleton className="h-10 w-24 rounded-md" />;
@@ -198,7 +205,7 @@ export function Header() {
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href={getHomeLink()} className="flex items-center space-x-2">
               <FishLogo className="h-8 w-8 text-primary" />
               <span className="font-bold hidden sm:inline-block">Malpe Meen</span>
             </Link>
