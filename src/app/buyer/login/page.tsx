@@ -150,11 +150,11 @@ export default function BuyerLoginPage() {
     <div className="flex min-h-screen">
        <div className="relative hidden lg:block lg:w-1/2">
         <Image
-          src="https://images.unsplash.com/photo-1599056024921-b3d551c89b88?q=80&w=1974&auto=format&fit=crop"
-          alt="Fresh fish at a market"
+          src="https://cdn.pixabay.com/photo/2018/01/05/02/47/fishing-3062034_1280.jpg"
+          alt="Fishing boat at sunset"
           fill
           className="object-cover"
-          data-ai-hint="fish market"
+          data-ai-hint="fishing boat sunset"
         />
         <div className="absolute inset-0 bg-black/50" />
       </div>
