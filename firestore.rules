@@ -14,7 +14,7 @@
  *
  * Key Security Decisions:
  * - Only authenticated users can create seller or buyer profiles.
- * - Users can only read, update, or delete their own profiles.
+ * - Users can only read, update, or delete their own profiles (with exceptions for analytics).
  * - Sellers can only create, update, or delete their own fish listings.
  * - The `fishListings` collection is publicly readable to allow anonymous users to browse.
  * - All write operations require authentication.
@@ -70,7 +70,7 @@ service cloud.firestore {
       allow list: if false; // Sellers list is not public
 
       allow create: if isOwner(sellerId) && request.resource.data.id == sellerId;
-      // Allow owner to update their profile, or any signed-in user to update analytics.
+      // Allow owner to update their profile, or any signed-in user for analytics.
       allow update: if isOwner(sellerId) || isSignedIn();
       allow delete: if isExistingOwner(sellerId);
     }
@@ -96,7 +96,7 @@ service cloud.firestore {
 
       allow create: if isSignedIn() && request.auth.uid == request.resource.data.sellerId;
       
-      // Allow any signed-in user to update view/call counts, but only owner can change other details.
+      // Allow owner to change details, or any signed-in user to update view/call counts.
       allow update: if (isOwner(resource.data.sellerId) && isCorrectSeller(resource.data.sellerId)) || isSignedIn();
       allow delete: if isOwner(resource.data.sellerId);
     }
