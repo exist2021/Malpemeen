@@ -71,13 +71,7 @@ service cloud.firestore {
 
       allow create: if isOwner(sellerId) && request.resource.data.id == sellerId;
       // Allow owner to update their profile, or any signed-in user to update analytics.
-      allow update: if isOwner(sellerId) ||
-                       (isSignedIn() && 
-                         (
-                           (request.resource.data.totalViews == resource.data.totalViews + 1 && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['totalViews'])) ||
-                           (request.resource.data.totalCalls == resource.data.totalCalls + 1 && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['totalCalls']))
-                         )
-                       );
+      allow update: if isOwner(sellerId) || isSignedIn();
       allow delete: if isExistingOwner(sellerId);
     }
 
@@ -103,13 +97,7 @@ service cloud.firestore {
       allow create: if isSignedIn() && request.auth.uid == request.resource.data.sellerId;
       
       // Allow any signed-in user to update view/call counts, but only owner can change other details.
-      allow update: if (isOwner(resource.data.sellerId) && isCorrectSeller(resource.data.sellerId)) ||
-                       (isSignedIn() && 
-                        (
-                          (request.resource.data.viewCount == resource.data.viewCount + 1 && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount'])) ||
-                          (request.resource.data.callClickCount == resource.data.callClickCount + 1 && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['callClickCount']))
-                        )
-                       );
+      allow update: if (isOwner(resource.data.sellerId) && isCorrectSeller(resource.data.sellerId)) || isSignedIn();
       allow delete: if isOwner(resource.data.sellerId);
     }
   }
