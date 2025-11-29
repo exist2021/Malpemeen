@@ -72,7 +72,7 @@ service cloud.firestore {
       allow create: if isOwner(sellerId) && request.resource.data.id == sellerId;
       // Allow owner to update their profile, or any signed-in user to update analytics.
       allow update: if isOwner(sellerId) ||
-                       (isSignedIn() &&
+                       (isSignedIn() && 
                          (
                            (request.resource.data.totalViews == resource.data.totalViews + 1 && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['totalViews'])) ||
                            (request.resource.data.totalCalls == resource.data.totalCalls + 1 && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['totalCalls']))
