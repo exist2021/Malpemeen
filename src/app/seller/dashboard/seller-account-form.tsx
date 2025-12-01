@@ -69,6 +69,7 @@ export function SellerAccountForm() {
         const updatedData: Partial<Seller> = {};
         if (formData.contactName !== profile.contactName) updatedData.contactName = formData.contactName;
         if (formData.companyName !== profile.companyName) updatedData.companyName = formData.companyName;
+        if (formData.email !== profile.email) updatedData.email = formData.email;
         if (formData.phoneNumber !== profile.phoneNumber) updatedData.phoneNumber = formData.phoneNumber;
         if (formData.address !== profile.address) updatedData.address = formData.address;
         if (formData.logoUrl !== profile.logoUrl) updatedData.logoUrl = formData.logoUrl;
@@ -158,7 +159,7 @@ export function SellerAccountForm() {
             </div>
             <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" value={formData.email} disabled />
+                <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="phoneNumber">Contact Number</Label>

@@ -66,6 +66,7 @@ export function BuyerAccountForm() {
 
         const updatedData: Partial<Buyer> = {};
         if (formData.name !== profile.name) updatedData.name = formData.name;
+        if (formData.email !== profile.email) updatedData.email = formData.email;
         if (formData.phoneNumber !== profile.phoneNumber) updatedData.phoneNumber = formData.phoneNumber;
         if (formData.place !== profile.place) updatedData.place = formData.place;
         if (formData.address !== profile.address) updatedData.address = formData.address;
@@ -147,7 +148,7 @@ export function BuyerAccountForm() {
             </div>
             <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" value={formData.email} disabled />
+                <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="phoneNumber">Contact Number</Label>

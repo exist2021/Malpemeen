@@ -26,7 +26,7 @@
         "email": {
             "type": "string",
             "format": "email",
-            "description": "Seller's email address."
+            "description": "Seller's email address. Can be updated by the user."
         },
         "address": {
             "type": "string",
@@ -73,7 +73,7 @@
         "email": {
             "type": "string",
             "format": "email",
-            "description": "Buyer's email address."
+            "description": "Buyer's email address. Can be updated by the user."
         },
         "place": {
             "type": "string",
