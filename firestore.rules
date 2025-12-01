@@ -70,8 +70,7 @@ service cloud.firestore {
       allow list: if false; // Sellers list is not public
 
       allow create: if isOwner(sellerId) && request.resource.data.id == sellerId;
-      // Allow owner to update their profile, or any signed-in user for analytics.
-      allow update: if isOwner(sellerId) || isSignedIn();
+      allow update: if isSignedIn();
       allow delete: if isExistingOwner(sellerId);
     }
 
@@ -94,10 +93,9 @@ service cloud.firestore {
       allow get: if true;
       allow list: if true;
 
-      allow create: if isSignedIn() && request.auth.uid == request.resource.data.sellerId;
+      allow create: if isSignedIn();
       
-      // Allow owner to change details, or any signed-in user to update view/call counts.
-      allow update: if (isOwner(resource.data.sellerId) && isCorrectSeller(resource.data.sellerId)) || isSignedIn();
+      allow update: if isSignedIn();
       allow delete: if isOwner(resource.data.sellerId);
     }
   }
