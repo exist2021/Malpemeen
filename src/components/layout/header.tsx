@@ -120,7 +120,7 @@ export function Header() {
                                 Account Settings
                             </DropdownMenuItem>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
+                        <DialogContent className="sm:max-w-[400px]">
                             <DialogHeader>
                             <DialogTitle>My Account</DialogTitle>
                             <DialogDescription>
@@ -139,7 +139,7 @@ export function Header() {
                                 Account Settings
                             </DropdownMenuItem>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
+                        <DialogContent className="sm:max-w-[400px]">
                             <DialogHeader>
                             <DialogTitle>Seller Details</DialogTitle>
                             <DialogDescription>
