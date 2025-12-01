@@ -92,7 +92,7 @@ service cloud.firestore {
       allow get: if true;
       allow list: if true;
 
-      allow create: if isSignedIn() && request.resource.data.sellerId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.sellerId == request.auth.uid;
       
       allow update: if isSignedIn();
       allow delete: if isOwner(resource.data.sellerId);
