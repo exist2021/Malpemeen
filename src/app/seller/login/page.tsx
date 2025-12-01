@@ -70,7 +70,7 @@ export default function SellerLoginPage() {
         await setDoc(docRef, sellerData);
         
         toast({ title: 'Sign up successful! Redirecting...' });
-        router.push('/seller/home');
+        router.push('/seller/dashboard');
 
       } catch (error: any) {
           if (error.name === 'FirebaseError' && error.message.includes('permission-denied')) {
@@ -149,7 +149,7 @@ export default function SellerLoginPage() {
 
   return (
     <>
-    <div className="flex min-h-screen flex-col-reverse md:flex-row">
+    <div className="flex min-h-screen flex-col md:flex-row">
       <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-8 mx-auto relative">
          <div ref={recaptchaContainerRef}></div>
          <Button variant="ghost" asChild className="absolute top-4 left-4">
