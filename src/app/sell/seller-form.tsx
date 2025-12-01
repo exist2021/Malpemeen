@@ -116,10 +116,9 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="relative w-full aspect-video bg-black rounded-md overflow-hidden">
-                       {hasCameraPermission ? (
-                            <video ref={videoRef} className="w-full h-full" autoPlay muted playsInline />
-                       ) : (
-                            <div className="w-full h-full flex items-center justify-center">
+                       <video ref={videoRef} className="w-full h-full" autoPlay muted playsInline />
+                       {!hasCameraPermission && (
+                            <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-black">
                                 <p className="text-muted-foreground">Waiting for camera permission...</p>
                             </div>
                        )}
