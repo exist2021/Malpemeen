@@ -57,7 +57,7 @@ interface SellerFormProps {
 
 function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: boolean, onOpenChange: (open: boolean) => void, onMediaCaptured: (url: string) => void }) {
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [hasCameraPermission, setHasCameraPermission] = useState(true);
+    const [hasCameraPermission, setHasCameraPermission] = useState(false);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -116,9 +116,15 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="relative w-full aspect-video bg-black rounded-md overflow-hidden">
-                       <video ref={videoRef} className="w-full h-full" autoPlay muted playsInline />
+                       {hasCameraPermission ? (
+                            <video ref={videoRef} className="w-full h-full" autoPlay muted playsInline />
+                       ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                                <p className="text-muted-foreground">Waiting for camera permission...</p>
+                            </div>
+                       )}
                     </div>
-                    {!hasCameraPermission && (
+                    {!hasCameraPermission && open && (
                         <Alert variant="destructive">
                             <AlertTitle>Camera Access Required</AlertTitle>
                             <AlertDescription>
@@ -376,7 +382,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
                 </div>
             ))}
              {(mediaUrls.length === 0) && (
-                <div className="relative aspect-square col-span-2 sm:col-span-3">
+                <div className="relative aspect-square col-span-full">
                     <Image src="https://images.unsplash.com/photo-1559106037-5435fac0c497?q=80&w=2070&auto=format&fit=crop" alt="Placeholder fish" fill className="rounded-md object-cover" data-ai-hint="fish market"/>
                 </div>
             )}
@@ -412,5 +418,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     </form>
   );
 }
+
+    
 
     
