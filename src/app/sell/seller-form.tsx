@@ -238,13 +238,8 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
           description,
           mediaUrls: mediaUrls,
           sellerId: user.uid,
+          pricePerKg: pricePerKg === '' ? 0 : Number(pricePerKg),
         };
-
-        if (pricePerKg !== '') {
-          listingData.pricePerKg = Number(pricePerKg);
-        } else {
-          listingData.pricePerKg = 0;
-        }
 
         if (totalQuantityInTons !== '') {
           listingData.totalQuantityInTons = Number(totalQuantityInTons);
@@ -438,9 +433,3 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     </form>
   );
 }
-
-    
-
-    
-
-

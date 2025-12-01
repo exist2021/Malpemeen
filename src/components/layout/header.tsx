@@ -217,7 +217,7 @@ export function Header() {
         <div className="flex items-center gap-2">
             <Link href={getHomeLink()} className="flex items-center space-x-2">
               <FishLogo className="h-8 w-8 text-primary" />
-              <span className="font-bold inline-block">Malpe Meen</span>
+              <span className="font-bold">Malpe Meen</span>
             </Link>
         </div>
         <div className="flex items-center gap-2">

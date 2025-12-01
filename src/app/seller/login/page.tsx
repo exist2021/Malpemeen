@@ -148,7 +148,6 @@ export default function SellerLoginPage() {
   };
 
   return (
-    <>
     <div className="flex min-h-screen flex-col md:flex-row">
       <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-8 mx-auto relative">
          <div ref={recaptchaContainerRef}></div>
@@ -250,6 +249,5 @@ export default function SellerLoginPage() {
         <div className="absolute inset-0 bg-black/50" />
       </div>
     </div>
-    </>
   );
 }
