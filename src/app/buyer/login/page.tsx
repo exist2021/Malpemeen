@@ -148,8 +148,8 @@ export default function BuyerLoginPage() {
 
   return (
     <>
-    <div className="flex min-h-screen">
-       <div className="relative hidden lg:block lg:w-1/2">
+    <div className="flex min-h-screen flex-col md:flex-row">
+       <div className="relative hidden md:block md:w-1/2">
         <Image
           src="https://cdn.pixabay.com/photo/2018/01/05/02/47/fishing-3062034_1280.jpg"
           alt="Fishing boat at sunset"
@@ -159,7 +159,7 @@ export default function BuyerLoginPage() {
         />
         <div className="absolute inset-0 bg-black/50" />
       </div>
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 mx-auto relative">
+      <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-8 mx-auto relative">
          <div ref={recaptchaContainerRef}></div>
          <Button variant="ghost" asChild className="absolute top-4 left-4">
             <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>

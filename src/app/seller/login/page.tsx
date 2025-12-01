@@ -133,7 +133,7 @@ export default function SellerLoginPage() {
         setConfirmationResult(null); // Clear result, move to sign up form
       } else {
         toast({ title: 'Login Successful!', description: 'Welcome back!' });
-         router.push('/seller/home');
+         router.push('/seller/dashboard');
       }
 
     } catch (error: any) {
@@ -149,8 +149,8 @@ export default function SellerLoginPage() {
 
   return (
     <>
-    <div className="flex min-h-screen">
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 mx-auto relative">
+    <div className="flex min-h-screen flex-col-reverse md:flex-row">
+      <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-8 mx-auto relative">
          <div ref={recaptchaContainerRef}></div>
          <Button variant="ghost" asChild className="absolute top-4 left-4">
             <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>
@@ -239,7 +239,7 @@ export default function SellerLoginPage() {
           </p>
         </div>
       </div>
-      <div className="relative hidden lg:block lg:w-1/2">
+      <div className="relative hidden md:block md:w-1/2">
         <Image
           src="https://cdn.pixabay.com/photo/2018/01/05/02/47/fishing-3062034_1280.jpg"
           alt="Fishing boat at sea"

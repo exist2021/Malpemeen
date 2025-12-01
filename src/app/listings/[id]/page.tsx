@@ -136,7 +136,7 @@ export default function ListingDetailPage() {
   return (
     <>
     <Header />
-    <div className="container mx-auto max-w-5xl py-6 sm:py-12">
+    <div className="container mx-auto max-w-5xl py-6 px-4 sm:py-12">
         <div className="mb-4">
           <Button variant="outline" onClick={() => router.back()}>
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -157,7 +157,7 @@ export default function ListingDetailPage() {
                                 alt={`Media ${index + 1} of ${listing.productName}`}
                                 fill
                                 className="object-cover rounded-lg"
-                                sizes="(max-width: 768px) 100vw, 50vw"
+                                sizes="(max-width: 768px) 100vw, 40vw"
                                 data-ai-hint="fish"
                             />
                         </div>
