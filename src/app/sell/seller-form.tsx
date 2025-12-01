@@ -64,21 +64,32 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
         let stream: MediaStream | null = null;
         
         const getCameraPermission = async () => {
-            if (!open) return;
+            if (!open || !navigator.mediaDevices) return;
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                // Request the rear-facing camera first
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                 setHasCameraPermission(true);
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
                 }
             } catch (error) {
-                console.error('Error accessing camera:', error);
-                setHasCameraPermission(false);
-                toast({
-                    variant: 'destructive',
-                    title: 'Camera Access Denied',
-                    description: 'Please enable camera permissions in your browser settings.',
-                });
+                console.error('Error accessing rear camera, trying default:', error);
+                // Fallback to default camera if environment is not available
+                 try {
+                     stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                     setHasCameraPermission(true);
+                     if (videoRef.current) {
+                        videoRef.current.srcObject = stream;
+                     }
+                 } catch (finalError) {
+                    console.error('Error accessing any camera:', finalError);
+                    setHasCameraPermission(false);
+                    toast({
+                        variant: 'destructive',
+                        title: 'Camera Access Denied',
+                        description: 'Please enable camera permissions in your browser settings.',
+                    });
+                 }
             }
         };
 
@@ -219,16 +230,25 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
 
     startTransition(async () => {
       try {
-        const listingData = {
+        const listingData: Partial<Omit<FishListing, 'id'>> = {
           productName,
-          pricePerKg: pricePerKg === '' ? 0 : Number(pricePerKg),
           portDetails: portDetails as FishListing['portDetails'],
-          totalQuantityInTons: totalQuantityInTons === '' ? 0 : Number(totalQuantityInTons),
           boatDetails: boatDetails as FishListing['boatDetails'],
           brandName,
           description,
           mediaUrls: mediaUrls,
+          sellerId: user.uid,
         };
+
+        if (pricePerKg !== '') {
+          listingData.pricePerKg = Number(pricePerKg);
+        } else {
+          listingData.pricePerKg = 0;
+        }
+
+        if (totalQuantityInTons !== '') {
+          listingData.totalQuantityInTons = Number(totalQuantityInTons);
+        }
 
         if (isEditMode && listing) {
             await updateFishListing(listing.id, listingData);
@@ -239,9 +259,8 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             router.push(`/listings/${listing.id}`);
         } else {
              const newListingRef = await addFishListing({
-              ...listingData,
-              sellerId: user.uid,
-            });
+              ...listingData
+            } as Omit<FishListing, 'id' | 'listedDate' | 'sellerName' | 'sellerPhone' | 'sellerAddress'>);
             toast({
               title: 'Success!',
               description: 'Your fish listing has been created.',
@@ -363,7 +382,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
       
        <div className="space-y-2">
             <Label htmlFor="pricePerKg">Price Per Kg (₹, Optional)</Label>
-            <Input id="pricePerKg" type="number" value={pricePerKg} onChange={(e) => setPricePerKg(e.target.value)} placeholder="Leave blank to show 0, or enter e.g., 250" aria-describedby="pricePerKg-error" />
+            <Input id="pricePerKg" type="number" value={pricePerKg} onChange={(e) => setPricePerKg(e.target.value)} placeholder="Leave blank for 0, or enter e.g., 250" aria-describedby="pricePerKg-error" />
             <div id="pricePerKg-error" aria-live="polite" aria-atomic="true">
               {errors?.pricePerKg && <p className="text-sm font-medium text-destructive">{errors.pricePerKg}</p>}
             </div>
@@ -383,7 +402,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
                 </div>
             ))}
              {(mediaUrls.length === 0) && (
-                <div className="relative aspect-square col-span-full">
+                <div className="relative aspect-square col-span-2 sm:col-span-3">
                     <Image src="https://images.unsplash.com/photo-1559106037-5435fac0c497?q=80&w=2070&auto=format&fit=crop" alt="Placeholder fish" fill className="rounded-md object-cover" data-ai-hint="fish market"/>
                 </div>
             )}
@@ -423,4 +442,5 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     
 
     
+
 
