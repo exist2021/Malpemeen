@@ -2,6 +2,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useUser, useAuth, useUserRole, useSellerProfile, useBuyerProfile } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { FishLogo } from '../fish-logo';
@@ -35,6 +36,9 @@ export function Header() {
   const { profile: sellerProfile, isLoading: isSellerProfileLoading } = useSellerProfile();
   const { profile: buyerProfile, isLoading: isBuyerProfileLoading } = useBuyerProfile();
   const auth = useAuth();
+  const [isBuyerDialogOpen, setBuyerDialogOpen] = useState(false);
+  const [isSellerDialogOpen, setSellerDialogOpen] = useState(false);
+
 
   const handleLogout = () => {
     if (auth) {
@@ -46,7 +50,7 @@ export function Header() {
   const getHomeLink = () => {
     if (!user) return "/";
     if (role === 'buyer') return "/buyer/dashboard";
-    if (role === 'seller') return "/seller/home";
+    if (role === 'seller') return "/seller/dashboard";
     return "/";
   }
 
@@ -88,8 +92,8 @@ export function Header() {
        return (
             <div className="flex items-center gap-2 sm:gap-4">
               {role === 'seller' && (
-                <Button variant="ghost" onClick={() => router.push('/seller/home')} className="hidden sm:inline-flex">
-                  Home
+                <Button variant="ghost" onClick={() => router.push('/seller/dashboard')} className="hidden sm:inline-flex">
+                  Dashboard
                 </Button>
               )}
               <DropdownMenu>
@@ -109,7 +113,7 @@ export function Header() {
                     </DropdownMenuItem>
                     )}
                   {role === 'buyer' && (
-                    <Dialog>
+                    <Dialog open={isBuyerDialogOpen} onOpenChange={setBuyerDialogOpen}>
                         <DialogTrigger asChild>
                           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                 <Settings className="mr-2 h-4 w-4" />
@@ -123,12 +127,12 @@ export function Header() {
                                 View and update your personal information.
                             </DialogDescription>
                             </DialogHeader>
-                            <BuyerAccountForm />
+                            <BuyerAccountForm onSave={() => setBuyerDialogOpen(false)} />
                         </DialogContent>
                     </Dialog>
                   )}
                   {role === 'seller' && (
-                    <Dialog>
+                    <Dialog open={isSellerDialogOpen} onOpenChange={setSellerDialogOpen}>
                         <DialogTrigger asChild>
                           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                 <Settings className="mr-2 h-4 w-4" />
@@ -142,7 +146,7 @@ export function Header() {
                                 View and update your seller information.
                             </DialogDescription>
                             </DialogHeader>
-                            <SellerAccountForm />
+                            <SellerAccountForm onSave={() => setSellerDialogOpen(false)}/>
                         </DialogContent>
                     </Dialog>
                   )}

@@ -16,7 +16,11 @@ import type { Seller } from '@/app/types';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-export function SellerAccountForm() {
+interface SellerAccountFormProps {
+    onSave?: () => void;
+}
+
+export function SellerAccountForm({ onSave }: SellerAccountFormProps) {
     const { profile, isLoading } = useSellerProfile();
     const { firestore } = useFirebase();
     const { toast } = useToast();
@@ -88,6 +92,7 @@ export function SellerAccountForm() {
                     title: 'Profile Updated',
                     description: 'Your account information has been successfully updated.',
                 });
+                onSave?.();
             } catch (error) {
                 toast({
                     variant: 'destructive',

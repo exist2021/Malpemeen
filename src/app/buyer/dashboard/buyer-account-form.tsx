@@ -14,8 +14,11 @@ import { Loader2, User } from 'lucide-react';
 import type { Buyer } from '@/app/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
+interface BuyerAccountFormProps {
+    onSave?: () => void;
+}
 
-export function BuyerAccountForm() {
+export function BuyerAccountForm({ onSave }: BuyerAccountFormProps) {
     const { profile, isLoading } = useBuyerProfile();
     const { firestore } = useFirebase();
     const { toast } = useToast();
@@ -85,6 +88,7 @@ export function BuyerAccountForm() {
                     title: 'Profile Updated',
                     description: 'Your account information has been successfully updated.',
                 });
+                onSave?.();
             } catch (error) {
                 toast({
                     variant: 'destructive',
