@@ -365,7 +365,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
       <div className="space-y-4">
         <Label>Product Media (Photos)</Label>
         
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {mediaUrls.map((url, index) => (
                 <div key={`${url}-${index}`} className="relative aspect-square">
                    <Image src={url} alt="Product media" fill className="rounded-md object-cover" data-ai-hint="fish"/>
@@ -376,13 +376,13 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
                 </div>
             ))}
              {(mediaUrls.length === 0) && (
-                <div className="relative aspect-square">
+                <div className="relative aspect-square col-span-2 sm:col-span-3">
                     <Image src="https://images.unsplash.com/photo-1559106037-5435fac0c497?q=80&w=2070&auto=format&fit=crop" alt="Placeholder fish" fill className="rounded-md object-cover" data-ai-hint="fish market"/>
                 </div>
             )}
         </div>
         
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-center gap-2">
           <input
             type="file"
             ref={fileInputRef}
@@ -391,11 +391,11 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             accept="image/*"
             multiple
           />
-          <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+          <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full sm:w-auto">
             <Upload className="mr-2 h-4 w-4" />
             Upload Photos
           </Button>
-          <Button type="button" variant="outline" onClick={() => setCameraOpen(true)}>
+          <Button type="button" variant="outline" onClick={() => setCameraOpen(true)} className="w-full sm:w-auto">
             <Camera className="mr-2 h-4 w-4" />
             Use Camera
           </Button>

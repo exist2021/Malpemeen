@@ -96,7 +96,7 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2">
                     {triggerContent}
-                    <span className="font-medium">{profileName || 'Account'}</span>
+                    <span className="font-medium hidden sm:inline-block">{profileName || 'Account'}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -207,7 +207,7 @@ export function Header() {
         <div className="flex items-center gap-4">
             <Link href={getHomeLink()} className="flex items-center space-x-2">
               <FishLogo className="h-8 w-8 text-primary" />
-              <span className="font-bold hidden sm:inline-block">Malpe Meen</span>
+              <span className="font-bold inline-block">Malpe Meen</span>
             </Link>
         </div>
         <div className="flex items-center gap-2">

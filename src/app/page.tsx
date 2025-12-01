@@ -38,7 +38,7 @@ export default function WelcomePage() {
         </p>
       </div>
       
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 w-full max-w-4xl">
         {userRoles.map((role) => (
           <Card key={role.title} className="text-center hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 bg-card">
             <CardHeader>
