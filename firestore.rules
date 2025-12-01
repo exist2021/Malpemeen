@@ -58,8 +58,8 @@ service cloud.firestore {
     /**
      * @description Checks if the incoming data for a fish listing has the correct seller ID.
      */
-    function isCorrectSeller(sellerId) {
-      return request.resource.data.sellerId == sellerId;
+    function isCorrectSeller() {
+      return request.resource.data.sellerId == request.auth.uid;
     }
 
     /**
@@ -93,7 +93,7 @@ service cloud.firestore {
       allow get: if true;
       allow list: if true;
 
-      allow create: if isSignedIn();
+      allow create: if isSignedIn() && isCorrectSeller();
       
       allow update: if isSignedIn();
       allow delete: if isOwner(resource.data.sellerId);
