@@ -219,9 +219,9 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
       try {
         const listingData = {
           productName,
-          pricePerKg: pricePerKg ? Number(pricePerKg) : undefined,
+          pricePerKg: pricePerKg === '' || isNaN(Number(pricePerKg)) ? undefined : Number(pricePerKg),
           portDetails: portDetails as FishListing['portDetails'],
-          totalQuantityInTons: totalQuantityInTons ? Number(totalQuantityInTons) : undefined,
+          totalQuantityInTons: totalQuantityInTons === '' || isNaN(Number(totalQuantityInTons)) ? undefined : Number(totalQuantityInTons),
           boatDetails: boatDetails as FishListing['boatDetails'],
           brandName,
           description,

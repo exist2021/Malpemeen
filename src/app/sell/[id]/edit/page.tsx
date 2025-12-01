@@ -40,9 +40,9 @@ export default function EditSellPage() {
             setListing(data);
             // Populate form state when listing is fetched
             setProductName(data.productName || '');
-            setPricePerKg(String(data.pricePerKg || ''));
+            setPricePerKg(data.pricePerKg === undefined ? '' : String(data.pricePerKg));
             setPortDetails(data.portDetails || '');
-            setTotalQuantityInTons(String(data.totalQuantityInTons || ''));
+            setTotalQuantityInTons(data.totalQuantityInTons === undefined ? '' : String(data.totalQuantityInTons));
             setBoatDetails(data.boatDetails || '');
             setBrandName(data.brandName || 'Malpe Meen Pvt Ltd');
             setDescription(data.description || '');
