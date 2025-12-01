@@ -150,7 +150,7 @@ export default function SellerLoginPage() {
   return (
     <>
     <div className="flex min-h-screen">
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 mx-auto relative">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 mx-auto relative">
          <div ref={recaptchaContainerRef}></div>
          <Button variant="ghost" asChild className="absolute top-4 left-4">
             <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>
@@ -253,5 +253,3 @@ export default function SellerLoginPage() {
     </>
   );
 }
-
-    

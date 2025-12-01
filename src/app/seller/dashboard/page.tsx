@@ -202,11 +202,14 @@ export default function SellerDashboard() {
     <>
       <Header />
       <main className="container mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">{seller?.companyName || 'Seller Dashboard'}</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{seller?.companyName || 'Seller Dashboard'}</h1>
+           <Button asChild>
+              <Link href="/sell"><PlusCircle className="mr-2 h-4 w-4" /> Create New</Link>
+            </Button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 mb-8">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 mb-8">
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Active Listings</CardTitle>
@@ -234,14 +237,9 @@ export default function SellerDashboard() {
         </div>
 
          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                    <CardTitle>Your Listings</CardTitle>
-                    <CardDescription>Manage your existing product listings below.</CardDescription>
-                </div>
-                <Button asChild>
-                    <Link href="/sell"><PlusCircle className="mr-2 h-4 w-4" /> Create New Listing</Link>
-                </Button>
+            <CardHeader>
+                <CardTitle>Your Listings</CardTitle>
+                <CardDescription>Manage your existing product listings below.</CardDescription>
             </CardHeader>
             <CardContent>
                 <SellerListings listings={listings} setListings={setListings} />
@@ -251,5 +249,3 @@ export default function SellerDashboard() {
     </>
   );
 }
-
-    

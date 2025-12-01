@@ -25,7 +25,7 @@ export default function SellPage() {
   return (
     <>
       <Header />
-      <div className="container mx-auto max-w-2xl py-12">
+      <div className="container mx-auto max-w-2xl py-6 sm:py-12 px-4">
         <div className="mb-4">
           <Button variant="outline" onClick={() => router.push('/seller/dashboard')}>
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -33,13 +33,13 @@ export default function SellPage() {
           </Button>
         </div>
         <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold tracking-tight font-headline">List Your Fish</CardTitle>
-            <CardDescription className="pt-2">
+          <CardHeader className="text-center px-4 sm:px-6">
+            <CardTitle className="text-2xl sm:text-3xl font-bold tracking-tight font-headline">List Your Fish</CardTitle>
+            <CardDescription className="pt-2 text-sm sm:text-base">
               Fill out the form below to list your catch. Your listing will be visible to buyers immediately.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 sm:px-6">
             <SellerForm
                 formState={{
                     productName,

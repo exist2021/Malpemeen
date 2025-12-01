@@ -118,13 +118,13 @@ export default function BuyerDashboard() {
     <>
     <Header />
     <main className="p-4 sm:p-6 lg:p-8">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-            <h1 className="text-3xl font-bold tracking-tight">Available Listings</h1>
-            <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Available Listings</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex items-center gap-2">
-                    <Label htmlFor="port-filter" className="text-sm font-medium">Filter by Port:</Label>
+                    <Label htmlFor="port-filter" className="text-sm font-medium">Port:</Label>
                     <Select value={portFilter} onValueChange={handlePortChange}>
-                        <SelectTrigger id="port-filter" className="w-[180px]">
+                        <SelectTrigger id="port-filter" className="w-full sm:w-[180px]">
                             <SelectValue placeholder="Select a port" />
                         </SelectTrigger>
                         <SelectContent>
@@ -137,9 +137,9 @@ export default function BuyerDashboard() {
                     </Select>
                 </div>
                  <div className="flex items-center gap-2">
-                    <Label htmlFor="seller-filter" className="text-sm font-medium">Filter by Seller:</Label>
+                    <Label htmlFor="seller-filter" className="text-sm font-medium">Seller:</Label>
                     <Select value={sellerFilter} onValueChange={setSellerFilter} disabled={availableSellers.length === 0}>
-                        <SelectTrigger id="seller-filter" className="w-[180px]">
+                        <SelectTrigger id="seller-filter" className="w-full sm:w-[180px]">
                             <SelectValue placeholder="Select a seller" />
                         </SelectTrigger>
                         <SelectContent>

@@ -18,7 +18,7 @@ import { useUser } from '@/firebase';
 
 function ListingDetailSkeleton() {
   return (
-    <div className="container mx-auto max-w-4xl py-12">
+    <div className="container mx-auto max-w-4xl py-6 sm:py-12">
        <div className="mb-4">
         <Button variant="outline" disabled>
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -26,7 +26,7 @@ function ListingDetailSkeleton() {
           </Button>
       </div>
       <Card>
-        <CardContent className="grid md:grid-cols-2 gap-8 p-8">
+        <CardContent className="grid md:grid-cols-2 gap-8 p-4 sm:p-8">
           <div className="space-y-4">
             <Skeleton className="aspect-square w-full rounded-xl" />
             <div className="grid grid-cols-4 gap-2">
@@ -64,10 +64,10 @@ function DetailItem({ icon: Icon, label, value }: { icon: React.ElementType, lab
     if (!value) return null;
     return (
         <div className="flex items-start gap-3">
-            <Icon className="h-5 w-5 text-muted-foreground mt-1" />
+            <Icon className="h-5 w-5 text-muted-foreground mt-1 flex-shrink-0" />
             <div>
                 <p className="text-sm font-medium text-muted-foreground">{label}</p>
-                <p className="text-base font-semibold">{value}</p>
+                <p className="text-base font-semibold break-words">{value}</p>
             </div>
         </div>
     );
@@ -136,16 +136,16 @@ export default function ListingDetailPage() {
   return (
     <>
     <Header />
-    <div className="container mx-auto max-w-5xl py-12">
+    <div className="container mx-auto max-w-5xl py-6 sm:py-12">
         <div className="mb-4">
-          <Button variant="outline" onClick={() => router.push('/buyer/dashboard')}>
+          <Button variant="outline" onClick={() => router.back()}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Listings
+            Back
           </Button>
         </div>
       <Card className="overflow-hidden">
-        <div className="grid md:grid-cols-5">
-            <div className="md:col-span-2 p-6">
+        <div className="grid md:grid-cols-5 flex-col md:flex-row">
+            <div className="md:col-span-2 p-4 sm:p-6">
                <Carousel className="w-full">
                 <CarouselContent>
                   {hasMedia ? (
@@ -180,9 +180,9 @@ export default function ListingDetailPage() {
               </Carousel>
             </div>
             
-            <div className="md:col-span-3 p-6 flex flex-col">
+            <div className="md:col-span-3 p-4 sm:p-6 flex flex-col">
                 <CardHeader className="px-0 pt-0">
-                     <CardTitle className="text-3xl font-bold">{listing.productName}</CardTitle>
+                     <CardTitle className="text-2xl sm:text-3xl font-bold">{listing.productName}</CardTitle>
                     <CardDescription className="flex items-center gap-2 pt-2">
                         <Copyright className="h-4 w-4" />
                         <span>{listing.brandName}</span>
@@ -190,7 +190,7 @@ export default function ListingDetailPage() {
                 </CardHeader>
                 <CardContent className="px-0 flex-grow">
                     <p className="text-lg text-muted-foreground">{listing.description}</p>
-                    <Separator className="my-6" />
+                    <Separator className="my-4 sm:my-6" />
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                         <DetailItem icon={IndianRupee} label="Price Per Kg" value={listing.pricePerKg ? `₹${listing.pricePerKg.toLocaleString()}` : 'N/A'} />
                         <DetailItem icon={Scale} label="Total Quantity" value={listing.totalQuantityInTons ? `${listing.totalQuantityInTons} Tons` : 'N/A'} />
@@ -201,7 +201,7 @@ export default function ListingDetailPage() {
                     </div>
                      {listing.sellerAddress && (
                         <>
-                            <Separator className="my-6" />
+                            <Separator className="my-4 sm:my-6" />
                             <DetailItem icon={MapPin} label="Seller Address" value={listing.sellerAddress} />
                         </>
                     )}
@@ -224,5 +224,3 @@ export default function ListingDetailPage() {
     </>
   );
 }
-
-    

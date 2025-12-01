@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -158,7 +159,7 @@ export default function BuyerLoginPage() {
         />
         <div className="absolute inset-0 bg-black/50" />
       </div>
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 mx-auto relative">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 mx-auto relative">
          <div ref={recaptchaContainerRef}></div>
          <Button variant="ghost" asChild className="absolute top-4 left-4">
             <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>
