@@ -115,13 +115,15 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
-                    <div className="relative w-full aspect-video bg-black rounded-md overflow-hidden">
-                       <video ref={videoRef} className="w-full h-full" autoPlay muted playsInline />
-                       {!hasCameraPermission && (
-                            <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-black">
-                                <p className="text-muted-foreground">Waiting for camera permission...</p>
-                            </div>
-                       )}
+                     <div className="relative w-full aspect-video bg-black rounded-md overflow-hidden">
+                        <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+                         {!hasCameraPermission && (
+                             <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-black/80 text-white p-4">
+                                 <CameraIcon className="h-10 w-10 mb-4" />
+                                 <p className="text-center">Waiting for camera permission...</p>
+                                 <p className="text-xs text-muted-foreground mt-2 text-center">Please allow camera access when prompted by your browser.</p>
+                             </div>
+                        )}
                     </div>
                     {!hasCameraPermission && open && (
                         <Alert variant="destructive">
@@ -195,7 +197,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
 
     const newErrors: any = {};
     if (!productName) newErrors.productName = ['Product Name is required.'];
-    if (pricePerKg && (isNaN(Number(pricePerKg)) || Number(pricePerKg) <= 0)) newErrors.pricePerKg = ['Please enter a valid price.'];
+    if (pricePerKg && (isNaN(Number(pricePerKg)) || Number(pricePerKg) < 0)) newErrors.pricePerKg = ['Please enter a valid price.'];
     if (totalQuantityInTons && (isNaN(Number(totalQuantityInTons)) || Number(totalQuantityInTons) <= 0)) newErrors.totalQuantityInTons = ['Please enter a valid quantity.'];
     if (!portDetails) newErrors.portDetails = ['Port Details are required.'];
     if (!boatDetails) newErrors.boatDetails = ['Please select a boat.'];
@@ -219,9 +221,9 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
       try {
         const listingData = {
           productName,
-          pricePerKg: pricePerKg === '' || isNaN(Number(pricePerKg)) ? undefined : Number(pricePerKg),
+          pricePerKg: pricePerKg === '' ? 0 : Number(pricePerKg),
           portDetails: portDetails as FishListing['portDetails'],
-          totalQuantityInTons: totalQuantityInTons === '' || isNaN(Number(totalQuantityInTons)) ? undefined : Number(totalQuantityInTons),
+          totalQuantityInTons: totalQuantityInTons === '' ? 0 : Number(totalQuantityInTons),
           boatDetails: boatDetails as FishListing['boatDetails'],
           brandName,
           description,
@@ -340,8 +342,8 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             <Input id="brandName" value={brandName} disabled />
         </div>
         <div className="space-y-2">
-            <Label htmlFor="totalQuantityInTons">Total Quantity Available (Tons)</Label>
-            <Input id="totalQuantityInTons" type="number" value={totalQuantityInTons} onChange={(e) => setTotalQuantityInTons(e.target.value)} placeholder="e.g., 10 (Optional)" aria-describedby="totalQuantityInTons-error" />
+            <Label htmlFor="totalQuantityInTons">Total Quantity Available (Tons, Optional)</Label>
+            <Input id="totalQuantityInTons" type="number" value={totalQuantityInTons} onChange={(e) => setTotalQuantityInTons(e.target.value)} placeholder="e.g., 10" aria-describedby="totalQuantityInTons-error" />
              <div id="totalQuantityInTons-error" aria-live="polite" aria-atomic="true">
               {errors?.totalQuantityInTons && <p className="text-sm font-medium text-destructive">{errors.totalQuantityInTons}</p>}
             </div>
@@ -360,8 +362,8 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
       </div>
       
        <div className="space-y-2">
-            <Label htmlFor="pricePerKg">Price Per Kg (₹)</Label>
-            <Input id="pricePerKg" type="number" value={pricePerKg} onChange={(e) => setPricePerKg(e.target.value)} placeholder="e.g., 250 (Optional)" aria-describedby="pricePerKg-error" />
+            <Label htmlFor="pricePerKg">Price Per Kg (₹, Optional)</Label>
+            <Input id="pricePerKg" type="number" value={pricePerKg} onChange={(e) => setPricePerKg(e.target.value)} placeholder="Leave blank to show 0, or enter e.g., 250" aria-describedby="pricePerKg-error" />
             <div id="pricePerKg-error" aria-live="polite" aria-atomic="true">
               {errors?.pricePerKg && <p className="text-sm font-medium text-destructive">{errors.pricePerKg}</p>}
             </div>
@@ -421,3 +423,4 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     
 
     
+

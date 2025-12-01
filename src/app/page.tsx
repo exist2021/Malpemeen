@@ -28,27 +28,27 @@ export default function WelcomePage() {
 
   return (
     <main className="relative flex flex-col items-center justify-center min-h-screen p-4 sm:p-8 overflow-hidden bg-white">
-      <div className="text-center mb-12 relative z-10">
-        <FishLogo className="h-28 w-28 text-primary mx-auto"/>
-        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mt-6 text-foreground">
+      <div className="text-center mb-8 sm:mb-12 relative z-10">
+        <FishLogo className="h-20 w-20 sm:h-28 sm:w-28 text-primary mx-auto"/>
+        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight mt-4 sm:mt-6 text-foreground">
           Welcome to Malpe Meen
         </h1>
-        <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="mt-2 sm:mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
           The digital marketplace connecting local fisheries with buyers. Choose your role to get started.
         </p>
       </div>
       
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 w-full max-w-4xl">
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 w-full max-w-md md:max-w-4xl">
         {userRoles.map((role) => (
           <Card key={role.title} className="text-center hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 bg-card">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold">{role.title}</CardTitle>
-              <CardDescription className="pt-2 min-h-[40px]">{role.description}</CardDescription>
+              <CardTitle className="text-xl sm:text-2xl font-bold">{role.title}</CardTitle>
+              <CardDescription className="pt-2 min-h-[40px] text-sm sm:text-base">{role.description}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button 
                 onClick={() => router.push(role.href)} 
-                className="w-full text-lg h-12"
+                className="w-full text-base sm:text-lg h-10 sm:h-12"
               >
                 {role.buttonText} <ArrowRight className="ml-2 h-5 w-5" />
               </Button>

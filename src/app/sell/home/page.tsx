@@ -14,12 +14,12 @@ import type { Seller } from '@/app/types';
 
 function SellerHomeSkeleton() {
     return (
-        <main className="container mx-auto max-w-4xl py-12">
-            <div className="text-center mb-12">
-                <Skeleton className="h-10 w-1/2 mx-auto mb-2" />
+        <main className="container mx-auto max-w-4xl py-8 sm:py-12 px-4">
+            <div className="text-center mb-8 sm:mb-12">
+                <Skeleton className="h-9 sm:h-10 w-1/2 mx-auto mb-2" />
                 <Skeleton className="h-5 w-3/4 mx-auto" />
             </div>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                 <Card>
                     <CardHeader>
                         <Skeleton className="h-7 w-3/4" />
@@ -89,17 +89,17 @@ export default function SellerHomePage() {
   return (
     <>
       <Header />
-      <main className="container mx-auto max-w-4xl py-12">
-        <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold tracking-tight">Welcome, {seller?.contactName || 'Seller'}</h1>
-            <p className="mt-2 text-lg text-muted-foreground">Great to see you again! Your dashboard is updated and ready for new orders. Let’s make today productive.</p>
+      <main className="container mx-auto max-w-4xl py-8 sm:py-12 px-4">
+        <div className="text-center mb-8 sm:mb-12">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">Welcome, {seller?.contactName || 'Seller'}</h1>
+            <p className="mt-2 text-md sm:text-lg text-muted-foreground max-w-2xl mx-auto">Great to see you again! Your dashboard is updated and ready for new orders. Let’s make today productive.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card className="flex flex-col text-center hover:shadow-lg transition-shadow bg-card p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            <Card className="flex flex-col text-center hover:shadow-lg transition-shadow bg-card p-4 sm:p-6">
                 <CardHeader className="p-0 mb-4">
-                    <CardTitle className="text-2xl font-bold">List a New Product</CardTitle>
-                    <CardDescription className="mt-2">Create a new listing for your fresh catch and make it available to customers right away.</CardDescription>
+                    <CardTitle className="text-xl sm:text-2xl font-bold">List a New Product</CardTitle>
+                    <CardDescription className="mt-2 text-sm sm:text-base">Create a new listing for your fresh catch and make it available to customers right away.</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow flex items-end justify-center p-0">
                     <Button onClick={() => router.push('/sell')} className="w-full">
@@ -108,10 +108,10 @@ export default function SellerHomePage() {
                 </CardContent>
             </Card>
 
-            <Card className="flex flex-col text-center hover:shadow-lg transition-shadow bg-card p-6">
+            <Card className="flex flex-col text-center hover:shadow-lg transition-shadow bg-card p-4 sm:p-6">
                 <CardHeader className="p-0 mb-4">
-                    <CardTitle className="text-2xl font-bold">View Dashboard</CardTitle>
-                    <CardDescription className="mt-2">See your sales analytics, manage your existing listings, and track your performance.</CardDescription>
+                    <CardTitle className="text-xl sm:text-2xl font-bold">View Dashboard</CardTitle>
+                    <CardDescription className="mt-2 text-sm sm:text-base">See your sales analytics, manage your existing listings, and track your performance.</CardDescription>
                 </CardHeader>
                  <CardContent className="flex-grow flex items-end justify-center p-0">
                      <Button onClick={() => router.push('/seller/dashboard')} className="w-full">

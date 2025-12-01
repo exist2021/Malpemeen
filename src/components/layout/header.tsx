@@ -86,22 +86,28 @@ export function Header() {
 
 
        return (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               {role === 'seller' && (
-                <Button variant="ghost" onClick={() => router.push('/seller/home')}>
+                <Button variant="ghost" onClick={() => router.push('/seller/home')} className="hidden sm:inline-flex">
                   Home
                 </Button>
               )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2">
+                  <Button variant="ghost" className="flex items-center gap-2 p-1 sm:p-2">
                     {triggerContent}
-                    <span className="font-medium hidden sm:inline-block">{profileName || 'Account'}</span>
+                    <span className="font-medium hidden sm:inline-block max-w-[100px] truncate">{profileName || 'Account'}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                   {role === 'seller' && (
+                    <DropdownMenuItem onClick={() => router.push('/seller/dashboard')}>
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        Dashboard
+                    </DropdownMenuItem>
+                    )}
                   {role === 'buyer' && (
                     <Dialog>
                         <DialogTrigger asChild>
@@ -204,7 +210,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
             <Link href={getHomeLink()} className="flex items-center space-x-2">
               <FishLogo className="h-8 w-8 text-primary" />
               <span className="font-bold inline-block">Malpe Meen</span>
