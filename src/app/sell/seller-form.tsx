@@ -412,11 +412,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             accept="image/*"
             multiple
           />
-          <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full sm:w-auto">
-            <Upload className="mr-2 h-4 w-4" />
-            Upload Photos
-          </Button>
-          <Button type="button" variant="outline" onClick={() => setCameraOpen(true)} className="w-full sm:w-auto">
+          <Button type="button" variant="outline" onClick={() => setCameraOpen(true)} className="w-full">
             <Camera className="mr-2 h-4 w-4" />
             Use Camera
           </Button>
