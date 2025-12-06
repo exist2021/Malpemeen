@@ -13,6 +13,7 @@ import { useFirebase } from '@/firebase';
 import { Loader2, User } from 'lucide-react';
 import type { Buyer } from '@/app/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface BuyerAccountFormProps {
     onSave?: () => void;
@@ -77,6 +78,7 @@ export function BuyerAccountForm({ onSave }: BuyerAccountFormProps) {
 
         if (Object.keys(updatedData).length === 0) {
             toast({ title: 'No changes to save.' });
+            onSave?.();
             return;
         }
         
@@ -125,47 +127,51 @@ export function BuyerAccountForm({ onSave }: BuyerAccountFormProps) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex flex-col items-center space-y-4">
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept="image/*"
-                />
-                <Avatar 
-                    className="h-24 w-24 cursor-pointer relative group"
-                    onClick={() => fileInputRef.current?.click()}
-                >
-                    <AvatarImage src={formData.photoUrl} alt={formData.name} />
-                    <AvatarFallback>
-                        <User className="h-10 w-10" />
-                    </AvatarFallback>
-                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                        <span className="text-xs text-center">Change Photo</span>
-                    </div>
-                </Avatar>
+            <ScrollArea className="h-[60vh] sm:h-auto sm:max-h-[70vh] pr-6">
+            <div className="space-y-4">
+                <div className="flex flex-col items-center space-y-4">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        className="hidden"
+                        accept="image/*"
+                    />
+                    <Avatar 
+                        className="h-24 w-24 cursor-pointer relative group"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <AvatarImage src={formData.photoUrl} alt={formData.name} />
+                        <AvatarFallback>
+                            <User className="h-10 w-10" />
+                        </AvatarFallback>
+                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                            <span className="text-xs text-center">Change Photo</span>
+                        </div>
+                    </Avatar>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input id="name" name="name" value={formData.name} onChange={handleInputChange} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="phoneNumber">Contact Number</Label>
+                    <Input id="phoneNumber" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="place">Place</Label>
+                    <Input id="place" name="place" placeholder="e.g., City, State" value={formData.place} onChange={handleInputChange} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="address">Address</Label>
+                    <Input id="address" name="address" placeholder="e.g., 123 Main St" value={formData.address} onChange={handleInputChange} />
+                </div>
             </div>
-            <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" name="name" value={formData.name} onChange={handleInputChange} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="phoneNumber">Contact Number</Label>
-                <Input id="phoneNumber" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="place">Place</Label>
-                <Input id="place" name="place" placeholder="e.g., City, State" value={formData.place} onChange={handleInputChange} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Input id="address" name="address" placeholder="e.g., 123 Main St" value={formData.address} onChange={handleInputChange} />
-            </div>
+            </ScrollArea>
             <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Save Changes

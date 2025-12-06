@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 interface SellerAccountFormProps {
@@ -153,61 +154,65 @@ export function SellerAccountForm({ onSave }: SellerAccountFormProps) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
-             <div className="flex flex-col items-center space-y-4">
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept="image/*"
-                />
-                <Avatar 
-                    className="h-24 w-24 cursor-pointer relative group"
-                    onClick={() => fileInputRef.current?.click()}
-                >
-                    <AvatarImage src={formData.logoUrl} alt={formData.companyName} />
-                    <AvatarFallback>
-                        <Building className="h-10 w-10" />
-                    </AvatarFallback>
-                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                        <span className="text-xs text-center">Change Logo</span>
-                    </div>
-                </Avatar>
+            <ScrollArea className="h-[60vh] sm:h-auto sm:max-h-[70vh] pr-6">
+             <div className="space-y-6">
+                <div className="flex flex-col items-center space-y-4">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        className="hidden"
+                        accept="image/*"
+                    />
+                    <Avatar 
+                        className="h-24 w-24 cursor-pointer relative group"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <AvatarImage src={formData.logoUrl} alt={formData.companyName} />
+                        <AvatarFallback>
+                            <Building className="h-10 w-10" />
+                        </AvatarFallback>
+                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                            <span className="text-xs text-center">Change Logo</span>
+                        </div>
+                    </Avatar>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="contactName">Contact Name</Label>
+                    <Input id="contactName" name="contactName" value={formData.contactName} onChange={handleInputChange} />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="companyName">Company Name</Label>
+                    <Input id="companyName" name="companyName" value={formData.companyName} onChange={handleInputChange} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="phoneNumber">Contact Number</Label>
+                    <Input id="phoneNumber" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="address">Address</Label>
+                    <Textarea id="address" name="address" value={formData.address} onChange={handleInputChange} placeholder="Your business address"/>
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="portDetails">Primary Port</Label>
+                    <Select value={formData.portDetails} onValueChange={(value) => setFormData(prev => ({...prev, portDetails: value as any}))}>
+                        <SelectTrigger id="portDetails">
+                            <SelectValue placeholder="Select your main port" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Malpe Port">Malpe Port</SelectItem>
+                            <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
+                            <SelectItem value="Kochi Port">Kochi Port</SelectItem>
+                            <SelectItem value="Hyderabad Port">Hyderabad Port</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
-            <div className="space-y-2">
-                <Label htmlFor="contactName">Contact Name</Label>
-                <Input id="contactName" name="contactName" value={formData.contactName} onChange={handleInputChange} />
-            </div>
-             <div className="space-y-2">
-                <Label htmlFor="companyName">Company Name</Label>
-                <Input id="companyName" name="companyName" value={formData.companyName} onChange={handleInputChange} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="phoneNumber">Contact Number</Label>
-                <Input id="phoneNumber" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Textarea id="address" name="address" value={formData.address} onChange={handleInputChange} placeholder="Your business address"/>
-            </div>
-             <div className="space-y-2">
-                <Label htmlFor="portDetails">Primary Port</Label>
-                <Select value={formData.portDetails} onValueChange={(value) => setFormData(prev => ({...prev, portDetails: value as any}))}>
-                    <SelectTrigger id="portDetails">
-                        <SelectValue placeholder="Select your main port" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="Malpe Port">Malpe Port</SelectItem>
-                        <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
-                        <SelectItem value="Kochi Port">Kochi Port</SelectItem>
-                        <SelectItem value="Hyderabad Port">Hyderabad Port</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
+            </ScrollArea>
             <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Save Changes
