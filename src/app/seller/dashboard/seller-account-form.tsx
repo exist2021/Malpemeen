@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { updateDoc, doc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
-import { Loader2, Building, Copyright } from 'lucide-react';
+import { Loader2, Building } from 'lucide-react';
 import type { Seller, FishListing } from '@/app/types';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
