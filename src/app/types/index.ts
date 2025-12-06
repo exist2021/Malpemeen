@@ -26,7 +26,6 @@ export type FishListing = {
     id: string;
     sellerId: string;
     mediaUrls: string[];
-    description: string;
     listedDate: string;
     sellerName?: string;
     sellerPhone?: string;

@@ -189,7 +189,6 @@ export default function ListingDetailPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="px-0 flex-grow">
-                    <p className="text-lg text-muted-foreground">{listing.description}</p>
                     <Separator className="my-4 sm:my-6" />
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                         <DetailItem icon={IndianRupee} label="Price Per Kg" value={listing.pricePerKg ? `₹${listing.pricePerKg.toLocaleString()}` : 'N/A'} />

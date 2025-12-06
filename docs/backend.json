@@ -133,10 +133,6 @@
           },
           "description": "URLs of the fish photos or videos."
         },
-        "description": {
-          "type": "string",
-          "description": "Description of the fish listing."
-        },
         "listedDate": {
           "type": "string",
           "description": "The date when listing was created",
@@ -182,7 +178,6 @@
         "sellerName",
         "sellerPhone",
         "mediaUrls",
-        "description",
         "listedDate",
         "productName",
         "portDetails",

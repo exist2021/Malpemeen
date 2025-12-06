@@ -19,7 +19,6 @@ export default function SellPage() {
     const [totalQuantityInTons, setTotalQuantityInTons] = useState('');
     const [boatDetails, setBoatDetails] = useState<FishListing['boatDetails'] | ''>('');
     const [brandName, setBrandName] = useState('Malpe Meen Pvt Ltd');
-    const [description, setDescription] = useState('');
     const [mediaUrls, setMediaUrls] = useState<string[]>([]);
     
   return (
@@ -48,7 +47,6 @@ export default function SellPage() {
                     totalQuantityInTons,
                     boatDetails,
                     brandName,
-                    description,
                     mediaUrls,
                 }}
                 setFormState={{
@@ -58,7 +56,6 @@ export default function SellPage() {
                     setTotalQuantityInTons,
                     setBoatDetails,
                     setBrandName,
-                    setDescription,
                     setMediaUrls,
                 }}
              />

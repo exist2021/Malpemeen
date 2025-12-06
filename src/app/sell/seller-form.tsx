@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { addFishListing, updateFishListing } from '@/app/lib/data';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Camera, Loader2, X, Upload, Video, CameraIcon, Circle, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -40,7 +39,6 @@ interface SellerFormProps {
         totalQuantityInTons: string;
         boatDetails: FishListing['boatDetails'] | '';
         brandName: string;
-        description: string;
         mediaUrls: string[];
     };
     setFormState: {
@@ -50,7 +48,6 @@ interface SellerFormProps {
         setTotalQuantityInTons: (value: string) => void;
         setBoatDetails: (value: FishListing['boatDetails'] | '') => void;
         setBrandName: (value: string) => void;
-        setDescription: (value: string) => void;
         setMediaUrls: (value: string[] | ((prev: string[]) => string[])) => void;
     };
 }
@@ -160,10 +157,10 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
 export function SellerForm({ listing, formState, setFormState }: SellerFormProps) {
   const { toast } = useToast();
   const {
-    productName, pricePerKg, portDetails, totalQuantityInTons, boatDetails, brandName, description, mediaUrls
+    productName, pricePerKg, portDetails, totalQuantityInTons, boatDetails, brandName, mediaUrls
   } = formState;
   const {
-    setProductName, setPricePerKg, setPortDetails, setTotalQuantityInTons, setBoatDetails, setBrandName, setDescription, setMediaUrls
+    setProductName, setPricePerKg, setPortDetails, setTotalQuantityInTons, setBoatDetails, setBrandName, setMediaUrls
   } = setFormState;
 
   const [errors, setErrors] = useState<Partial<Record<keyof Omit<FishListing, 'id' | 'sellerId' | 'listedDate'>, string[]>>>({});
@@ -192,7 +189,6 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         setTotalQuantityInTons(listing.totalQuantityInTons ? String(listing.totalQuantityInTons) : '');
         setBoatDetails(listing.boatDetails || '');
         setBrandName(listing.brandName || 'Malpe Meen Pvt Ltd');
-        setDescription(listing.description || '');
         setMediaUrls(listing.mediaUrls || []);
     } else if (!isEditMode) {
         // Reset form for new listing, but pre-fill port from profile
@@ -201,14 +197,13 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         setTotalQuantityInTons('');
         setBoatDetails('');
         setBrandName('Malpe Meen Pvt Ltd');
-        setDescription('');
         setMediaUrls([]);
         if (sellerProfile) {
             setPortDetails(sellerProfile.portDetails || '');
         }
     }
 
-  }, [user, isUserLoading, router, isEditMode, listing, sellerProfile, setProductName, setPricePerKg, setPortDetails, setTotalQuantityInTons, setBoatDetails, setBrandName, setDescription, setMediaUrls]);
+  }, [user, isUserLoading, router, isEditMode, listing, sellerProfile, setProductName, setPricePerKg, setPortDetails, setTotalQuantityInTons, setBoatDetails, setBrandName, setMediaUrls]);
 
 
   const removeMedia = (urlToRemove: string) => {
@@ -229,7 +224,6 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     if (totalQuantityInTons && (isNaN(Number(totalQuantityInTons)) || Number(totalQuantityInTons) <= 0)) newErrors.totalQuantityInTons = ['Please enter a valid quantity.'];
     if (!portDetails) newErrors.portDetails = ['Port Details are required.'];
     if (!boatDetails) newErrors.boatDetails = ['Please select a boat.'];
-    if (description.length < 10) newErrors.description = ['Description must be at least 10 characters.'];
     if (mediaUrls.length === 0) newErrors.mediaUrls = ['Please add at least one photo or video.'];
 
 
@@ -252,7 +246,6 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
           portDetails: portDetails as FishListing['portDetails'],
           boatDetails: boatDetails as FishListing['boatDetails'],
           brandName,
-          description,
           mediaUrls: mediaUrls,
           sellerId: user.uid,
           pricePerKg: pricePerKg === '' ? 0 : Number(pricePerKg),
@@ -308,19 +301,6 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
   const handleMediaCaptured = (url: string) => {
     if (url && !mediaUrls.includes(url)) {
         setMediaUrls(prev => [...prev, url]);
-    }
-  };
-
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setMediaUrls(prev => [...prev, reader.result as string]);
-        };
-        reader.readAsDataURL(file);
-      });
     }
   };
 
@@ -380,17 +360,6 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             </div>
         </div>
       </div>
-
-
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-            <Label htmlFor="description">Description</Label>
-        </div>
-        <Textarea id="description" name="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the fish, its quality, size, and any other relevant details." required aria-describedby="description-error" />
-        <div id="description-error" aria-live="polite" aria-atomic="true">
-          {errors?.description && <p className="text-sm font-medium text-destructive">{errors.description}</p>}
-        </div>
-      </div>
       
        <div className="space-y-2">
             <Label htmlFor="pricePerKg">Price Per Kg (₹, Optional)</Label>
@@ -421,14 +390,6 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         </div>
         
         <div className="flex flex-col sm:flex-row items-center gap-2">
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileSelect}
-            className="hidden"
-            accept="image/*"
-            multiple
-          />
           <Button type="button" variant="outline" onClick={() => setCameraOpen(true)} className="w-full">
             <Camera className="mr-2 h-4 w-4" />
             Use Camera
