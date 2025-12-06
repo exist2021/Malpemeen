@@ -212,8 +212,8 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     if (mediaUrls.length === 0) newErrors.mediaUrls = ['Please add at least one photo.'];
 
     // For new listings, check profile has required fields
-    if (!isEditMode && (!sellerProfile.portDetails || !sellerProfile.brandName)) {
-        toast({ variant: 'destructive', title: 'Profile Incomplete', description: 'Please set your Port and Brand Name in your Account Settings before listing.'});
+    if (!isEditMode && !sellerProfile.portDetails) {
+        toast({ variant: 'destructive', title: 'Profile Incomplete', description: 'Please set your Port in your Account Settings before listing.'});
         return;
     }
 
@@ -238,7 +238,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
               boatDetails: boatDetails as FishListing['boatDetails'],
               mediaUrls: mediaUrls,
               pricePerKg: pricePerKg === '' ? 0 : Number(pricePerKg),
-              // Port and Brand are locked, but might be part of an update payload if they were editable
+              // Port and Brand are locked for editing
               portDetails: listing.portDetails,
               brandName: listing.brandName,
             };
@@ -312,25 +312,21 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             </div>
         </div>
 
-        {sellerProfile?.brandName && !isEditMode && (
-          <div className="space-y-2 p-3 bg-muted rounded-md border">
-              <Label>Brand Name</Label>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Copyright className="h-4 w-4" />
-                  <p className="font-semibold">{sellerProfile.brandName}</p>
-              </div>
-          </div>
-        )}
+        <div className="space-y-2 p-3 bg-muted rounded-md border">
+            <Label>Brand Name</Label>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Copyright className="h-4 w-4" />
+                <p className="font-semibold">Malpe Meen Pvt Ltd</p>
+            </div>
+        </div>
         
-        {sellerProfile?.portDetails && !isEditMode && (
-          <div className="space-y-2 p-3 bg-muted rounded-md border">
-              <Label>Port</Label>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                   <Anchor className="h-4 w-4" />
-                  <p className="font-semibold">{sellerProfile.portDetails}</p>
-              </div>
-          </div>
-        )}
+        <div className="space-y-2 p-3 bg-muted rounded-md border">
+            <Label>Port</Label>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                 <Anchor className="h-4 w-4" />
+                 <p className="font-semibold">{isEditMode && listing ? listing.portDetails : sellerProfile?.portDetails}</p>
+            </div>
+        </div>
 
         <div className="space-y-2">
             <Label htmlFor="boatDetails">Boat Details</Label>

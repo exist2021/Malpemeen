@@ -119,7 +119,7 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
   if (!sellerData.companyName || !sellerData.phoneNumber) {
       throw new Error("Seller profile is incomplete. Company name and phone number are required.");
   }
-   if (!sellerData.portDetails || !sellerData.brandName) {
+   if (!sellerData.portDetails) {
     throw new Error("Seller profile is incomplete. Port and Brand Name are required.");
   }
 
@@ -131,7 +131,7 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
     sellerPhone: sellerData.phoneNumber,
     sellerAddress: sellerData.address || '',
     portDetails: sellerData.portDetails,
-    brandName: sellerData.brandName,
+    brandName: 'Malpe Meen Pvt Ltd',
     listedDate: new Date().toISOString(),
     viewCount: 0,
     callClickCount: 0,

@@ -37,7 +37,6 @@ export function SellerAccountForm({ onSave }: SellerAccountFormProps) {
     const [formData, setFormData] = useState<{
         contactName: string;
         companyName: string;
-        brandName: string;
         email: string;
         phoneNumber: string;
         address: string;
@@ -46,7 +45,6 @@ export function SellerAccountForm({ onSave }: SellerAccountFormProps) {
     }>({
         contactName: '',
         companyName: '',
-        brandName: '',
         email: '',
         phoneNumber: '',
         address: '',
@@ -59,7 +57,6 @@ export function SellerAccountForm({ onSave }: SellerAccountFormProps) {
             setFormData({
                 contactName: profile.contactName || '',
                 companyName: profile.companyName || '',
-                brandName: profile.brandName || '',
                 email: profile.email || '',
                 phoneNumber: profile.phoneNumber || '',
                 address: profile.address || '',
@@ -93,7 +90,6 @@ export function SellerAccountForm({ onSave }: SellerAccountFormProps) {
         const updatedData: Partial<Seller> = {};
         if (formData.contactName !== profile.contactName) updatedData.contactName = formData.contactName;
         if (formData.companyName !== profile.companyName) updatedData.companyName = formData.companyName;
-        if (formData.brandName !== profile.brandName) updatedData.brandName = formData.brandName;
         if (formData.email !== profile.email) updatedData.email = formData.email;
         if (formData.phoneNumber !== profile.phoneNumber) updatedData.phoneNumber = formData.phoneNumber;
         if (formData.address !== profile.address) updatedData.address = formData.address;
@@ -186,10 +182,6 @@ export function SellerAccountForm({ onSave }: SellerAccountFormProps) {
                  <div className="space-y-2">
                     <Label htmlFor="companyName">Company Name</Label>
                     <Input id="companyName" name="companyName" value={formData.companyName} onChange={handleInputChange} />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="brandName">Brand Name</Label>
-                    <Input id="brandName" name="brandName" value={formData.brandName} onChange={handleInputChange} placeholder="Your brand for listings"/>
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>

@@ -4,7 +4,6 @@ export type Seller = {
     phoneNumber: string;
     contactName: string;
     companyName: string;
-    brandName?: string;
     portDetails: 'Malpe Port' | 'Mangalore Port' | 'Kochi Port' | 'Hyderabad Port';
     email?: string;
     address?: string;
