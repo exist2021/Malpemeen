@@ -104,7 +104,7 @@ export async function getFishListingById(id: string): Promise<FishListing | null
 }
 
 
-export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDate' | 'sellerName' | 'sellerPhone' | 'sellerAddress'>): Promise<DocumentReference> {
+export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDate' | 'sellerName' | 'sellerPhone' | 'sellerAddress' | 'portDetails' | 'brandName'>): Promise<DocumentReference> {
   const { firestore } = initializeFirebase();
   
   const sellerRef = doc(firestore, 'sellers', listing.sellerId);
@@ -119,6 +119,9 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
   if (!sellerData.companyName || !sellerData.phoneNumber) {
       throw new Error("Seller profile is incomplete. Company name and phone number are required.");
   }
+   if (!sellerData.portDetails || !sellerData.brandName) {
+    throw new Error("Seller profile is incomplete. Port and Brand Name are required.");
+  }
 
   const fishListingsRef = collection(firestore, `fishListings`);
   
@@ -127,6 +130,8 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
     sellerName: sellerData.companyName,
     sellerPhone: sellerData.phoneNumber,
     sellerAddress: sellerData.address || '',
+    portDetails: sellerData.portDetails,
+    brandName: sellerData.brandName,
     listedDate: new Date().toISOString(),
     viewCount: 0,
     callClickCount: 0,

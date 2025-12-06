@@ -7,7 +7,7 @@ import { addFishListing, updateFishListing } from '@/app/lib/data';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Camera, Loader2, X, Upload, Video, CameraIcon, Circle, Check } from 'lucide-react';
+import { Camera, Loader2, X, Upload, Video, CameraIcon, Circle, Check, Anchor, Copyright } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useUser, useSellerProfile } from '@/firebase';
 import { useRouter } from 'next/navigation';
@@ -35,19 +35,15 @@ interface SellerFormProps {
     formState: {
         productName: string;
         pricePerKg: string;
-        portDetails: FishListing['portDetails'] | '';
         totalQuantityInTons: string;
         boatDetails: FishListing['boatDetails'] | '';
-        brandName: string;
         mediaUrls: string[];
     };
     setFormState: {
         setProductName: (value: string) => void;
         setPricePerKg: (value: string) => void;
-        setPortDetails: (value: FishListing['portDetails'] | '') => void;
         setTotalQuantityInTons: (value: string) => void;
         setBoatDetails: (value: FishListing['boatDetails'] | '') => void;
-        setBrandName: (value: string) => void;
         setMediaUrls: (value: string[] | ((prev: string[]) => string[])) => void;
     };
 }
@@ -157,10 +153,10 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
 export function SellerForm({ listing, formState, setFormState }: SellerFormProps) {
   const { toast } = useToast();
   const {
-    productName, pricePerKg, portDetails, totalQuantityInTons, boatDetails, brandName, mediaUrls
+    productName, pricePerKg, totalQuantityInTons, boatDetails, mediaUrls
   } = formState;
   const {
-    setProductName, setPricePerKg, setPortDetails, setTotalQuantityInTons, setBoatDetails, setBrandName, setMediaUrls
+    setProductName, setPricePerKg, setTotalQuantityInTons, setBoatDetails, setMediaUrls
   } = setFormState;
 
   const [errors, setErrors] = useState<Partial<Record<keyof Omit<FishListing, 'id' | 'sellerId' | 'listedDate'>, string[]>>>({});
@@ -178,33 +174,22 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
       router.push('/seller/login');
     }
 
-    if (sellerProfile && !isEditMode) {
-        setPortDetails(sellerProfile.portDetails || '');
-        setBrandName(sellerProfile.brandName || sellerProfile.companyName || '');
-    }
-    
     if (isEditMode && listing) {
         setProductName(listing.productName || '');
         setPricePerKg(listing.pricePerKg ? String(listing.pricePerKg) : '');
-        setPortDetails(listing.portDetails || '');
         setTotalQuantityInTons(listing.totalQuantityInTons ? String(listing.totalQuantityInTons) : '');
         setBoatDetails(listing.boatDetails || '');
-        setBrandName(listing.brandName || '');
         setMediaUrls(listing.mediaUrls || []);
     } else if (!isEditMode) {
-        // Reset form for new listing, but pre-fill port and brand from profile
+        // Reset form for new listing
         setProductName('');
         setPricePerKg('');
         setTotalQuantityInTons('');
         setBoatDetails('');
         setMediaUrls([]);
-        if (sellerProfile) {
-            setPortDetails(sellerProfile.portDetails || '');
-            setBrandName(sellerProfile.brandName || sellerProfile.companyName || '');
-        }
     }
 
-  }, [user, isUserLoading, router, isEditMode, listing, sellerProfile, setProductName, setPricePerKg, setPortDetails, setTotalQuantityInTons, setBoatDetails, setBrandName, setMediaUrls]);
+  }, [user, isUserLoading, router, isEditMode, listing, setProductName, setPricePerKg, setTotalQuantityInTons, setBoatDetails, setMediaUrls]);
 
 
   const removeMedia = (urlToRemove: string) => {
@@ -214,19 +199,23 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!user) {
-      toast({ variant: 'destructive', title: 'You must be logged in to create a listing.' });
+    if (!user || !sellerProfile) {
+      toast({ variant: 'destructive', title: 'You must be logged in and have a complete profile.' });
       return;
     }
 
     const newErrors: any = {};
     if (!productName) newErrors.productName = ['Product Name is required.'];
-    if (!brandName) newErrors.brandName = ['Brand Name is required.'];
     if (pricePerKg && (isNaN(Number(pricePerKg)) || Number(pricePerKg) < 0)) newErrors.pricePerKg = ['Please enter a valid price.'];
     if (totalQuantityInTons && (isNaN(Number(totalQuantityInTons)) || Number(totalQuantityInTons) <= 0)) newErrors.totalQuantityInTons = ['Please enter a valid quantity.'];
-    if (!portDetails) newErrors.portDetails = ['Port Details are required.'];
     if (!boatDetails) newErrors.boatDetails = ['Please select a boat.'];
-    if (mediaUrls.length === 0) newErrors.mediaUrls = ['Please add at least one photo or video.'];
+    if (mediaUrls.length === 0) newErrors.mediaUrls = ['Please add at least one photo.'];
+
+    // For new listings, check profile has required fields
+    if (!isEditMode && (!sellerProfile.portDetails || !sellerProfile.brandName)) {
+        toast({ variant: 'destructive', title: 'Profile Incomplete', description: 'Please set your Port and Brand Name in your Account Settings before listing.'});
+        return;
+    }
 
 
     if (Object.keys(newErrors).length > 0) {
@@ -243,31 +232,36 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
 
     startTransition(async () => {
       try {
-        const listingData: Partial<Omit<FishListing, 'id'>> = {
-          productName,
-          portDetails: portDetails as FishListing['portDetails'],
-          boatDetails: boatDetails as FishListing['boatDetails'],
-          brandName,
-          mediaUrls: mediaUrls,
-          sellerId: user.uid,
-          pricePerKg: pricePerKg === '' ? 0 : Number(pricePerKg),
-        };
-
-        if (totalQuantityInTons !== '') {
-          listingData.totalQuantityInTons = Number(totalQuantityInTons);
-        }
-
         if (isEditMode && listing) {
-            await updateFishListing(listing.id, listingData);
+            const listingUpdateData: Partial<Omit<FishListing, 'id'>> = {
+              productName,
+              boatDetails: boatDetails as FishListing['boatDetails'],
+              mediaUrls: mediaUrls,
+              pricePerKg: pricePerKg === '' ? 0 : Number(pricePerKg),
+              // Port and Brand are locked, but might be part of an update payload if they were editable
+              portDetails: listing.portDetails,
+              brandName: listing.brandName,
+            };
+             if (totalQuantityInTons !== '') {
+              listingUpdateData.totalQuantityInTons = Number(totalQuantityInTons);
+            }
+
+            await updateFishListing(listing.id, listingUpdateData);
             toast({
               title: 'Success!',
               description: 'Your fish listing has been updated.',
             });
             router.push(`/listings/${listing.id}`);
         } else {
-             const newListingRef = await addFishListing({
-              ...listingData
-            } as Omit<FishListing, 'id' | 'listedDate' | 'sellerName' | 'sellerPhone' | 'sellerAddress'>);
+             const newListingData = {
+              productName,
+              boatDetails: boatDetails as FishListing['boatDetails'],
+              mediaUrls: mediaUrls,
+              sellerId: user.uid,
+              pricePerKg: pricePerKg === '' ? 0 : Number(pricePerKg),
+              totalQuantityInTons: totalQuantityInTons === '' ? 0 : Number(totalQuantityInTons),
+            };
+            const newListingRef = await addFishListing(newListingData);
             toast({
               title: 'Success!',
               description: 'Your fish listing has been created.',
@@ -309,38 +303,35 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
   return (
     <form onSubmit={handleSubmit} className="mt-2 space-y-8">
        <CameraCaptureDialog open={isCameraOpen} onOpenChange={setCameraOpen} onMediaCaptured={handleMediaCaptured} />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
+        <div className="space-y-2 md:col-span-2">
             <Label htmlFor="productName">Product Name</Label>
             <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="e.g., Sardine" required aria-describedby="productName-error" />
             <div id="productName-error" aria-live="polite" aria-atomic="true">
               {errors?.productName && <p className="text-sm font-medium text-destructive">{errors.productName}</p>}
             </div>
         </div>
-         <div className="space-y-2">
-            <Label htmlFor="brandName">Brand Name</Label>
-            <Input id="brandName" value={brandName} onChange={(e) => setBrandName(e.target.value)} placeholder="Your brand name" required aria-describedby="brandName-error"/>
-            <div id="brandName-error" aria-live="polite" aria-atomic="true">
-              {errors?.brandName && <p className="text-sm font-medium text-destructive">{errors.brandName}</p>}
-            </div>
-        </div>
-        <div className="space-y-2">
-            <Label htmlFor="portDetails">Port Details</Label>
-            <Select value={portDetails} onValueChange={(value) => setPortDetails(value as any)} required>
-                <SelectTrigger id="portDetails" aria-describedby="portDetails-error">
-                    <SelectValue placeholder="Select a port" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="Malpe Port">Malpe Port</SelectItem>
-                    <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
-                    <SelectItem value="Kochi Port">Kochi Port</SelectItem>
-                    <SelectItem value="Hyderabad Port">Hyderabad Port</SelectItem>
-                </SelectContent>
-            </Select>
-            <div id="portDetails-error" aria-live="polite" aria-atomic="true">
-              {errors?.portDetails && <p className="text-sm font-medium text-destructive">{errors.portDetails}</p>}
-            </div>
-        </div>
+
+        {sellerProfile?.brandName && !isEditMode && (
+          <div className="space-y-2 p-3 bg-muted rounded-md border">
+              <Label>Brand Name</Label>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Copyright className="h-4 w-4" />
+                  <p className="font-semibold">{sellerProfile.brandName}</p>
+              </div>
+          </div>
+        )}
+        
+        {sellerProfile?.portDetails && !isEditMode && (
+          <div className="space-y-2 p-3 bg-muted rounded-md border">
+              <Label>Port</Label>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                   <Anchor className="h-4 w-4" />
+                  <p className="font-semibold">{sellerProfile.portDetails}</p>
+              </div>
+          </div>
+        )}
+
         <div className="space-y-2">
             <Label htmlFor="boatDetails">Boat Details</Label>
             <Select value={boatDetails} onValueChange={(value) => setBoatDetails(value as any)} required>
@@ -364,9 +355,9 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
               {errors?.totalQuantityInTons && <p className="text-sm font-medium text-destructive">{errors.totalQuantityInTons}</p>}
             </div>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 md:col-span-2">
             <Label htmlFor="pricePerKg">Price Per Kg (₹, Optional)</Label>
-            <Input id="pricePerKg" type="number" value={pricePerKg} onChange={(e) => setPricePerKg(e.target.value)} placeholder="Leave blank for 0, or enter e.g., 250" aria-describedby="pricePerKg-error" />
+            <Input id="pricePerKg" type="number" value={pricePerKg} onChange={(e) => setPricePerKg(e.target.value)} placeholder="Leave blank if price is negotiable" aria-describedby="pricePerKg-error" />
             <div id="pricePerKg-error" aria-live="polite" aria-atomic="true">
               {errors?.pricePerKg && <p className="text-sm font-medium text-destructive">{errors.pricePerKg}</p>}
             </div>
