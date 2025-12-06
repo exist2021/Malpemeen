@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Camera, Loader2, X, Upload, Video, CameraIcon, Circle, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useUser } from '@/firebase';
+import { useUser, useSellerProfile } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import type { FishListing } from '@/app/types';
 import {
@@ -168,6 +168,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
 
   const [errors, setErrors] = useState<Partial<Record<keyof Omit<FishListing, 'id' | 'sellerId' | 'listedDate'>, string[]>>>({});
   const { user, isUserLoading } = useUser();
+  const { profile: sellerProfile, isLoading: isSellerProfileLoading } = useSellerProfile();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const isEditMode = !!listing;
@@ -179,19 +180,35 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     if (!isUserLoading && !user) {
       router.push('/seller/login');
     }
+
+    if (sellerProfile && !isEditMode) {
+        setPortDetails(sellerProfile.portDetails || '');
+    }
     
-    if (!isEditMode) {
+    if (isEditMode && listing) {
+        setProductName(listing.productName || '');
+        setPricePerKg(listing.pricePerKg ? String(listing.pricePerKg) : '');
+        setPortDetails(listing.portDetails || '');
+        setTotalQuantityInTons(listing.totalQuantityInTons ? String(listing.totalQuantityInTons) : '');
+        setBoatDetails(listing.boatDetails || '');
+        setBrandName(listing.brandName || 'Malpe Meen Pvt Ltd');
+        setDescription(listing.description || '');
+        setMediaUrls(listing.mediaUrls || []);
+    } else if (!isEditMode) {
+        // Reset form for new listing, but pre-fill port from profile
         setProductName('');
         setPricePerKg('');
-        setPortDetails('');
         setTotalQuantityInTons('');
         setBoatDetails('');
         setBrandName('Malpe Meen Pvt Ltd');
         setDescription('');
         setMediaUrls([]);
+        if (sellerProfile) {
+            setPortDetails(sellerProfile.portDetails || '');
+        }
     }
 
-  }, [user, isUserLoading, router, isEditMode, setProductName, setPricePerKg, setPortDetails, setTotalQuantityInTons, setBoatDetails, setBrandName, setDescription, setMediaUrls]);
+  }, [user, isUserLoading, router, isEditMode, listing, sellerProfile, setProductName, setPricePerKg, setPortDetails, setTotalQuantityInTons, setBoatDetails, setBrandName, setDescription, setMediaUrls]);
 
 
   const removeMedia = (urlToRemove: string) => {
@@ -284,7 +301,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     });
   };
   
-  if (isUserLoading || !user) {
+  if (isUserLoading || isSellerProfileLoading || !user) {
     return <p>Loading...</p>
   }
 

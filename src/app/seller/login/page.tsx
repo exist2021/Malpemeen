@@ -16,15 +16,24 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Phone as PhoneIcon, Loader2, User, Building, MapPin } from 'lucide-react';
+import { ArrowLeft, Phone as PhoneIcon, Loader2, User, Building, MapPin, Anchor } from 'lucide-react';
 import { FishLogo } from '@/components/fish-logo';
 import { Textarea } from '@/components/ui/textarea';
+import type { FishListing } from '@/app/types';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function SellerLoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [contactName, setContactName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [address, setAddress] = useState('');
+  const [portDetails, setPortDetails] = useState<FishListing['portDetails'] | ''>('');
   const [phone, setPhone] = useState('');
   const router = useRouter();
   const { auth, firestore } = useFirebase();
@@ -55,6 +64,11 @@ export default function SellerLoginPage() {
         toast({ variant: 'destructive', title: 'You must verify your phone to sign up.'});
         return;
     };
+     if (!portDetails) {
+        toast({ variant: 'destructive', title: 'Port details are required.'});
+        return;
+    }
+
     setIsSigningUp(true);
     try {
         const user = auth.currentUser;
@@ -63,6 +77,7 @@ export default function SellerLoginPage() {
             contactName: contactName,
             companyName: companyName,
             address: address,
+            portDetails: portDetails,
             phoneNumber: user.phoneNumber,
         };
         const docRef = doc(firestore, 'sellers', user.uid);
@@ -74,7 +89,7 @@ export default function SellerLoginPage() {
 
       } catch (error: any) {
           if (error.name === 'FirebaseError' && error.message.includes('permission-denied')) {
-              const sellerData = { id: auth.currentUser.uid, contactName, companyName, address, phoneNumber: `+91${phone}` };
+              const sellerData = { id: auth.currentUser.uid, contactName, companyName, address, portDetails, phoneNumber: `+91${phone}` };
               const docRef = doc(firestore, 'sellers', auth.currentUser!.uid);
               const contextualError = new FirestorePermissionError({
                   path: docRef.path,
@@ -184,6 +199,23 @@ export default function SellerLoginPage() {
                     <div className="relative">
                         <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                         <Textarea id="signup-address" placeholder="Your business address" value={address} onChange={(e) => setAddress(e.target.value)} required className="pl-10"/>
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="portDetails">Primary Port</Label>
+                    <div className="relative">
+                         <Anchor className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Select value={portDetails} onValueChange={(value) => setPortDetails(value as any)} required>
+                            <SelectTrigger id="portDetails" className="pl-10">
+                                <SelectValue placeholder="Select your main port" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Malpe Port">Malpe Port</SelectItem>
+                                <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
+                                <SelectItem value="Kochi Port">Kochi Port</SelectItem>
+                                <SelectItem value="Hyderabad Port">Hyderabad Port</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
                 <div className="flex h-10 w-full items-center rounded-md border border-input bg-muted px-3 text-sm">

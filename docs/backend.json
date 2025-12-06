@@ -23,6 +23,11 @@
           "type": "string",
           "description": "The registered name of the seller's company."
         },
+        "portDetails": {
+          "type": "string",
+          "description": "The primary port of operation for the seller.",
+          "enum": ["Malpe Port", "Mangalore Port", "Kochi Port", "Hyderabad Port"]
+        },
         "email": {
             "type": "string",
             "format": "email",
@@ -49,7 +54,8 @@
         "id",
         "phoneNumber",
         "contactName",
-        "companyName"
+        "companyName",
+        "portDetails"
       ]
     },
     "Buyer": {
