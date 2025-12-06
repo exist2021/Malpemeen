@@ -2,7 +2,6 @@
 'use client';
 
 import { useState, useEffect, useTransition, useRef } from 'react';
-import Image from 'next/image';
 import { useSellerProfile } from '@/firebase/provider';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -11,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { updateDoc, doc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
-import { Loader2, User, Building, Anchor } from 'lucide-react';
+import { Loader2, Building } from 'lucide-react';
 import type { Seller, FishListing } from '@/app/types';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -23,7 +22,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from '@/components/ui/scroll-area';
-
 
 interface SellerAccountFormProps {
     onSave?: () => void;
