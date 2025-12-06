@@ -159,7 +159,7 @@ export default function BuyerLoginPage() {
         />
         <div className="absolute inset-0 bg-black/50" />
       </div>
-      <div className="flex flex-1 md:flex-row">
+      <div className="flex flex-1 flex-col md:flex-row">
         <div className="relative hidden md:block md:w-1/2">
             <Image
             src="https://cdn.pixabay.com/photo/2018/01/05/02/47/fishing-3062034_1280.jpg"
@@ -178,9 +178,9 @@ export default function BuyerLoginPage() {
             <div className="w-full max-w-sm">
             <div className="text-center mb-8">
                 <FishLogo className="h-16 w-16 text-primary mx-auto"/>
-                <h2 className="text-3xl font-bold tracking-tight mt-4">Buyer Login or Sign Up</h2>
+                <h2 className="text-3xl font-bold tracking-tight mt-4">{isNewUser ? "Create Buyer Account" : "Buyer Login"}</h2>
                 <p className="mt-2 text-muted-foreground">
-                    Ready to find the freshest catch from Malpe? Enter your phone number to get started.
+                    {isNewUser ? "Enter your name to finish signing up." : "Enter your phone number to log in or sign up."}
                 </p>
             </div>
 
@@ -220,9 +220,7 @@ export default function BuyerLoginPage() {
 
             {isNewUser && (
                 <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleFinalizeSignUp(); }}>
-                    <div className="text-center">
-                        <p className="text-muted-foreground">Welcome! Let's finish creating your account.</p>
-                    </div>
+                    
                     <div className="space-y-2">
                         <Label htmlFor="signup-name">Your Name</Label>
                         <div className="relative">
