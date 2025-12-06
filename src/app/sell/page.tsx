@@ -18,7 +18,7 @@ export default function SellPage() {
     const [portDetails, setPortDetails] = useState<FishListing['portDetails'] | ''>('');
     const [totalQuantityInTons, setTotalQuantityInTons] = useState('');
     const [boatDetails, setBoatDetails] = useState<FishListing['boatDetails'] | ''>('');
-    const [brandName, setBrandName] = useState('Malpe Meen Pvt Ltd');
+    const [brandName, setBrandName] = useState('');
     const [mediaUrls, setMediaUrls] = useState<string[]>([]);
     
   return (
