@@ -161,117 +161,19 @@ export default function SellerLoginPage() {
       setIsVerifyingOtp(false);
     }
   };
+  
+  const currentTitle = isSignUp ? 'Create a Seller Account' : (confirmationResult ? 'Enter OTP' : 'Seller Login or Sign Up');
+  const currentDescription = isSignUp 
+    ? 'Join our network to reach more buyers and grow your business.' 
+    : (confirmationResult 
+        ? `We've sent a code to +91 ${phone}.`
+        : 'Welcome! Enter your phone number to begin.');
+
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
-      <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-8 mx-auto relative">
-         <div ref={recaptchaContainerRef}></div>
-         <Button variant="ghost" asChild className="absolute top-4 left-4">
-            <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>
-        </Button>
-        <div className="w-full max-w-sm">
-         <div className="text-center mb-8">
-            <FishLogo className="h-16 w-16 text-primary mx-auto"/>
-            <h2 className="text-3xl font-bold tracking-tight mt-4">{isSignUp ? 'Create a Seller Account' : 'Seller Login or Sign Up'}</h2>
-            <p className="mt-2 text-muted-foreground">
-                {isSignUp ? 'Join our network to reach more buyers and grow your business.' : 'Welcome! Enter your phone number to begin.'}
-            </p>
-         </div>
-          
-          {isSignUp ? (
-            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSignUp(); }}>
-                 <div className="space-y-2">
-                    <Label htmlFor="signup-contact-name">Contact Name</Label>
-                    <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input id="signup-contact-name" type="text" placeholder="John Doe" value={contactName} onChange={(e) => setContactName(e.target.value)} required className="pl-10"/>
-                    </div>
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="signup-company-name">Company Name</Label>
-                    <div className="relative">
-                        <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input id="signup-company-name" type="text" placeholder="Malpe Meen Pvt Ltd" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required className="pl-10"/>
-                    </div>
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="signup-address">Address</Label>
-                    <div className="relative">
-                        <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                        <Textarea id="signup-address" placeholder="Your business address" value={address} onChange={(e) => setAddress(e.target.value)} required className="pl-10"/>
-                    </div>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="portDetails">Primary Port</Label>
-                    <div className="relative">
-                         <Anchor className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Select value={portDetails} onValueChange={(value) => setPortDetails(value as any)} required>
-                            <SelectTrigger id="portDetails" className="pl-10">
-                                <SelectValue placeholder="Select your main port" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Malpe Port">Malpe Port</SelectItem>
-                                <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
-                                <SelectItem value="Kochi Port">Kochi Port</SelectItem>
-                                <SelectItem value="Hyderabad Port">Hyderabad Port</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-                <div className="flex h-10 w-full items-center rounded-md border border-input bg-muted px-3 text-sm">
-                    <PhoneIcon className="h-5 w-5 text-muted-foreground" />
-                    <span className="pl-2 pr-2 text-muted-foreground">+91</span>
-                    <Input value={phone} disabled className="w-full p-0 border-0 bg-transparent"/>
-                </div>
-                <Button type="submit" className="w-full h-12 text-base" disabled={isSigningUp}>
-                  {isSigningUp && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Complete Sign Up
-                </Button>
-            </form>
-          ) : (
-             <>
-                {!confirmationResult ? (
-                <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handlePhoneAuth(); }}>
-                    <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <div className="flex h-10 w-full items-center rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                        <PhoneIcon className="h-5 w-5 text-muted-foreground" />
-                        <span className="pl-2 pr-2 text-muted-foreground">+91</span>
-                        <Input id="phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"/>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Country code (+91) is automatically used.</p>
-                    </div>
-                    <Button type="submit" className="w-full h-12 text-base" disabled={isSendingOtp}>
-                    {isSendingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Send OTP
-                    </Button>
-                </form>
-                ) : (
-                <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleVerifyOtp(); }}>
-                    <div className="space-y-2">
-                    <Label htmlFor="otp">Enter OTP</Label>
-                    <Input id="otp" type="text" placeholder="123456" value={otp} onChange={(e) => setOtp(e.target.value)} required />
-                    </div>
-                    <Button type="submit" className="w-full h-12 text-base" disabled={isVerifyingOtp}>
-                    {isVerifyingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Verify OTP
-                    </Button>
-                    <Button variant="link" onClick={() => setConfirmationResult(null)}>Back</Button>
-                </form>
-                )}
-            </>
-          )}
-          
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Not a seller?{' '}
-            <Link href="/buyer/login" className="font-semibold text-primary hover:underline">
-               Buyer Login
-            </Link>
-          </p>
-        </div>
-      </div>
-      <div className="relative hidden md:block md:w-1/2">
-        <Image
+    <div className="flex min-h-screen flex-col">
+       <div className="md:hidden relative w-full h-48">
+         <Image
           src="https://cdn.pixabay.com/photo/2018/01/05/02/47/fishing-3062034_1280.jpg"
           alt="Fishing boat at sea"
           fill
@@ -280,6 +182,130 @@ export default function SellerLoginPage() {
         />
         <div className="absolute inset-0 bg-black/50" />
       </div>
+
+      <div className="flex flex-1 md:flex-row">
+        <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-8 mx-auto relative">
+            <div ref={recaptchaContainerRef}></div>
+            <Button variant="ghost" asChild className="absolute top-4 left-4">
+                <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>
+            </Button>
+            <div className="w-full max-w-sm">
+            <div className="text-center mb-8">
+                <FishLogo className="h-16 w-16 text-primary mx-auto"/>
+                <h2 className="text-3xl font-bold tracking-tight mt-4">{currentTitle}</h2>
+                <p className="mt-2 text-muted-foreground">{currentDescription}</p>
+            </div>
+            
+            {isSignUp ? (
+                <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSignUp(); }}>
+                    <div className="space-y-2">
+                        <Label htmlFor="signup-contact-name">Contact Name</Label>
+                        <div className="relative">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input id="signup-contact-name" type="text" placeholder="John Doe" value={contactName} onChange={(e) => setContactName(e.target.value)} required className="pl-10"/>
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="signup-company-name">Company Name</Label>
+                        <div className="relative">
+                            <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input id="signup-company-name" type="text" placeholder="Malpe Meen Pvt Ltd" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required className="pl-10"/>
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="signup-address">Address</Label>
+                        <div className="relative">
+                            <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                            <Textarea id="signup-address" placeholder="Your business address" value={address} onChange={(e) => setAddress(e.target.value)} required className="pl-10"/>
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="portDetails">Primary Port</Label>
+                        <div className="relative">
+                            <Anchor className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Select value={portDetails} onValueChange={(value) => setPortDetails(value as any)} required>
+                                <SelectTrigger id="portDetails" className="pl-10">
+                                    <SelectValue placeholder="Select your main port" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Malpe Port">Malpe Port</SelectItem>
+                                    <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
+                                    <SelectItem value="Kochi Port">Kochi Port</SelectItem>
+                                    <SelectItem value="Hyderabad Port">Hyderabad Port</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <div className="flex h-10 w-full items-center rounded-md border border-input bg-muted px-3 text-sm">
+                        <PhoneIcon className="h-5 w-5 text-muted-foreground" />
+                        <span className="pl-2 pr-2 text-muted-foreground">+91</span>
+                        <Input value={phone} disabled className="w-full p-0 border-0 bg-transparent"/>
+                    </div>
+                    <Button type="submit" className="w-full h-12 text-base" disabled={isSigningUp}>
+                    {isSigningUp && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Complete Sign Up
+                    </Button>
+                </form>
+            ) : (
+                <>
+                    {!confirmationResult ? (
+                    <>
+                    <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handlePhoneAuth(); }}>
+                        <div className="space-y-2">
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <div className="flex h-10 w-full items-center rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                            <PhoneIcon className="h-5 w-5 text-muted-foreground" />
+                            <span className="pl-2 pr-2 text-muted-foreground">+91</span>
+                            <Input id="phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"/>
+                        </div>
+                        <p className="text-xs text-muted-foreground">Country code (+91) is automatically used.</p>
+                        </div>
+                        <Button type="submit" className="w-full h-12 text-base" disabled={isSendingOtp}>
+                        {isSendingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        Send OTP
+                        </Button>
+                    </form>
+                     <p className="mt-4 text-center text-sm text-muted-foreground">
+                        New seller? This will start the sign up process.
+                     </p>
+                    </>
+                    ) : (
+                    <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleVerifyOtp(); }}>
+                        <div className="space-y-2">
+                        <Label htmlFor="otp">Enter OTP</Label>
+                        <Input id="otp" type="text" placeholder="123456" value={otp} onChange={(e) => setOtp(e.target.value)} required />
+                        </div>
+                        <Button type="submit" className="w-full h-12 text-base" disabled={isVerifyingOtp}>
+                        {isVerifyingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        Verify OTP
+                        </Button>
+                        <Button variant="link" onClick={() => setConfirmationResult(null)}>Back</Button>
+                    </form>
+                    )}
+                </>
+            )}
+            
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+                Not a seller?{' '}
+                <Link href="/buyer/login" className="font-semibold text-primary hover:underline">
+                Buyer Login
+                </Link>
+            </p>
+            </div>
+        </div>
+        <div className="relative hidden md:block md:w-1/2">
+            <Image
+            src="https://cdn.pixabay.com/photo/2018/01/05/02/47/fishing-3062034_1280.jpg"
+            alt="Fishing boat at sea"
+            fill
+            className="object-cover"
+            data-ai-hint="fishing boat"
+            />
+            <div className="absolute inset-0 bg-black/50" />
+        </div>
+      </div>
     </div>
   );
 }
+
+    
