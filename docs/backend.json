@@ -23,6 +23,10 @@
           "type": "string",
           "description": "The registered name of the seller's company."
         },
+        "brandName": {
+          "type": "string",
+          "description": "The brand name used by the seller for their products."
+        },
         "portDetails": {
           "type": "string",
           "description": "The primary port of operation for the seller.",
@@ -157,7 +161,7 @@
         },
         "brandName": {
           "type": "string",
-          "description": "Brand name for the product, fixed to 'Malpe Meen Pvt Ltd'."
+          "description": "Brand name for the product."
         },
         "viewCount": {
             "type": "number",

@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Phone as PhoneIcon, Loader2, User, Building, MapPin, Anchor } from 'lucide-react';
+import { ArrowLeft, Phone as PhoneIcon, Loader2, User, Building, MapPin, Anchor, Copyright } from 'lucide-react';
 import { FishLogo } from '@/components/fish-logo';
 import { Textarea } from '@/components/ui/textarea';
 import type { FishListing } from '@/app/types';
@@ -32,6 +32,7 @@ export default function SellerLoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [contactName, setContactName] = useState('');
   const [companyName, setCompanyName] = useState('');
+  const [brandName, setBrandName] = useState('');
   const [address, setAddress] = useState('');
   const [portDetails, setPortDetails] = useState<FishListing['portDetails'] | ''>('');
   const [phone, setPhone] = useState('');
@@ -76,6 +77,7 @@ export default function SellerLoginPage() {
             id: user.uid,
             contactName: contactName,
             companyName: companyName,
+            brandName: brandName || companyName, // Default brand name to company name
             address: address,
             portDetails: portDetails,
             phoneNumber: user.phoneNumber,
@@ -89,7 +91,7 @@ export default function SellerLoginPage() {
 
       } catch (error: any) {
           if (error.name === 'FirebaseError' && error.message.includes('permission-denied')) {
-              const sellerData = { id: auth.currentUser.uid, contactName, companyName, address, portDetails, phoneNumber: `+91${phone}` };
+              const sellerData = { id: auth.currentUser.uid, contactName, companyName, brandName, address, portDetails, phoneNumber: `+91${phone}` };
               const docRef = doc(firestore, 'sellers', auth.currentUser!.uid);
               const contextualError = new FirestorePermissionError({
                   path: docRef.path,
@@ -212,6 +214,13 @@ export default function SellerLoginPage() {
                             <Input id="signup-company-name" type="text" placeholder="Malpe Meen Pvt Ltd" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required className="pl-10"/>
                         </div>
                     </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="signup-brand-name">Brand Name (Optional)</Label>
+                        <div className="relative">
+                            <Copyright className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input id="signup-brand-name" type="text" placeholder="Defaults to company name" value={brandName} onChange={(e) => setBrandName(e.target.value)} className="pl-10"/>
+                        </div>
+                    </div>
                     <div className="space-y-2">
                         <Label htmlFor="signup-address">Address</Label>
                         <div className="relative">
@@ -307,5 +316,3 @@ export default function SellerLoginPage() {
     </div>
   );
 }
-
-    

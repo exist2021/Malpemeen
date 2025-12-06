@@ -180,6 +180,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
 
     if (sellerProfile && !isEditMode) {
         setPortDetails(sellerProfile.portDetails || '');
+        setBrandName(sellerProfile.brandName || sellerProfile.companyName || '');
     }
     
     if (isEditMode && listing) {
@@ -188,18 +189,18 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         setPortDetails(listing.portDetails || '');
         setTotalQuantityInTons(listing.totalQuantityInTons ? String(listing.totalQuantityInTons) : '');
         setBoatDetails(listing.boatDetails || '');
-        setBrandName(listing.brandName || 'Malpe Meen Pvt Ltd');
+        setBrandName(listing.brandName || '');
         setMediaUrls(listing.mediaUrls || []);
     } else if (!isEditMode) {
-        // Reset form for new listing, but pre-fill port from profile
+        // Reset form for new listing, but pre-fill port and brand from profile
         setProductName('');
         setPricePerKg('');
         setTotalQuantityInTons('');
         setBoatDetails('');
-        setBrandName('Malpe Meen Pvt Ltd');
         setMediaUrls([]);
         if (sellerProfile) {
             setPortDetails(sellerProfile.portDetails || '');
+            setBrandName(sellerProfile.brandName || sellerProfile.companyName || '');
         }
     }
 
@@ -220,6 +221,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
 
     const newErrors: any = {};
     if (!productName) newErrors.productName = ['Product Name is required.'];
+    if (!brandName) newErrors.brandName = ['Brand Name is required.'];
     if (pricePerKg && (isNaN(Number(pricePerKg)) || Number(pricePerKg) < 0)) newErrors.pricePerKg = ['Please enter a valid price.'];
     if (totalQuantityInTons && (isNaN(Number(totalQuantityInTons)) || Number(totalQuantityInTons) <= 0)) newErrors.totalQuantityInTons = ['Please enter a valid quantity.'];
     if (!portDetails) newErrors.portDetails = ['Port Details are required.'];
@@ -308,11 +310,18 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     <form onSubmit={handleSubmit} className="mt-2 space-y-8">
        <CameraCaptureDialog open={isCameraOpen} onOpenChange={setCameraOpen} onMediaCaptured={handleMediaCaptured} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2 md:col-span-2">
+        <div className="space-y-2">
             <Label htmlFor="productName">Product Name</Label>
             <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="e.g., Sardine" required aria-describedby="productName-error" />
             <div id="productName-error" aria-live="polite" aria-atomic="true">
               {errors?.productName && <p className="text-sm font-medium text-destructive">{errors.productName}</p>}
+            </div>
+        </div>
+         <div className="space-y-2">
+            <Label htmlFor="brandName">Brand Name</Label>
+            <Input id="brandName" value={brandName} onChange={(e) => setBrandName(e.target.value)} placeholder="Your brand name" required aria-describedby="brandName-error"/>
+            <div id="brandName-error" aria-live="polite" aria-atomic="true">
+              {errors?.brandName && <p className="text-sm font-medium text-destructive">{errors.brandName}</p>}
             </div>
         </div>
         <div className="space-y-2">
@@ -348,10 +357,6 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
               {errors?.boatDetails && <p className="text-sm font-medium text-destructive">{errors.boatDetails}</p>}
             </div>
         </div>
-         <div className="space-y-2">
-            <Label htmlFor="brandName">Brand Name</Label>
-            <Input id="brandName" value={brandName} disabled />
-        </div>
         <div className="space-y-2">
             <Label htmlFor="totalQuantityInTons">Total Quantity Available (Tons, Optional)</Label>
             <Input id="totalQuantityInTons" type="number" value={totalQuantityInTons} onChange={(e) => setTotalQuantityInTons(e.target.value)} placeholder="e.g., 10" aria-describedby="totalQuantityInTons-error" />
@@ -359,16 +364,15 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
               {errors?.totalQuantityInTons && <p className="text-sm font-medium text-destructive">{errors.totalQuantityInTons}</p>}
             </div>
         </div>
-      </div>
-      
-       <div className="space-y-2">
+        <div className="space-y-2">
             <Label htmlFor="pricePerKg">Price Per Kg (₹, Optional)</Label>
             <Input id="pricePerKg" type="number" value={pricePerKg} onChange={(e) => setPricePerKg(e.target.value)} placeholder="Leave blank for 0, or enter e.g., 250" aria-describedby="pricePerKg-error" />
             <div id="pricePerKg-error" aria-live="polite" aria-atomic="true">
               {errors?.pricePerKg && <p className="text-sm font-medium text-destructive">{errors.pricePerKg}</p>}
             </div>
         </div>
-
+      </div>
+      
       <div className="space-y-4">
         <Label>Product Media (Photos)</Label>
         
