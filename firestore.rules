@@ -36,6 +36,13 @@ service cloud.firestore {
     }
 
     /**
+     * @description Checks if the authenticated user is an admin.
+     */
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.phone_number == '+919892334681';
+    }
+
+    /**
      * @description Checks if the authenticated user's UID matches the provided user ID.
      * @param {string} userId The user ID to compare against the authenticated user's UID.
      * @returns {boolean} True if the user is signed in and the UID matches, false otherwise.
@@ -59,6 +66,11 @@ service cloud.firestore {
      */
     function isCorrectSeller() {
       return request.resource.data.sellerId == request.auth.uid;
+    }
+
+    // Global Admin Rule: Admins can read/write everything.
+    match /{document=**} {
+      allow read, write: if isAdmin();
     }
 
     /**

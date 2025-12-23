@@ -3,8 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, User, Anchor, IndianRupee, Calendar, Package, Camera } from 'lucide-react';
 import type { FishListing } from '@/app/types';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { cn, formatToIST } from '@/lib/utils';
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
 
 interface FishCardProps {
@@ -64,7 +63,7 @@ export function FishCard({ listing }: FishCardProps) {
                 </div>
                 <div className="flex items-center gap-1.5">
                     <Calendar className="h-3.5 w-3.5" />
-                    <span>{listing.listedDate ? format(new Date(listing.listedDate), 'MMM d') : ''}</span>
+                    <span className="truncate max-w-[120px]">{listing.listedDate ? formatToIST(listing.listedDate) : ''}</span>
                 </div>
             </div>
         </div>
@@ -72,5 +71,3 @@ export function FishCard({ listing }: FishCardProps) {
     </Link>
   );
 }
-
-    

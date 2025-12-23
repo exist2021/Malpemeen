@@ -17,6 +17,7 @@ export default function SellPage() {
     const [pricePerKg, setPricePerKg] = useState('');
     const [totalQuantityInTons, setTotalQuantityInTons] = useState('');
     const [boatDetails, setBoatDetails] = useState<FishListing['boatDetails'] | ''>('');
+    const [portDetails, setPortDetails] = useState<FishListing['portDetails']>('Malpe Port');
     const [mediaUrls, setMediaUrls] = useState<string[]>([]);
     
   return (
@@ -43,6 +44,7 @@ export default function SellPage() {
                     pricePerKg,
                     totalQuantityInTons,
                     boatDetails,
+                    portDetails,
                     mediaUrls,
                 }}
                 setFormState={{
@@ -50,6 +52,7 @@ export default function SellPage() {
                     setPricePerKg,
                     setTotalQuantityInTons,
                     setBoatDetails,
+                    setPortDetails,
                     setMediaUrls,
                 }}
              />

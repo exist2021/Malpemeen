@@ -49,7 +49,8 @@ export function SellerAccountForm({ onSave }: SellerAccountFormProps) {
         phoneNumber: '',
         address: '',
         logoUrl: '',
-        portDetails: '',
+        // Default to Malpe Port if not set
+        portDetails: 'Malpe Port',
     });
 
     useEffect(() => {
@@ -61,7 +62,8 @@ export function SellerAccountForm({ onSave }: SellerAccountFormProps) {
                 phoneNumber: profile.phoneNumber || '',
                 address: profile.address || '',
                 logoUrl: profile.logoUrl || '',
-                portDetails: profile.portDetails || '',
+                // Default to Malpe Port if not set in profile
+                portDetails: profile.portDetails || 'Malpe Port',
             });
         }
     }, [profile]);

@@ -33,7 +33,8 @@ export default function SellerLoginPage() {
   const [contactName, setContactName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [address, setAddress] = useState('');
-  const [portDetails, setPortDetails] = useState<FishListing['portDetails'] | ''>('');
+  // Default port to Malpe Port
+  const [portDetails, setPortDetails] = useState<FishListing['portDetails'] | ''>('Malpe Port');
   const [phone, setPhone] = useState('');
   const router = useRouter();
   const { auth, firestore } = useFirebase();

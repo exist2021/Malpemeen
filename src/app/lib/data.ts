@@ -13,11 +13,11 @@ export async function getFishListings(): Promise<FishListing[]> {
   const { firestore } = initializeFirebase();
   const listingsCol = collection(firestore, 'fishListings');
   
-  // Calculate the timestamp for 12 hours ago
-  const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
+  // Calculate the timestamp for 6 hours ago
+  const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
 
   // Query for listings created after the calculated timestamp
-  const q = query(listingsCol, where('listedDate', '>', twelveHoursAgo), orderBy('listedDate', 'desc'));
+  const q = query(listingsCol, where('listedDate', '>', sixHoursAgo), orderBy('listedDate', 'desc'));
 
   try {
     const querySnapshot = await getDocs(q);
@@ -44,7 +44,7 @@ export async function getSellerFishListings(sellerId: string): Promise<FishListi
   const { firestore } = initializeFirebase();
   const listingsCol = collection(firestore, 'fishListings');
   
-  const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
+  const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
 
   // Simplified query: Only fetch by sellerId to avoid composite index issues.
   const q = query(listingsCol, where("sellerId", "==", sellerId));
@@ -54,7 +54,7 @@ export async function getSellerFishListings(sellerId: string): Promise<FishListi
     const allListings = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FishListing));
     
     // Filter by date on the client-side.
-    const filteredListings = allListings.filter(listing => new Date(listing.listedDate) > twelveHoursAgo);
+    const filteredListings = allListings.filter(listing => new Date(listing.listedDate) > sixHoursAgo);
 
     // Sort by date on the client-side to ensure newest are first.
     const sortedListings = filteredListings.sort((a, b) => new Date(b.listedDate).getTime() - new Date(a.listedDate).getTime());
@@ -70,6 +70,32 @@ export async function getSellerFishListings(sellerId: string): Promise<FishListi
       errorEmitter.emit('permission-error', contextualError);
     } else {
       console.error("Error fetching seller fish listings: ", e);
+    }
+    return [];
+  }
+}
+
+export async function getAllFishListingsForAdmin(): Promise<FishListing[]> {
+  const { firestore } = initializeFirebase();
+  const listingsCol = collection(firestore, 'fishListings');
+  // Admin sees all listings, sorted by date (newest first)
+  const q = query(listingsCol, orderBy('listedDate', 'desc'));
+
+  try {
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    } as FishListing));
+  } catch (e: any) {
+     if (e.code === 'permission-denied') {
+        const contextualError = new FirestorePermissionError({
+            path: 'fishListings',
+            operation: 'list',
+        });
+        errorEmitter.emit('permission-error', contextualError);
+    } else {
+        console.error("Error fetching admin fish listings: ", e);
     }
     return [];
   }
@@ -104,7 +130,7 @@ export async function getFishListingById(id: string): Promise<FishListing | null
 }
 
 
-export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDate' | 'sellerName' | 'sellerPhone' | 'sellerAddress' | 'portDetails' | 'brandName'>): Promise<DocumentReference> {
+export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDate' | 'sellerName' | 'sellerPhone' | 'sellerAddress' | 'brandName'>): Promise<DocumentReference> {
   const { firestore } = initializeFirebase();
   
   const sellerRef = doc(firestore, 'sellers', listing.sellerId);
@@ -119,8 +145,10 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
   if (!sellerData.companyName || !sellerData.phoneNumber) {
       throw new Error("Seller profile is incomplete. Company name and phone number are required.");
   }
-   if (!sellerData.portDetails) {
-    throw new Error("Seller profile is incomplete. Port and Brand Name are required.");
+  
+  // Port is now provided in listing, or falls back to profile
+  if (!listing.portDetails && !sellerData.portDetails) {
+    throw new Error("Port details are required.");
   }
 
   const fishListingsRef = collection(firestore, `fishListings`);
@@ -130,7 +158,7 @@ export async function addFishListing(listing: Omit<FishListing, 'id' | 'listedDa
     sellerName: sellerData.companyName,
     sellerPhone: sellerData.phoneNumber,
     sellerAddress: sellerData.address || '',
-    portDetails: sellerData.portDetails,
+    portDetails: listing.portDetails || sellerData.portDetails,
     brandName: 'Malpe Meen Pvt Ltd',
     listedDate: new Date().toISOString(),
     viewCount: 0,

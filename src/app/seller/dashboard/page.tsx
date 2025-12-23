@@ -24,7 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { format } from 'date-fns';
+import { formatToIST } from '@/lib/utils';
 
 function SellerListings({ listings, setListings }: { listings: FishListing[], setListings: React.Dispatch<React.SetStateAction<FishListing[]>> }) {
     const { toast } = useToast();
@@ -98,7 +98,7 @@ function SellerListings({ listings, setListings }: { listings: FishListing[], se
                                 <p className="text-sm text-muted-foreground">
                                     {listing.pricePerKg ? `₹${listing.pricePerKg.toLocaleString()} / Kg` : 'Price not set'}
                                 </p>
-                                <p className="text-sm text-muted-foreground">Listed on {format(new Date(listing.listedDate), 'MMM d, yyyy')}</p>
+                                <p className="text-sm text-muted-foreground">Listed on {formatToIST(listing.listedDate)}</p>
                             </div>
                             <div className="flex gap-2 flex-shrink-0 mt-4 sm:mt-0">
                                 <Button asChild variant="outline" size="icon">

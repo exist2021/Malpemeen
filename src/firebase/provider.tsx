@@ -51,7 +51,7 @@ export interface UserHookResult { // Renamed from UserAuthHookResult for consist
   userError: Error | null;
 }
 
-export type UserRole = 'seller' | 'buyer' | null;
+export type UserRole = 'seller' | 'buyer' | 'admin' | null;
 
 export interface UserRoleHookResult {
     role: UserRole;
@@ -215,6 +215,14 @@ export const useUserRole = (): UserRoleHookResult => {
 
         const checkRoles = async () => {
             setIsRoleLoading(true);
+
+            // Hardcoded Admin Check
+            if (user.phoneNumber === '+919892334681') {
+                setRole('admin');
+                setIsRoleLoading(false);
+                return;
+            }
+
             const sellerRef = doc(firestore, 'sellers', user.uid);
             const sellerSnap = await getDoc(sellerRef);
             if (sellerSnap.exists()) {

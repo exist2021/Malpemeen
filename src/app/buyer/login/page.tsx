@@ -193,7 +193,8 @@ export default function BuyerLoginPage() {
                         <Label htmlFor="phone">Phone Number</Label>
                         <div className="flex h-10 w-full items-center rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
                             <PhoneIcon className="h-5 w-5 text-muted-foreground" />
-                            <span className="pl-2 pr-2 text-muted-foreground">+91</span>\n                            <Input id="phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"/>
+                            <span className="pl-2 pr-2 text-muted-foreground">+91</span>
+                            <Input id="phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"/>
                         </div>
                         <p className="text-xs text-muted-foreground">Country code (+91) is automatically used.</p>
                     </div>
@@ -211,8 +212,8 @@ export default function BuyerLoginPage() {
                         <Label htmlFor="otp">Enter OTP</Label>
                         <Input id="otp" type="text" placeholder="123456" value={otp} onChange={(e) => setOtp(e.target.value)} required />
                     </div>
-                    <Button type=\"submit\" className=\"w-full h-12 text-base\" disabled={isVerifyingOtp}>
-                        {isVerifyingOtp ? <Loader2 className=\"mr-2 h-4 w-4 animate-spin\" /> : null}
+                    <Button type="submit" className="w-full h-12 text-base" disabled={isVerifyingOtp}>
+                        {isVerifyingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                         Verify & Login
                     </Button>
                     <Button variant="link" onClick={() => { setConfirmationResult(null); setOtp(''); }}>Back to phone number</Button>

@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 @layer base {
+  /* Force static positioning on html to prevent Next.js scroll restoration issues */
+  html {
+    position: static !important;
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;

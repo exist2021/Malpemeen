@@ -37,6 +37,7 @@ interface SellerFormProps {
         pricePerKg: string;
         totalQuantityInTons: string;
         boatDetails: FishListing['boatDetails'] | '';
+        portDetails: FishListing['portDetails'];
         mediaUrls: string[];
     };
     setFormState: {
@@ -44,6 +45,7 @@ interface SellerFormProps {
         setPricePerKg: (value: string) => void;
         setTotalQuantityInTons: (value: string) => void;
         setBoatDetails: (value: FishListing['boatDetails'] | '') => void;
+        setPortDetails: (value: FishListing['portDetails']) => void;
         setMediaUrls: (value: string[] | ((prev: string[]) => string[])) => void;
     };
 }
@@ -153,10 +155,10 @@ function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: bo
 export function SellerForm({ listing, formState, setFormState }: SellerFormProps) {
   const { toast } = useToast();
   const {
-    productName, pricePerKg, totalQuantityInTons, boatDetails, mediaUrls
+    productName, pricePerKg, totalQuantityInTons, boatDetails, portDetails, mediaUrls
   } = formState;
   const {
-    setProductName, setPricePerKg, setTotalQuantityInTons, setBoatDetails, setMediaUrls
+    setProductName, setPricePerKg, setTotalQuantityInTons, setBoatDetails, setPortDetails, setMediaUrls
   } = setFormState;
 
   const [errors, setErrors] = useState<Partial<Record<keyof Omit<FishListing, 'id' | 'sellerId' | 'listedDate'>, string[]>>>({});
@@ -179,9 +181,15 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         setPricePerKg(listing.pricePerKg ? String(listing.pricePerKg) : '');
         setTotalQuantityInTons(listing.totalQuantityInTons ? String(listing.totalQuantityInTons) : '');
         setBoatDetails(listing.boatDetails || '');
+        setPortDetails(listing.portDetails);
         setMediaUrls(listing.mediaUrls || []);
     } else if (!isEditMode) {
         // Reset form for new listing
+        // Keep default port (Malpe Port) or use seller profile
+        if (sellerProfile?.portDetails) {
+            setPortDetails(sellerProfile.portDetails);
+        }
+        // Other fields
         setProductName('');
         setPricePerKg('');
         setTotalQuantityInTons('');
@@ -189,7 +197,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         setMediaUrls([]);
     }
 
-  }, [user, isUserLoading, router, isEditMode, listing, setProductName, setPricePerKg, setTotalQuantityInTons, setBoatDetails, setMediaUrls]);
+  }, [user, isUserLoading, router, isEditMode, listing, sellerProfile, setProductName, setPricePerKg, setTotalQuantityInTons, setBoatDetails, setPortDetails, setMediaUrls]);
 
 
   const removeMedia = (urlToRemove: string) => {
@@ -211,13 +219,6 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
     if (!boatDetails) newErrors.boatDetails = ['Please select a boat.'];
     if (mediaUrls.length === 0) newErrors.mediaUrls = ['Please add at least one photo.'];
 
-    // For new listings, check profile has required fields
-    if (!isEditMode && !sellerProfile.portDetails) {
-        toast({ variant: 'destructive', title: 'Profile Incomplete', description: 'Please set your Port in your Account Settings before listing.'});
-        return;
-    }
-
-
     if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
         toast({
@@ -238,8 +239,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
               boatDetails: boatDetails as FishListing['boatDetails'],
               mediaUrls: mediaUrls,
               pricePerKg: pricePerKg === '' ? 0 : Number(pricePerKg),
-              // Port and Brand are locked for editing
-              portDetails: listing.portDetails,
+              portDetails: portDetails,
               brandName: listing.brandName,
             };
              if (totalQuantityInTons !== '') {
@@ -260,6 +260,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
               sellerId: user.uid,
               pricePerKg: pricePerKg === '' ? 0 : Number(pricePerKg),
               totalQuantityInTons: totalQuantityInTons === '' ? 0 : Number(totalQuantityInTons),
+              portDetails: portDetails,
             };
             const newListingRef = await addFishListing(newListingData);
             toast({
@@ -277,8 +278,6 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
           errorMessage = error.message;
         }
 
-        // The global error handler for FirestorePermissionError will catch permission issues
-        // so we only need to toast other generic errors.
         if (!error.message.includes('permission-denied')) {
             toast({
               variant: 'destructive',
@@ -320,12 +319,19 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             </div>
         </div>
         
-        <div className="space-y-2 p-3 bg-muted rounded-md border">
-            <Label>Port</Label>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                 <Anchor className="h-4 w-4" />
-                 <p className="font-semibold">{isEditMode && listing ? listing.portDetails : sellerProfile?.portDetails}</p>
-            </div>
+        <div className="space-y-2">
+            <Label htmlFor="portDetails">Port</Label>
+            <Select value={portDetails} onValueChange={(value) => setPortDetails(value as FishListing['portDetails'])} required>
+              <SelectTrigger id="portDetails">
+                <SelectValue placeholder="Select a port" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Malpe Port">Malpe Port</SelectItem>
+                <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
+                <SelectItem value="Kochi Port">Kochi Port</SelectItem>
+                <SelectItem value="Hyderabad Port">Hyderabad Port</SelectItem>
+              </SelectContent>
+            </Select>
         </div>
 
         <div className="space-y-2">

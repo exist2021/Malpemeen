@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Phone, Calendar, User, ArrowLeft, Anchor, Ship, Info, Tag, Copyright, IndianRupee, MapPin, Scale } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/layout/header';
-import { format } from 'date-fns';
+import { formatToIST } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { useUser } from '@/firebase';
 
@@ -193,7 +193,7 @@ export default function ListingDetailPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                         <DetailItem icon={IndianRupee} label="Price Per Kg" value={listing.pricePerKg ? `₹${listing.pricePerKg.toLocaleString()}` : 'N/A'} />
                         <DetailItem icon={Scale} label="Total Quantity" value={listing.totalQuantityInTons ? `${listing.totalQuantityInTons} Tons` : 'N/A'} />
-                        <DetailItem icon={Calendar} label="Listed Date" value={listing.listedDate ? format(new Date(listing.listedDate), 'MMMM d, yyyy') : 'N/A'} />
+                        <DetailItem icon={Calendar} label="Listed Date" value={listing.listedDate ? formatToIST(listing.listedDate) : 'N/A'} />
                         <DetailItem icon={User} label="Seller" value={listing.sellerName} />
                         <DetailItem icon={Anchor} label="Port Details" value={listing.portDetails} />
                         <DetailItem icon={Ship} label="Boat" value={listing.boatDetails} />
