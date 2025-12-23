@@ -366,14 +366,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {mediaUrls.map((url, index) => (
                 <div key={`${url}-${index}`} className="relative aspect-square">
-                   <Image 
-                    src={url} 
-                    alt="Product media" 
-                    fill 
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="rounded-md object-cover" 
-                    data-ai-hint="fish"
-                   />
+                   <Image src={url} alt="Product media" fill className="rounded-md object-cover" data-ai-hint="fish"/>
 
                     <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeMedia(url)}>
                         <X className="h-4 w-4" />
@@ -382,14 +375,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             ))}
              {(mediaUrls.length === 0) && (
                 <div className="relative aspect-square col-span-2 sm:col-span-3">
-                    <Image 
-                        src="https://images.unsplash.com/photo-1559106037-5435fac0c497?q=80&w=2070&auto=format&fit=crop" 
-                        alt="Placeholder fish" 
-                        fill 
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className="rounded-md object-cover" 
-                        data-ai-hint="fish market"
-                    />
+                    <Image src="https://images.unsplash.com/photo-1559106037-5435fac0c497?q=80&w=2070&auto=format&fit=crop" alt="Placeholder fish" fill className="rounded-md object-cover" data-ai-hint="fish market"/>
                 </div>
             )}
         </div>
