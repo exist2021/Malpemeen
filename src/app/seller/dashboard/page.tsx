@@ -82,7 +82,13 @@ function SellerListings({ listings, setListings }: { listings: FishListing[], se
                         <Card key={listing.id} className="flex flex-col sm:flex-row items-center p-4 gap-4 hover:shadow-md transition-shadow">
                             <div className="relative h-24 w-24 rounded-md overflow-hidden bg-muted flex-shrink-0 flex items-center justify-center">
                                 {firstMediaUrl ? (
-                                    <Image src={firstMediaUrl} alt={listing.productName} layout="fill" className="object-cover" />
+                                    <Image 
+                                        src={firstMediaUrl} 
+                                        alt={listing.productName} 
+                                        fill 
+                                        sizes="(max-width: 640px) 100px, 150px"
+                                        className="object-cover" 
+                                    />
                                 ): (
                                     <Camera className="h-8 w-8 text-muted-foreground" />
                                 )}
