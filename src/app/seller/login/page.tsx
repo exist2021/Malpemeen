@@ -177,6 +177,7 @@ export default function SellerLoginPage() {
           src="https://cdn.pixabay.com/photo/2018/01/05/02/47/fishing-3062034_1280.jpg"
           alt="Fishing boat at sea"
           fill
+          sizes="100vw"
           className="object-cover"
           data-ai-hint="fishing boat"
         />
@@ -298,6 +299,7 @@ export default function SellerLoginPage() {
             src="https://cdn.pixabay.com/photo/2018/01/05/02/47/fishing-3062034_1280.jpg"
             alt="Fishing boat at sea"
             fill
+            sizes="50vw"
             className="object-cover"
             data-ai-hint="fishing boat"
             />
