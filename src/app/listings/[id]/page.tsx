@@ -9,7 +9,7 @@ import type { FishListing } from '@/app/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Button } from '@/components/ui/button';
-import { Phone, Calendar, User, ArrowLeft, Anchor, Ship, Info, Tag, Copyright, IndianRupee, MapPin, Scale } from 'lucide-react';
+import { Phone, Calendar, User, ArrowLeft, Anchor, Ship, Info, Tag, Copyright, IndianRupee, MapPin, Scale, Video } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/layout/header';
 import { formatToIST } from '@/lib/utils';
@@ -130,7 +130,7 @@ export default function ListingDetailPage() {
     );
   }
   
-  const hasMedia = listing.mediaUrls && Array.isArray(listing.mediaUrls) && listing.mediaUrls.length > 0;
+  const hasMedia = (listing.mediaUrls && Array.isArray(listing.mediaUrls) && listing.mediaUrls.length > 0) || listing.videoUrl;
   const isOwner = user?.uid === listing.sellerId;
 
   return (
@@ -149,7 +149,8 @@ export default function ListingDetailPage() {
                <Carousel className="w-full">
                 <CarouselContent>
                   {hasMedia ? (
-                    listing.mediaUrls.map((url, index) => (
+                    <>
+                    {listing.mediaUrls?.map((url, index) => (
                       <CarouselItem key={index}>
                         <div className="relative aspect-square w-full">
                             <Image
@@ -162,7 +163,20 @@ export default function ListingDetailPage() {
                             />
                         </div>
                       </CarouselItem>
-                    ))
+                    ))}
+                    {listing.videoUrl && (
+                        <CarouselItem key="video">
+                             <div className="relative aspect-square w-full bg-black rounded-lg flex items-center justify-center">
+                                <video 
+                                    src={listing.videoUrl} 
+                                    className="w-full h-full object-contain" 
+                                    controls 
+                                    playsInline
+                                />
+                             </div>
+                        </CarouselItem>
+                    )}
+                    </>
                   ) : (
                     <CarouselItem>
                       <div className="relative aspect-square w-full bg-muted flex items-center justify-center rounded-lg">
@@ -171,7 +185,7 @@ export default function ListingDetailPage() {
                     </CarouselItem>
                   )}
                 </CarouselContent>
-                {hasMedia && listing.mediaUrls.length > 1 && (
+                {hasMedia && ((listing.mediaUrls?.length || 0) + (listing.videoUrl ? 1 : 0)) > 1 && (
                     <>
                         <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2" />
                         <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2" />

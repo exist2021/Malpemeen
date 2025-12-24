@@ -7,9 +7,9 @@ import { addFishListing, updateFishListing } from '@/app/lib/data';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Camera, Loader2, X, Upload, Video, CameraIcon, Circle, Check, Anchor, Copyright } from 'lucide-react';
+import { Camera, Loader2, X, Video } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useUser, useSellerProfile } from '@/firebase';
+import { useUser, useSellerProfile, useStorage } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import type { FishListing } from '@/app/types';
 import {
@@ -19,15 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 
 interface SellerFormProps {
@@ -39,6 +31,7 @@ interface SellerFormProps {
         boatDetails: FishListing['boatDetails'] | '';
         portDetails: FishListing['portDetails'];
         mediaUrls: string[];
+        videoUrl: string;
     };
     setFormState: {
         setProductName: (value: string) => void;
@@ -47,289 +40,146 @@ interface SellerFormProps {
         setBoatDetails: (value: FishListing['boatDetails'] | '') => void;
         setPortDetails: (value: FishListing['portDetails']) => void;
         setMediaUrls: (value: string[] | ((prev: string[]) => string[])) => void;
+        setVideoUrl: (value: string) => void;
     };
 }
-
-function CameraCaptureDialog({ open, onOpenChange, onMediaCaptured }: { open: boolean, onOpenChange: (open: boolean) => void, onMediaCaptured: (url: string) => void }) {
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const [hasCameraPermission, setHasCameraPermission] = useState(false);
-    const { toast } = useToast();
-
-    useEffect(() => {
-        let stream: MediaStream | null = null;
-        
-        const getCameraPermission = async () => {
-            if (!open || !navigator.mediaDevices) return;
-            try {
-                // Request the rear-facing camera first
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                setHasCameraPermission(true);
-                if (videoRef.current) {
-                    videoRef.current.srcObject = stream;
-                }
-            } catch (error) {
-                console.error('Error accessing rear camera, trying default:', error);
-                // Fallback to default camera if environment is not available
-                 try {
-                     stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                     setHasCameraPermission(true);
-                     if (videoRef.current) {
-                        videoRef.current.srcObject = stream;
-                     }
-                 } catch (finalError) {
-                    console.error('Error accessing any camera:', finalError);
-                    setHasCameraPermission(false);
-                    toast({
-                        variant: 'destructive',
-                        title: 'Camera Access Denied',
-                        description: 'Please enable camera permissions in your browser settings.',
-                    });
-                 }
-            }
-        };
-
-        getCameraPermission();
-
-        return () => {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
-        };
-    }, [open, toast]);
-
-    const handleCapturePhoto = () => {
-        if (videoRef.current) {
-            const canvas = document.createElement('canvas');
-            canvas.width = videoRef.current.videoWidth;
-            canvas.height = videoRef.current.videoHeight;
-            const context = canvas.getContext('2d');
-            if (context) {
-                context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-                onMediaCaptured(canvas.toDataURL('image/jpeg'));
-                onOpenChange(false);
-            }
-        }
-    };
-
-    return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[625px]">
-                <DialogHeader>
-                    <DialogTitle>Live Capture</DialogTitle>
-                    <DialogDescription>
-                        Capture a photo of your product.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                     <div className="relative w-full aspect-video bg-black rounded-md overflow-hidden">
-                        <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
-                         {!hasCameraPermission && (
-                             <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-black/80 text-white p-4">
-                                 <CameraIcon className="h-10 w-10 mb-4" />
-                                 <p className="text-center">Waiting for camera permission...</p>
-                                 <p className="text-xs text-muted-foreground mt-2 text-center">Please allow camera access when prompted by your browser.</p>
-                             </div>
-                        )}
-                    </div>
-                    {!hasCameraPermission && open && (
-                        <Alert variant="destructive">
-                            <AlertTitle>Camera Access Required</AlertTitle>
-                            <AlertDescription>
-                                Please allow camera access in your browser to use this feature.
-                            </AlertDescription>
-                        </Alert>
-                    )}
-                </div>
-                <DialogFooter>
-                     <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                    <Button type="button" onClick={handleCapturePhoto} disabled={!hasCameraPermission}>
-                        <CameraIcon className="mr-2 h-4 w-4" /> Capture Photo
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
-}
-
 
 export function SellerForm({ listing, formState, setFormState }: SellerFormProps) {
   const { toast } = useToast();
   const {
-    productName, pricePerKg, totalQuantityInTons, boatDetails, portDetails, mediaUrls
+    productName, pricePerKg, totalQuantityInTons, boatDetails, portDetails, mediaUrls, videoUrl
   } = formState;
   const {
-    setProductName, setPricePerKg, setTotalQuantityInTons, setBoatDetails, setPortDetails, setMediaUrls
+    setProductName, setPricePerKg, setTotalQuantityInTons, setBoatDetails, setPortDetails, setMediaUrls, setVideoUrl
   } = setFormState;
 
-  const [errors, setErrors] = useState<Partial<Record<keyof Omit<FishListing, 'id' | 'sellerId' | 'listedDate'>, string[]>>>({});
   const { user, isUserLoading } = useUser();
   const { profile: sellerProfile, isLoading: isSellerProfileLoading } = useSellerProfile();
+  const storage = useStorage();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const isEditMode = !!listing;
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [isCameraOpen, setCameraOpen] = useState(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/seller/login');
     }
+  }, [user, isUserLoading, router]);
 
-    if (isEditMode && listing) {
-        setProductName(listing.productName || '');
-        setPricePerKg(listing.pricePerKg ? String(listing.pricePerKg) : '');
-        setTotalQuantityInTons(listing.totalQuantityInTons ? String(listing.totalQuantityInTons) : '');
-        setBoatDetails(listing.boatDetails || '');
-        setPortDetails(listing.portDetails);
-        setMediaUrls(listing.mediaUrls || []);
-    } else if (!isEditMode) {
-        // Reset form for new listing
-        // Keep default port (Malpe Port) or use seller profile
-        if (sellerProfile?.portDetails) {
-            setPortDetails(sellerProfile.portDetails);
-        }
-        // Other fields
-        setProductName('');
-        setPricePerKg('');
-        setTotalQuantityInTons('');
-        setBoatDetails('');
-        setMediaUrls([]);
-    }
+  const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              setMediaUrls(prev => [...prev, reader.result as string]);
+          };
+          reader.readAsDataURL(file);
+      }
+  };
 
-  }, [user, isUserLoading, router, isEditMode, listing, sellerProfile, setProductName, setPricePerKg, setTotalQuantityInTons, setBoatDetails, setPortDetails, setMediaUrls]);
-
+  const handleVideoFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+          setVideoFile(file);
+          setVideoUrl(URL.createObjectURL(file));
+      }
+  };
 
   const removeMedia = (urlToRemove: string) => {
     setMediaUrls(prev => prev.filter(url => url !== urlToRemove));
   }
 
+  const removeVideo = () => {
+      setVideoUrl('');
+      setVideoFile(null);
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!user || !sellerProfile) {
-      toast({ variant: 'destructive', title: 'You must be logged in and have a complete profile.' });
-      return;
-    }
+    if (!user || !sellerProfile) return;
 
-    const newErrors: any = {};
-    if (!productName) newErrors.productName = ['Product Name is required.'];
-    if (pricePerKg && (isNaN(Number(pricePerKg)) || Number(pricePerKg) < 0)) newErrors.pricePerKg = ['Please enter a valid price.'];
-    if (totalQuantityInTons && (isNaN(Number(totalQuantityInTons)) || Number(totalQuantityInTons) <= 0)) newErrors.totalQuantityInTons = ['Please enter a valid quantity.'];
-    if (!boatDetails) newErrors.boatDetails = ['Please select a boat.'];
-    if (mediaUrls.length === 0) newErrors.mediaUrls = ['Please add at least one photo.'];
-
-    if (Object.keys(newErrors).length > 0) {
-        setErrors(newErrors);
-        toast({
-            variant: 'destructive',
-            title: `Failed to ${isEditMode ? 'update' : 'create'} listing.`,
-            description: 'Please check the fields.',
-        });
-        return;
-    }
-    
-    setErrors({});
+    setIsUploading(true);
 
     startTransition(async () => {
       try {
-        if (isEditMode && listing) {
-            const listingUpdateData: Partial<Omit<FishListing, 'id'>> = {
-              productName,
-              boatDetails: boatDetails as FishListing['boatDetails'],
-              mediaUrls: mediaUrls,
-              pricePerKg: pricePerKg === '' ? 0 : Number(pricePerKg),
-              portDetails: portDetails,
-              brandName: listing.brandName,
-            };
-             if (totalQuantityInTons !== '') {
-              listingUpdateData.totalQuantityInTons = Number(totalQuantityInTons);
-            }
+        let finalVideoUrl = videoUrl;
 
-            await updateFishListing(listing.id, listingUpdateData);
-            toast({
-              title: 'Success!',
-              description: 'Your fish listing has been updated.',
-            });
-            router.push(`/listings/${listing.id}`);
+        if (videoFile && storage) {
+            try {
+                // Simple upload with no complex progress listeners
+                const storageRef = ref(storage, `listings/${user.uid}/${Date.now()}_${videoFile.name}`);
+                
+                // Add a timeout of 20 seconds for the upload
+                const uploadPromise = uploadBytes(storageRef, videoFile);
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error("Timeout")), 20000)
+                );
+
+                const snapshot = await Promise.race([uploadPromise, timeoutPromise]) as any;
+                finalVideoUrl = await getDownloadURL(snapshot.ref);
+            } catch (err) {
+                console.error("Video upload failed or timed out, proceeding without it", err);
+                finalVideoUrl = ""; // Fallback: save without video so button isn't stuck
+                toast({
+                    variant: "destructive",
+                    title: "Video upload skipped",
+                    description: "The upload took too long or failed. Listing created without video."
+                });
+            }
+        }
+
+        const listingData = {
+          productName,
+          boatDetails: boatDetails as any,
+          mediaUrls,
+          videoUrl: finalVideoUrl,
+          pricePerKg: Number(pricePerKg) || 0,
+          totalQuantityInTons: Number(totalQuantityInTons) || 0,
+          portDetails,
+        };
+
+        if (isEditMode && listing) {
+            await updateFishListing(listing.id, listingData);
         } else {
-             const newListingData = {
-              productName,
-              boatDetails: boatDetails as FishListing['boatDetails'],
-              mediaUrls: mediaUrls,
-              sellerId: user.uid,
-              pricePerKg: pricePerKg === '' ? 0 : Number(pricePerKg),
-              totalQuantityInTons: totalQuantityInTons === '' ? 0 : Number(totalQuantityInTons),
-              portDetails: portDetails,
-            };
-            const newListingRef = await addFishListing(newListingData);
-            toast({
-              title: 'Success!',
-              description: 'Your fish listing has been created.',
-            });
-            router.push(`/listings/${newListingRef.id}`);
+            await addFishListing({ ...listingData, sellerId: user.uid });
         }
         
-        router.refresh();
+        setIsUploading(false);
+        router.push('/seller/dashboard');
         
       } catch (error: any) {
-        let errorMessage = 'Something went wrong. Please try again.';
-        if (error instanceof Error) {
-          errorMessage = error.message;
-        }
-
-        if (!error.message.includes('permission-denied')) {
-            toast({
-              variant: 'destructive',
-              title: `Error ${isEditMode ? 'Updating' : 'Creating'} Listing`,
-              description: errorMessage,
-            });
-        }
+        setIsUploading(false);
+        console.error("SUBMISSION ERROR:", error);
+        toast({ variant: 'destructive', title: 'Error', description: error.message });
       }
     });
   };
   
-  if (isUserLoading || isSellerProfileLoading || !user) {
-    return <p>Loading...</p>
-  }
-
-  const handleMediaCaptured = (url: string) => {
-    if (url && !mediaUrls.includes(url)) {
-        setMediaUrls(prev => [...prev, url]);
-    }
-  };
+  if (isUserLoading || isSellerProfileLoading || !user) return <p>Loading...</p>;
 
   return (
     <form onSubmit={handleSubmit} className="mt-2 space-y-8">
-       <CameraCaptureDialog open={isCameraOpen} onOpenChange={setCameraOpen} onMediaCaptured={handleMediaCaptured} />
+      <input type="file" accept="image/*" capture="environment" ref={photoInputRef} className="hidden" onChange={handlePhotoCapture} />
+      <input type="file" accept="video/*" capture="environment" ref={videoInputRef} className="hidden" onChange={handleVideoFile} />
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
         <div className="space-y-2 md:col-span-2">
             <Label htmlFor="productName">Product Name</Label>
-            <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="e.g., Sardine" required aria-describedby="productName-error" />
-            <div id="productName-error" aria-live="polite" aria-atomic="true">
-              {errors?.productName && <p className="text-sm font-medium text-destructive">{errors.productName}</p>}
-            </div>
-        </div>
-
-        <div className="space-y-2 p-3 bg-muted rounded-md border">
-            <Label>Brand Name</Label>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Copyright className="h-4 w-4" />
-                <p className="font-semibold">Malpe Meen Pvt Ltd</p>
-            </div>
+            <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="e.g., Sardine" required />
         </div>
         
         <div className="space-y-2">
             <Label htmlFor="portDetails">Port</Label>
-            <Select value={portDetails} onValueChange={(value) => setPortDetails(value as FishListing['portDetails'])} required>
-              <SelectTrigger id="portDetails">
-                <SelectValue placeholder="Select a port" />
-              </SelectTrigger>
+            <Select value={portDetails} onValueChange={(value) => setPortDetails(value as any)} required>
+              <SelectTrigger id="portDetails"><SelectValue placeholder="Select a port" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="Malpe Port">Malpe Port</SelectItem>
-                <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
-                <SelectItem value="Kochi Port">Kochi Port</SelectItem>
-                <SelectItem value="Hyderabad Port">Hyderabad Port</SelectItem>
+                {["Malpe Port", "Mangalore Port", "Kochi Port", "Hyderabad Port"].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
               </SelectContent>
             </Select>
         </div>
@@ -337,83 +187,46 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         <div className="space-y-2">
             <Label htmlFor="boatDetails">Boat Details</Label>
             <Select value={boatDetails} onValueChange={(value) => setBoatDetails(value as any)} required>
-              <SelectTrigger id="boatDetails" aria-describedby="boatDetails-error">
-                <SelectValue placeholder="Select a boat type" />
-              </SelectTrigger>
+              <SelectTrigger id="boatDetails"><SelectValue placeholder="Select a boat type" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="Ashok Leyland">Ashok Leyland</SelectItem>
-                <SelectItem value="Persian Boat">Persian Boat</SelectItem>
-                <SelectItem value="370-Boat">370-Boat</SelectItem>
+                {["Ashok Leyland", "Persian Boat", "370-Boat"].map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
               </SelectContent>
             </Select>
-            <div id="boatDetails-error" aria-live="polite" aria-atomic="true">
-              {errors?.boatDetails && <p className="text-sm font-medium text-destructive">{errors.boatDetails}</p>}
-            </div>
         </div>
         <div className="space-y-2">
-            <Label htmlFor="totalQuantityInTons">Total Quantity Available (Tons, Optional)</Label>
-            <Input id="totalQuantityInTons" type="number" value={totalQuantityInTons} onChange={(e) => setTotalQuantityInTons(e.target.value)} placeholder="e.g., 10" aria-describedby="totalQuantityInTons-error" />
-             <div id="totalQuantityInTons-error" aria-live="polite" aria-atomic="true">
-              {errors?.totalQuantityInTons && <p className="text-sm font-medium text-destructive">{errors.totalQuantityInTons}</p>}
-            </div>
+            <Label htmlFor="totalQuantityInTons">Quantity (Tons)</Label>
+            <Input id="totalQuantityInTons" type="number" value={totalQuantityInTons} onChange={(e) => setTotalQuantityInTons(e.target.value)} />
         </div>
         <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="pricePerKg">Price Per Kg (₹, Optional)</Label>
-            <Input id="pricePerKg" type="number" value={pricePerKg} onChange={(e) => setPricePerKg(e.target.value)} placeholder="Leave blank if price is negotiable" aria-describedby="pricePerKg-error" />
-            <div id="pricePerKg-error" aria-live="polite" aria-atomic="true">
-              {errors?.pricePerKg && <p className="text-sm font-medium text-destructive">{errors.pricePerKg}</p>}
-            </div>
+            <Label htmlFor="pricePerKg">Price Per Kg (₹)</Label>
+            <Input id="pricePerKg" type="number" value={pricePerKg} onChange={(e) => setPricePerKg(e.target.value)} />
         </div>
       </div>
       
       <div className="space-y-4">
-        <Label>Product Media (Photos)</Label>
-        
+        <Label>Photos & Video</Label>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {mediaUrls.map((url, index) => (
-                <div key={`${url}-${index}`} className="relative aspect-square">
-                   <Image 
-                    src={url} 
-                    alt="Product media" 
-                    fill 
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="rounded-md object-cover" 
-                    data-ai-hint="fish"
-                   />
-
-                    <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeMedia(url)}>
-                        <X className="h-4 w-4" />
-                    </Button>
+                <div key={index} className="relative aspect-square">
+                   <Image src={url} alt="Product" fill className="rounded-md object-cover" />
+                   <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeMedia(url)}><X className="h-4 w-4" /></Button>
                 </div>
             ))}
-             {(mediaUrls.length === 0) && (
-                <div className="relative aspect-square col-span-2 sm:col-span-3">
-                    <Image 
-                        src="https://images.unsplash.com/photo-1559106037-5435fac0c497?q=80&w=2070&auto=format&fit=crop" 
-                        alt="Placeholder fish" 
-                        fill 
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className="rounded-md object-cover" 
-                        data-ai-hint="fish market"
-                    />
+            {videoUrl && (
+                <div className="relative aspect-square">
+                    <video key={videoUrl} src={videoUrl} className="w-full h-full object-cover rounded-md" controls playsInline />
+                    <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={removeVideo}><X className="h-4 w-4" /></Button>
                 </div>
             )}
         </div>
-        
         <div className="flex flex-col sm:flex-row items-center gap-2">
-          <Button type="button" variant="outline" onClick={() => setCameraOpen(true)} className="w-full">
-            <Camera className="mr-2 h-4 w-4" />
-            Use Camera
-          </Button>
-        </div>
-        <div id="mediaUrls-error" aria-live="polite" aria-atomic="true">
-          {errors?.mediaUrls && <p className="text-sm font-medium text-destructive">{errors.mediaUrls}</p>}
+          <Button type="button" variant="outline" onClick={() => photoInputRef.current?.click()} className="w-full h-12"><Camera className="mr-2 h-4 w-4" /> Photo</Button>
+          <Button type="button" variant="outline" onClick={() => videoInputRef.current?.click()} className="w-full h-12"><Video className="mr-2 h-4 w-4" /> Video</Button>
         </div>
       </div>
 
-      <Button type="submit" disabled={isPending} className="w-full">
-        {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-        {isEditMode ? 'Update Listing' : 'List My Catch'}
+      <Button type="submit" disabled={isPending || isUploading} className="w-full h-14 text-xl font-bold">
+        {isUploading ? <><Loader2 className="animate-spin mr-2" /> Saving Listing...</> : (isEditMode ? 'Update Listing' : 'List My Catch')}
       </Button>
     </form>
   );

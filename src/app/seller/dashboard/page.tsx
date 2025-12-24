@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { getSellerFishListings, deleteFishListing } from '@/app/lib/data';
 import type { FishListing } from '@/app/types';
 import Image from 'next/image';
-import { Pencil, Trash2, Loader2, PlusCircle, List, IndianRupee, Package, Camera } from 'lucide-react';
+import { Pencil, Trash2, Loader2, PlusCircle, List, IndianRupee, Package, Camera, Video } from 'lucide-react';
 import { Header } from '@/components/layout/header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -28,6 +28,7 @@ import { formatToIST } from '@/lib/utils';
 
 function SellerListings({ listings, setListings }: { listings: FishListing[], setListings: React.Dispatch<React.SetStateAction<FishListing[]>> }) {
     const { toast } = useToast();
+    const router = useRouter();
     const [isDeleting, startDeleteTransition] = useTransition();
 
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -82,9 +83,14 @@ function SellerListings({ listings, setListings }: { listings: FishListing[], se
             <div className="space-y-4">
                 {listings.map(listing => {
                     const firstMediaUrl = listing.mediaUrls && listing.mediaUrls.length > 0 ? listing.mediaUrls[0] : null;
+                    const hasVideo = !!listing.videoUrl;
 
                     return (
-                        <Card key={listing.id} className="flex flex-col sm:flex-row items-center p-4 gap-4 hover:shadow-md transition-shadow">
+                        <Card 
+                            key={listing.id} 
+                            className="flex flex-col sm:flex-row items-center p-4 gap-4 hover:shadow-md transition-shadow cursor-pointer"
+                            onClick={() => router.push(`/listings/${listing.id}`)}
+                        >
                             <div className="relative h-24 w-24 rounded-md overflow-hidden bg-muted flex-shrink-0 flex items-center justify-center">
                                 {firstMediaUrl ? (
                                     <Image 
@@ -94,18 +100,20 @@ function SellerListings({ listings, setListings }: { listings: FishListing[], se
                                         sizes="(max-width: 640px) 100px, 150px"
                                         className="object-cover" 
                                     />
-                                ): (
+                                ) : hasVideo ? (
+                                     <Video className="h-8 w-8 text-muted-foreground" />
+                                ) : (
                                     <Camera className="h-8 w-8 text-muted-foreground" />
                                 )}
                             </div>
                             <div className="flex-grow min-w-0 text-center sm:text-left">
-                                <Link href={`/listings/${listing.id}`} className="font-semibold truncate hover:underline">{listing.productName}</Link>
+                                <span className="font-semibold truncate hover:underline">{listing.productName}</span>
                                 <p className="text-sm text-muted-foreground">
                                     {listing.pricePerKg ? `₹${listing.pricePerKg.toLocaleString()} / Kg` : 'Price not set'}
                                 </p>
                                 <p className="text-sm text-muted-foreground">Listed on {formatToIST(listing.listedDate)}</p>
                             </div>
-                            <div className="flex gap-2 flex-shrink-0 mt-4 sm:mt-0">
+                            <div className="flex gap-2 flex-shrink-0 mt-4 sm:mt-0" onClick={(e) => e.stopPropagation()}>
                                 <Button asChild variant="outline" size="icon">
                                     <Link href={`/sell/${listing.id}/edit`}>
                                         <Pencil className="h-4 w-4" />

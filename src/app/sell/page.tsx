@@ -19,7 +19,8 @@ export default function SellPage() {
     const [boatDetails, setBoatDetails] = useState<FishListing['boatDetails'] | ''>('');
     const [portDetails, setPortDetails] = useState<FishListing['portDetails']>('Malpe Port');
     const [mediaUrls, setMediaUrls] = useState<string[]>([]);
-    
+    const [videoUrl, setVideoUrl] = useState<string>('');
+
   return (
     <>
       <Header />
@@ -46,6 +47,7 @@ export default function SellPage() {
                     boatDetails,
                     portDetails,
                     mediaUrls,
+                    videoUrl
                 }}
                 setFormState={{
                     setProductName,
@@ -54,6 +56,7 @@ export default function SellPage() {
                     setBoatDetails,
                     setPortDetails,
                     setMediaUrls,
+                    setVideoUrl
                 }}
              />
           </CardContent>

@@ -26,6 +26,7 @@ export type FishListing = {
     id: string;
     sellerId: string;
     mediaUrls: string[];
+    videoUrl?: string; // Add video URL
     listedDate: string;
     sellerName?: string;
     sellerPhone?: string;

@@ -66,7 +66,7 @@ export function Header() {
     if (user) {
         let triggerContent;
         const isLoading = isSellerProfileLoading || isBuyerProfileLoading;
-        const profileName = role === 'seller' ? sellerProfile?.companyName : (role === 'buyer' ? buyerProfile?.name : 'Admin');
+        const profileName = role === 'seller' ? (sellerProfile?.contactName || sellerProfile?.companyName) : (role === 'buyer' ? buyerProfile?.name : (buyerProfile?.name || 'User'));
 
         if (isLoading) {
             triggerContent = <Skeleton className="h-9 w-9 rounded-full" />;
@@ -116,7 +116,7 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2 p-1 sm:p-2">
                     {triggerContent}
-                    <span className="font-medium hidden sm:inline-block max-w-[100px] truncate">{role === 'admin' ? 'User' : (profileName || 'Account')}</span>
+                    <span className="font-medium hidden sm:inline-block max-w-[100px] truncate">{profileName || 'Account'}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -134,7 +134,8 @@ export function Header() {
                         Admin Dashboard
                     </DropdownMenuItem>
                     )} */}
-                  {role === 'buyer' && (
+                  
+                    {/* Always allow account settings access if a buyer profile exists or if role is buyer or admin */}
                     <Dialog open={isBuyerDialogOpen} onOpenChange={setBuyerDialogOpen}>
                         <DialogTrigger asChild>
                           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -152,13 +153,13 @@ export function Header() {
                             <BuyerAccountForm onSave={() => setBuyerDialogOpen(false)} />
                         </DialogContent>
                     </Dialog>
-                  )}
+                  
                   {role === 'seller' && (
                     <Dialog open={isSellerDialogOpen} onOpenChange={setSellerDialogOpen}>
                         <DialogTrigger asChild>
                           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                 <Settings className="mr-2 h-4 w-4" />
-                                Account Settings
+                                Seller Settings
                             </DropdownMenuItem>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[400px]">

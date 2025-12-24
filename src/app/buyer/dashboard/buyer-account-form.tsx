@@ -8,8 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { updateDoc, doc } from 'firebase/firestore';
-import { useFirebase } from '@/firebase';
+import { updateDoc, doc, setDoc } from 'firebase/firestore';
+import { useFirebase, useUser } from '@/firebase';
 import { Loader2, User } from 'lucide-react';
 import type { Buyer } from '@/app/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -20,6 +20,7 @@ interface BuyerAccountFormProps {
 }
 
 export function BuyerAccountForm({ onSave }: BuyerAccountFormProps) {
+    const { user } = useUser();
     const { profile, isLoading } = useBuyerProfile();
     const { firestore } = useFirebase();
     const { toast } = useToast();
@@ -45,8 +46,16 @@ export function BuyerAccountForm({ onSave }: BuyerAccountFormProps) {
                 address: profile.address || '',
                 photoUrl: profile.photoUrl || '',
             });
+        } else if (user) {
+            // Pre-fill from user object if profile doesn't exist yet
+            setFormData(prev => ({
+                ...prev,
+                phoneNumber: user.phoneNumber || '',
+                email: user.email || '',
+                name: user.displayName || '',
+            }));
         }
-    }, [profile]);
+    }, [profile, user]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -66,32 +75,54 @@ export function BuyerAccountForm({ onSave }: BuyerAccountFormProps) {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!profile || !firestore) return;
+        // We need the user authenticated, even if profile doesn't exist yet (first time edit)
+        if (!user || !firestore) return;
 
-        const updatedData: Partial<Buyer> = {};
-        if (formData.name !== profile.name) updatedData.name = formData.name;
-        if (formData.email !== profile.email) updatedData.email = formData.email;
-        if (formData.phoneNumber !== profile.phoneNumber) updatedData.phoneNumber = formData.phoneNumber;
-        if (formData.place !== profile.place) updatedData.place = formData.place;
-        if (formData.address !== profile.address) updatedData.address = formData.address;
-        if (formData.photoUrl !== profile.photoUrl) updatedData.photoUrl = formData.photoUrl;
-
-        if (Object.keys(updatedData).length === 0) {
-            toast({ title: 'No changes to save.' });
-            onSave?.();
-            return;
-        }
-        
         startTransition(async () => {
             try {
-                const docRef = doc(firestore, 'buyers', profile.id);
-                await updateDoc(docRef, updatedData);
-                toast({
-                    title: 'Profile Updated',
-                    description: 'Your account information has been successfully updated.',
-                });
+                const docRef = doc(firestore, 'buyers', user.uid);
+                
+                // If profile exists, update only changes. 
+                // If not (e.g. admin creating profile for first time), set entire doc.
+                if (profile) {
+                    const updatedData: Partial<Buyer> = {};
+                    if (formData.name !== profile.name) updatedData.name = formData.name;
+                    if (formData.email !== profile.email) updatedData.email = formData.email;
+                    if (formData.phoneNumber !== profile.phoneNumber) updatedData.phoneNumber = formData.phoneNumber;
+                    if (formData.place !== profile.place) updatedData.place = formData.place;
+                    if (formData.address !== profile.address) updatedData.address = formData.address;
+                    if (formData.photoUrl !== profile.photoUrl) updatedData.photoUrl = formData.photoUrl;
+
+                    if (Object.keys(updatedData).length > 0) {
+                        await updateDoc(docRef, updatedData);
+                        toast({
+                            title: 'Profile Updated',
+                            description: 'Your account information has been successfully updated.',
+                        });
+                    } else {
+                        toast({ title: 'No changes to save.' });
+                    }
+                } else {
+                     // Creating new profile (e.g. for Admin)
+                     const newProfile: Buyer = {
+                         id: user.uid,
+                         name: formData.name,
+                         phoneNumber: formData.phoneNumber || user.phoneNumber || '',
+                         email: formData.email,
+                         place: formData.place,
+                         address: formData.address,
+                         photoUrl: formData.photoUrl,
+                     };
+                     await setDoc(docRef, newProfile);
+                     toast({
+                        title: 'Profile Created',
+                        description: 'Your account information has been saved.',
+                    });
+                }
+                
                 onSave?.();
             } catch (error) {
+                console.error("Profile update error:", error);
                 toast({
                     variant: 'destructive',
                     title: 'Update Failed',
@@ -102,7 +133,7 @@ export function BuyerAccountForm({ onSave }: BuyerAccountFormProps) {
     };
 
 
-    if (isLoading) {
+    if (isLoading && !user) {
         return (
             <div className="space-y-4">
                 <div className="flex justify-center">
