@@ -51,7 +51,10 @@ export function Header() {
     if (!user) return "/";
     if (role === 'buyer') return "/buyer/dashboard";
     if (role === 'seller') return "/seller/dashboard";
-    if (role === 'admin') return "/admin/dashboard";
+    // Admin still redirects to admin dashboard if clicked on logo, or maybe buyer dashboard?
+    // Let's keep it consistent, if role is admin, they probably want admin dashboard.
+    // But the user requested to hide it.
+    if (role === 'admin') return "/admin/dashboard"; 
     return "/";
   }
 
@@ -103,16 +106,17 @@ export function Header() {
                   Dashboard
                 </Button>
               )}
-              {role === 'admin' && (
+              {/* Hidden Admin Panel Button as per request */}
+              {/* {role === 'admin' && (
                 <Button variant="ghost" onClick={() => router.push('/admin/dashboard')} className="hidden sm:inline-flex">
                   Admin Panel
                 </Button>
-              )}
+              )} */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2 p-1 sm:p-2">
                     {triggerContent}
-                    <span className="font-medium hidden sm:inline-block max-w-[100px] truncate">{profileName || 'Account'}</span>
+                    <span className="font-medium hidden sm:inline-block max-w-[100px] truncate">{role === 'admin' ? 'User' : (profileName || 'Account')}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -124,12 +128,12 @@ export function Header() {
                         Dashboard
                     </DropdownMenuItem>
                     )}
-                   {role === 'admin' && (
+                   {/* {role === 'admin' && (
                     <DropdownMenuItem onClick={() => router.push('/admin/dashboard')}>
                         <LayoutDashboard className="mr-2 h-4 w-4" />
                         Admin Dashboard
                     </DropdownMenuItem>
-                    )}
+                    )} */}
                   {role === 'buyer' && (
                     <Dialog open={isBuyerDialogOpen} onOpenChange={setBuyerDialogOpen}>
                         <DialogTrigger asChild>

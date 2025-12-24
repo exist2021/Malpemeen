@@ -80,7 +80,7 @@ function FishListings({ portFilter, sellerFilter }: { portFilter: string, seller
 export default function BuyerDashboard() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
-  const [portFilter, setPortFilter] = useState('all');
+  const [portFilter, setPortFilter] = useState('Malpe Port');
   const [sellerFilter, setSellerFilter] = useState('all');
 
   // This state will hold all listings to derive sellers from

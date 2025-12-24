@@ -68,6 +68,11 @@ function SellerListings({ listings, setListings }: { listings: FishListing[], se
                 <Package className="mx-auto h-12 w-12 text-muted-foreground" />
                 <h3 className="mt-4 text-lg font-semibold text-foreground">No listings yet</h3>
                 <p className="mt-1 text-sm text-muted-foreground">Get started by creating your first listing.</p>
+                <div className="mt-6">
+                    <Button asChild>
+                        <Link href="/sell"><PlusCircle className="mr-2 h-4 w-4" /> Create New Listing</Link>
+                    </Button>
+                </div>
             </div>
         )
     }
@@ -211,7 +216,7 @@ export default function SellerDashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{seller?.companyName || 'Seller Dashboard'}</h1>
            <Button asChild>
-              <Link href="/sell"><PlusCircle className="mr-2 h-4 w-4" /> Create New</Link>
+              <Link href="/sell"><PlusCircle className="mr-2 h-4 w-4" /> Create New Listing</Link>
             </Button>
         </div>
 
@@ -243,9 +248,14 @@ export default function SellerDashboard() {
         </div>
 
          <Card>
-            <CardHeader>
-                <CardTitle>Your Listings</CardTitle>
-                <CardDescription>Manage your existing product listings below.</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Your Listings</CardTitle>
+                    <CardDescription>Manage your existing product listings below.</CardDescription>
+                </div>
+                 <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
+                    <Link href="/sell"><PlusCircle className="mr-2 h-4 w-4" /> Add New</Link>
+                 </Button>
             </CardHeader>
             <CardContent>
                 <SellerListings listings={listings} setListings={setListings} />
