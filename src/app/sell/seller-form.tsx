@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 
 interface SellerFormProps {
@@ -64,6 +64,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
   const videoInputRef = useRef<HTMLInputElement>(null);
   
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
@@ -75,24 +76,30 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
   const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-              setMediaUrls(prev => [...prev, reader.result as string]);
-          };
-          reader.readAsDataURL(file);
+          // Store the file object for later upload
+          setImageFiles(prev => [...prev, file]);
+          
+          // Create a local URL for immediate preview
+          const previewUrl = URL.createObjectURL(file);
+          setMediaUrls(prev => [...prev, previewUrl]);
       }
   };
 
   const handleVideoFile = (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
+          console.log("Video file selected:", file.name, file.size, file.type);
           setVideoFile(file);
           setVideoUrl(URL.createObjectURL(file));
       }
   };
 
-  const removeMedia = (urlToRemove: string) => {
-    setMediaUrls(prev => prev.filter(url => url !== urlToRemove));
+  const removeMedia = (urlToRemove: string, index: number) => {
+    // If it's a local object URL, find and remove the corresponding file
+    if (urlToRemove.startsWith('blob:')) {
+        setImageFiles(prev => prev.filter((_, i) => i !== index));
+    }
+    setMediaUrls(prev => prev.filter((_, i) => i !== index));
   }
 
   const removeVideo = () => {
@@ -102,34 +109,65 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!user || !sellerProfile) return;
+    console.log("Form submitted. User:", user?.uid, "SellerProfile:", sellerProfile?.id);
+    if (!user || !sellerProfile) {
+        console.error("User or seller profile missing");
+        return;
+    }
 
     setIsUploading(true);
 
     startTransition(async () => {
       try {
         let finalVideoUrl = videoUrl;
+        let finalMediaUrls = [...mediaUrls];
 
-        if (videoFile && storage) {
+        if (!storage) throw new Error("Storage service not available");
+
+        // 1. Handle Image Uploads
+        const uploadedImageUrls: string[] = [];
+        for (let i = 0; i < imageFiles.length; i++) {
+            const file = imageFiles[i];
+            const storagePath = `listings/${user.uid}/images/${Date.now()}_${file.name}`;
+            const storageRef = ref(storage, storagePath);
+            console.log(`Uploading image ${i+1}/${imageFiles.length}:`, file.name);
+            
+            const snapshot = await uploadBytes(storageRef, file);
+            const downloadUrl = await getDownloadURL(snapshot.ref);
+            uploadedImageUrls.push(downloadUrl);
+        }
+
+        // Replace local blob URLs with remote storage URLs
+        // Note: This logic assumes new images were appended. 
+        // A cleaner way is to separate existing URLs from new files.
+        finalMediaUrls = [
+            ...mediaUrls.filter(url => !url.startsWith('blob:')),
+            ...uploadedImageUrls
+        ];
+
+        // 2. Handle Video Upload
+        if (videoFile) {
             try {
-                // Simple upload with no complex progress listeners
-                const storageRef = ref(storage, `listings/${user.uid}/${Date.now()}_${videoFile.name}`);
+                console.log("Starting video upload for file:", videoFile.name, "size:", videoFile.size);
+                const storagePath = `listings/${user.uid}/videos/${Date.now()}_${videoFile.name}`;
+                const storageRef = ref(storage, storagePath);
                 
-                // Add a timeout of 20 seconds for the upload
+                console.log("Calling uploadBytes for video...");
                 const uploadPromise = uploadBytes(storageRef, videoFile);
                 const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error("Timeout")), 20000)
+                    setTimeout(() => reject(new Error("Video upload timed out (120s)")), 120000)
                 );
 
                 const snapshot = await Promise.race([uploadPromise, timeoutPromise]) as any;
                 finalVideoUrl = await getDownloadURL(snapshot.ref);
-            } catch (err) {
-                console.error("Video upload failed or timed out, proceeding without it", err);
-                finalVideoUrl = ""; // Fallback: save without video so button isn't stuck
+                console.log("Video upload successful. URL:", finalVideoUrl);
+            } catch (err: any) {
+                console.error("Video upload failed:", err);
+                finalVideoUrl = ""; 
                 toast({
                     variant: "destructive",
-                    title: "Video upload skipped",
-                    description: "The upload took too long or failed. Listing created without video."
+                    title: "Video upload failed",
+                    description: err.message || "Listing created without video."
                 });
             }
         }
@@ -137,12 +175,14 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         const listingData = {
           productName,
           boatDetails: boatDetails as any,
-          mediaUrls,
+          mediaUrls: finalMediaUrls,
           videoUrl: finalVideoUrl,
           pricePerKg: Number(pricePerKg) || 0,
           totalQuantityInTons: Number(totalQuantityInTons) || 0,
           portDetails,
         };
+
+        console.log("Saving listing data to Firestore...");
 
         if (isEditMode && listing) {
             await updateFishListing(listing.id, listingData);
@@ -150,6 +190,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             await addFishListing({ ...listingData, sellerId: user.uid });
         }
         
+        console.log("Listing saved successfully");
         setIsUploading(false);
         router.push('/seller/dashboard');
         
@@ -209,7 +250,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             {mediaUrls.map((url, index) => (
                 <div key={index} className="relative aspect-square">
                    <Image src={url} alt="Product" fill className="rounded-md object-cover" />
-                   <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeMedia(url)}><X className="h-4 w-4" /></Button>
+                   <Button type="button" size="icon" variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full" onClick={() => removeMedia(url, index)}><X className="h-4 w-4" /></Button>
                 </div>
             ))}
             {videoUrl && (
