@@ -44,6 +44,18 @@ interface SellerFormProps {
     };
 }
 
+const FISH_NAMES = [
+  "Bangude (mackerel)",
+  "Buthai ( sardine )",
+  "Anjal(king fish)",
+  "Kedar( tuna )",
+  "Yedi (crab)",
+  "Manji(pomfret)",
+  "Nang(sole fish )",
+  "Koddai ( Crocker)",
+  "Melu ( butter fish )"
+];
+
 export function SellerForm({ listing, formState, setFormState }: SellerFormProps) {
   const { toast } = useToast();
   const {
@@ -212,7 +224,16 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
         <div className="space-y-2 md:col-span-2">
             <Label htmlFor="productName">Product Name</Label>
-            <Input id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="e.g., Sardine" required />
+            <Select value={productName} onValueChange={(value) => setProductName(value)} required>
+              <SelectTrigger id="productName">
+                <SelectValue placeholder="Select fish name" />
+              </SelectTrigger>
+              <SelectContent>
+                {FISH_NAMES.map(fish => (
+                  <SelectItem key={fish} value={fish}>{fish}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
         </div>
         
         <div className="space-y-2">
