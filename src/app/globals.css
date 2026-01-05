@@ -5,7 +5,9 @@
 @layer base {
   /* Force static positioning on html to prevent Next.js scroll restoration issues */
   html {
-    /* position: static !important; */
+    position: static !important;
+    scroll-behavior: auto !important;
+    scroll-padding-top: 4rem; /* Matches header height (h-16) */
   }
 
   :root {
