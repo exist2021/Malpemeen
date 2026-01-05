@@ -6,10 +6,25 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { FishLogo } from '@/components/fish-logo';
 import { ArrowRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useUser, useUserRole } from '@/firebase';
+import { useEffect } from 'react';
 
 export default function WelcomePage() {
   const router = useRouter();
+  const { user, isUserLoading } = useUser();
+  const { role, isRoleLoading } = useUserRole();
+
+  useEffect(() => {
+    if (!isUserLoading && !isRoleLoading && user) {
+        if (role === 'buyer') {
+            router.push('/buyer/dashboard');
+        } else if (role === 'seller') {
+            router.push('/seller/dashboard');
+        } else if (role === 'admin') {
+            router.push('/admin');
+        }
+    }
+  }, [user, role, isUserLoading, isRoleLoading, router]);
 
   const userRoles = [
     {
@@ -25,6 +40,19 @@ export default function WelcomePage() {
       href: "/seller/login",
     },
   ];
+
+  if (isUserLoading || isRoleLoading) {
+      return (
+          <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 bg-white">
+               <FishLogo className="h-20 w-20 sm:h-24 sm:w-24 text-primary animate-pulse"/>
+               <p className="mt-4 text-muted-foreground animate-pulse">Loading...</p>
+          </div>
+      )
+  }
+
+  // If user is already logged in, the useEffect will handle the redirect.
+  // We don't want to flash the welcome page briefly if we can avoid it.
+  if (user) return null;
 
   return (
     <main className="relative flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 bg-white overflow-x-hidden">

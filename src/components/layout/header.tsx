@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, HelpCircle, Mail, Phone, Info, Building, Shield } from 'lucide-react';
+import { User as UserIcon, Settings, LogOut, LayoutDashboard, HelpCircle, Mail, Phone, Info, Building } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import {
   Dialog,
@@ -50,11 +50,8 @@ export function Header() {
   const getHomeLink = () => {
     if (!user) return "/";
     if (role === 'buyer') return "/buyer/dashboard";
-    if (role === 'seller') return "/seller/dashboard";
-    // Admin still redirects to admin dashboard if clicked on logo, or maybe buyer dashboard?
-    // Let's keep it consistent, if role is admin, they probably want admin dashboard.
-    // But the user requested to hide it.
-    if (role === 'admin') return "/admin/dashboard"; 
+    // Admins are treated as sellers for navigation
+    if (role === 'seller' || role === 'admin') return "/seller/dashboard";
     return "/";
   }
 
@@ -66,34 +63,22 @@ export function Header() {
     if (user) {
         let triggerContent;
         const isLoading = isSellerProfileLoading || isBuyerProfileLoading;
-        const profileName = role === 'seller' ? (sellerProfile?.contactName || sellerProfile?.companyName) : (role === 'buyer' ? buyerProfile?.name : (buyerProfile?.name || 'User'));
+        const isSellerLike = role === 'seller' || role === 'admin';
+        const profileName = isSellerLike ? (sellerProfile?.contactName || sellerProfile?.companyName) : (role === 'buyer' ? buyerProfile?.name : (buyerProfile?.name || 'User'));
 
         if (isLoading) {
             triggerContent = <Skeleton className="h-9 w-9 rounded-full" />;
-        } else if (role === 'seller' && sellerProfile?.logoUrl) {
+        } else if (isSellerLike && sellerProfile?.logoUrl) {
             triggerContent = (
                 <Avatar className="h-9 w-9">
                     <AvatarImage src={sellerProfile.logoUrl} alt={sellerProfile.companyName} />
                     <AvatarFallback><Building className="h-4 w-4" /></AvatarFallback>
                 </Avatar>
             );
-        } else if (role === 'buyer' && buyerProfile?.photoUrl) {
-            triggerContent = (
-                <Avatar className="h-9 w-9">
-                    <AvatarImage src={buyerProfile.photoUrl} alt={buyerProfile.name} />
-                    <AvatarFallback><UserIcon className="h-4 w-4" /></AvatarFallback>
-                </Avatar>
-            );
-        } else if (role === 'admin') {
-             triggerContent = (
-                <div className="h-9 w-9 flex items-center justify-center rounded-full bg-primary text-primary-foreground">
-                   <Shield className="h-5 w-5" />
-                </div>
-            );
         } else {
              triggerContent = (
                 <div className="h-9 w-9 flex items-center justify-center rounded-full bg-muted">
-                   {role === 'seller' ? <Building className="h-5 w-5" /> : <UserIcon className="h-5 w-5" />}
+                   {isSellerLike ? <Building className="h-5 w-5" /> : <UserIcon className="h-5 w-5" />}
                 </div>
             );
         }
@@ -101,17 +86,11 @@ export function Header() {
 
        return (
             <div className="flex items-center gap-2 sm:gap-4">
-              {role === 'seller' && (
+              {isSellerLike && (
                 <Button variant="ghost" onClick={() => router.push('/seller/dashboard')} className="hidden sm:inline-flex">
                   Dashboard
                 </Button>
               )}
-              {/* Hidden Admin Panel Button as per request */}
-              {/* {role === 'admin' && (
-                <Button variant="ghost" onClick={() => router.push('/admin/dashboard')} className="hidden sm:inline-flex">
-                  Admin Panel
-                </Button>
-              )} */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2 p-1 sm:p-2">
@@ -122,18 +101,12 @@ export function Header() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                   {role === 'seller' && (
+                   {isSellerLike && (
                     <DropdownMenuItem onClick={() => router.push('/seller/dashboard')}>
                         <LayoutDashboard className="mr-2 h-4 w-4" />
                         Dashboard
                     </DropdownMenuItem>
                     )}
-                   {/* {role === 'admin' && (
-                    <DropdownMenuItem onClick={() => router.push('/admin/dashboard')}>
-                        <LayoutDashboard className="mr-2 h-4 w-4" />
-                        Admin Dashboard
-                    </DropdownMenuItem>
-                    )} */}
                   
                     {/* Always allow account settings access if a buyer profile exists or if role is buyer or admin */}
                     <Dialog open={isBuyerDialogOpen} onOpenChange={setBuyerDialogOpen}>
@@ -154,7 +127,7 @@ export function Header() {
                         </DialogContent>
                     </Dialog>
                   
-                  {role === 'seller' && (
+                  {isSellerLike && (
                     <Dialog open={isSellerDialogOpen} onOpenChange={setSellerDialogOpen}>
                         <DialogTrigger asChild>
                           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

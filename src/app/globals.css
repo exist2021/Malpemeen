@@ -3,11 +3,12 @@
 @tailwind utilities;
 
 @layer base {
-  /* Force static positioning on html to prevent Next.js scroll restoration issues */
+  /* Prevent Next.js scroll restoration warnings and issues */
   html {
-    position: static !important;
     scroll-behavior: auto !important;
     scroll-padding-top: 4rem; /* Matches header height (h-16) */
+    /* Ensure height is 100% to help with some scroll issues, but avoid fixed/sticky here */
+    height: 100%;
   }
 
   :root {
