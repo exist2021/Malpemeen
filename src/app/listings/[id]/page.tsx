@@ -9,7 +9,7 @@ import type { FishListing } from '@/app/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Button } from '@/components/ui/button';
-import { Phone, Calendar, User, ArrowLeft, Anchor, Ship, Info, Tag, Copyright, IndianRupee, MapPin, Scale, Video } from 'lucide-react';
+import { Phone, Calendar, User, ArrowLeft, Anchor, Ship, Info, Tag, Copyright, IndianRupee, MapPin, Scale, Video, Hash } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/layout/header';
 import { formatToIST } from '@/lib/utils';
@@ -206,6 +206,7 @@ export default function ListingDetailPage() {
                     <Separator className="my-4 sm:my-6" />
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                         <DetailItem icon={IndianRupee} label="Price Per Kg" value={listing.pricePerKg ? `₹${listing.pricePerKg.toLocaleString()}` : 'N/A'} />
+                        <DetailItem icon={Hash} label="Count Per Kg" value={listing.countPerKg ? `${listing.countPerKg}` : undefined} />
                         <DetailItem icon={Scale} label="Total Quantity" value={listing.totalQuantityInTons ? `${listing.totalQuantityInTons} Tons` : 'N/A'} />
                         <DetailItem icon={Calendar} label="Listed Date" value={listing.listedDate ? formatToIST(listing.listedDate) : 'N/A'} />
                         <DetailItem icon={User} label="Seller" value={listing.sellerName} />

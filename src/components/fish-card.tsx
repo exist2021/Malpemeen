@@ -1,7 +1,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, User, Anchor, IndianRupee, Calendar, Package, Camera } from 'lucide-react';
+import { ArrowRight, User, Anchor, IndianRupee, Calendar, Package, Camera, Hash } from 'lucide-react';
 import type { FishListing } from '@/app/types';
 import { cn, formatToIST } from '@/lib/utils';
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
@@ -46,6 +46,13 @@ export function FishCard({ listing }: FishCardProps) {
             "absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"
             )}>
             </div>
+            
+            {listing.countPerKg && (
+              <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded-md text-xs font-bold flex items-center gap-1">
+                <Hash className="h-3 w-3" />
+                <span>{listing.countPerKg} / kg</span>
+              </div>
+            )}
         </div>
 
         <div className="p-3 flex flex-col justify-between h-1/3">

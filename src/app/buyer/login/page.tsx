@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth, useFirebase, errorEmitter, FirestorePermissionError } from '@/firebase';
+import { useAuth, useFirebase, errorEmitter, FirestorePermissionError, useUser, useUserRole } from '@/firebase';
 import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
@@ -24,6 +24,8 @@ export default function BuyerLoginPage() {
   const [phone, setPhone] = useState('');
   const router = useRouter();
   const { auth, firestore } = useFirebase();
+  const { user, isUserLoading } = useUser();
+  const { role, isRoleLoading } = useUserRole();
   const { toast } = useToast();
 
   const [otp, setOtp] = useState('');
@@ -35,6 +37,12 @@ export default function BuyerLoginPage() {
   const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
+  // Redirect if already logged in as buyer
+  useEffect(() => {
+    if (!isUserLoading && !isRoleLoading && user && role === 'buyer') {
+      router.replace('/buyer/dashboard');
+    }
+  }, [user, role, isUserLoading, isRoleLoading, router]);
 
   useEffect(() => {
     if (auth && recaptchaContainerRef.current && !recaptchaVerifierRef.current) {

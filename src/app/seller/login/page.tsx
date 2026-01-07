@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth, useFirebase, errorEmitter, FirestorePermissionError } from '@/firebase';
+import { useAuth, useFirebase, errorEmitter, FirestorePermissionError, useUser, useUserRole } from '@/firebase';
 import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
@@ -38,6 +38,8 @@ export default function SellerLoginPage() {
   const [phone, setPhone] = useState('');
   const router = useRouter();
   const { auth, firestore } = useFirebase();
+  const { user, isUserLoading } = useUser();
+  const { role, isRoleLoading } = useUserRole();
   const { toast } = useToast();
 
   const [otp, setOtp] = useState('');
@@ -47,6 +49,13 @@ export default function SellerLoginPage() {
   const [isSigningUp, setIsSigningUp] = useState(false);
   const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
+
+  // Redirect if already logged in as seller or admin
+  useEffect(() => {
+    if (!isUserLoading && !isRoleLoading && user && (role === 'seller' || role === 'admin')) {
+      router.replace('/seller/dashboard');
+    }
+  }, [user, role, isUserLoading, isRoleLoading, router]);
 
 
   useEffect(() => {

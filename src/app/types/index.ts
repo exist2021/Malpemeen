@@ -33,6 +33,7 @@ export type FishListing = {
     sellerAddress?: string;
     productName: string;
     pricePerKg?: number;
+    countPerKg?: number; // Added count per kg
     portDetails: 'Malpe Port' | 'Mangalore Port' | 'Kochi Port' | 'Hyderabad Port';
     boatDetails: 'Ashok Leyland' | 'Persian Boat' | '370-Boat';
     brandName: string;

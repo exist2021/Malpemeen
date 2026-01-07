@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 
 function ListingsSkeleton() {
@@ -29,7 +30,7 @@ function ListingsSkeleton() {
   );
 }
 
-function FishListings({ portFilter, sellerFilter }: { portFilter: string, sellerFilter: string }) {
+function FishListings({ portFilter, sellerFilter, showWithCountOnly }: { portFilter: string, sellerFilter: string, showWithCountOnly: boolean }) {
   const [allListings, setAllListings] = useState<FishListing[]>([]);
   const [filteredListings, setFilteredListings] = useState<FishListing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,8 +56,12 @@ function FishListings({ portFilter, sellerFilter }: { portFilter: string, seller
       listings = listings.filter(listing => listing.sellerId === sellerFilter);
     }
 
+    if (showWithCountOnly) {
+      listings = listings.filter(listing => listing.countPerKg !== undefined && listing.countPerKg !== null);
+    }
+
     setFilteredListings(listings);
-  }, [portFilter, sellerFilter, allListings]);
+  }, [portFilter, sellerFilter, showWithCountOnly, allListings]);
 
 
   if (loading) {
@@ -82,6 +87,7 @@ export default function BuyerDashboard() {
   const router = useRouter();
   const [portFilter, setPortFilter] = useState('Malpe Port');
   const [sellerFilter, setSellerFilter] = useState('all');
+  const [showWithCountOnly, setShowWithCountOnly] = useState(false);
 
   // This state will hold all listings to derive sellers from
   const [allListings, setAllListings] = useState<FishListing[]>([]);
@@ -118,9 +124,17 @@ export default function BuyerDashboard() {
     <>
     <Header />
     <main className="p-4 sm:p-6 lg:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Available Listings</h1>
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex items-center space-x-2 bg-muted/50 px-3 py-2 rounded-lg">
+                    <Switch 
+                        id="count-filter" 
+                        checked={showWithCountOnly} 
+                        onCheckedChange={setShowWithCountOnly} 
+                    />
+                    <Label htmlFor="count-filter" className="text-sm font-medium cursor-pointer">Show with Count/Kg only</Label>
+                </div>
                 <div className="flex w-full items-center gap-2">
                     <Label htmlFor="port-filter" className="text-sm font-medium">Port:</Label>
                     <Select value={portFilter} onValueChange={handlePortChange}>
@@ -152,7 +166,7 @@ export default function BuyerDashboard() {
                 </div>
             </div>
         </div>
-        <FishListings portFilter={portFilter} sellerFilter={sellerFilter} />
+        <FishListings portFilter={portFilter} sellerFilter={sellerFilter} showWithCountOnly={showWithCountOnly} />
     </main>
     </>
   );

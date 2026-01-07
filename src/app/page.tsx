@@ -17,11 +17,11 @@ export default function WelcomePage() {
   useEffect(() => {
     if (!isUserLoading && !isRoleLoading && user) {
         if (role === 'buyer') {
-            router.push('/buyer/dashboard');
+            router.replace('/buyer/dashboard');
         } else if (role === 'seller') {
-            router.push('/seller/dashboard');
+            router.replace('/seller/dashboard');
         } else if (role === 'admin') {
-            router.push('/admin');
+            router.replace('/admin');
         }
     }
   }, [user, role, isUserLoading, isRoleLoading, router]);
@@ -41,18 +41,16 @@ export default function WelcomePage() {
     },
   ];
 
-  if (isUserLoading || isRoleLoading) {
+  if (isUserLoading || isRoleLoading || user) {
       return (
           <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 bg-white">
                <FishLogo className="h-20 w-20 sm:h-24 sm:w-24 text-primary animate-pulse"/>
-               <p className="mt-4 text-muted-foreground animate-pulse">Loading...</p>
+               <p className="mt-4 text-muted-foreground animate-pulse">
+                {user ? "Redirecting to your dashboard..." : "Loading..."}
+               </p>
           </div>
       )
   }
-
-  // If user is already logged in, the useEffect will handle the redirect.
-  // We don't want to flash the welcome page briefly if we can avoid it.
-  if (user) return null;
 
   return (
     <main className="relative flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 bg-white overflow-x-hidden">

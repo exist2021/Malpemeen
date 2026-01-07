@@ -27,6 +27,7 @@ interface SellerFormProps {
     formState: {
         productName: string;
         pricePerKg: string;
+        countPerKg: string;
         totalQuantityInTons: string;
         boatDetails: FishListing['boatDetails'] | '';
         portDetails: FishListing['portDetails'];
@@ -36,6 +37,7 @@ interface SellerFormProps {
     setFormState: {
         setProductName: (value: string) => void;
         setPricePerKg: (value: string) => void;
+        setCountPerKg: (value: string) => void;
         setTotalQuantityInTons: (value: string) => void;
         setBoatDetails: (value: FishListing['boatDetails'] | '') => void;
         setPortDetails: (value: FishListing['portDetails']) => void;
@@ -59,10 +61,10 @@ const FISH_NAMES = [
 export function SellerForm({ listing, formState, setFormState }: SellerFormProps) {
   const { toast } = useToast();
   const {
-    productName, pricePerKg, totalQuantityInTons, boatDetails, portDetails, mediaUrls, videoUrl
+    productName, pricePerKg, countPerKg, totalQuantityInTons, boatDetails, portDetails, mediaUrls, videoUrl
   } = formState;
   const {
-    setProductName, setPricePerKg, setTotalQuantityInTons, setBoatDetails, setPortDetails, setMediaUrls, setVideoUrl
+    setProductName, setPricePerKg, setCountPerKg, setTotalQuantityInTons, setBoatDetails, setPortDetails, setMediaUrls, setVideoUrl
   } = setFormState;
 
   const { user, isUserLoading } = useUser();
@@ -190,6 +192,7 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
           mediaUrls: finalMediaUrls,
           videoUrl: finalVideoUrl,
           pricePerKg: Number(pricePerKg) || 0,
+          countPerKg: countPerKg ? Number(countPerKg) : undefined,
           totalQuantityInTons: Number(totalQuantityInTons) || 0,
           portDetails,
         };
@@ -259,9 +262,13 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             <Label htmlFor="totalQuantityInTons">Quantity (Tons)</Label>
             <Input id="totalQuantityInTons" type="number" value={totalQuantityInTons} onChange={(e) => setTotalQuantityInTons(e.target.value)} />
         </div>
-        <div className="space-y-2 md:col-span-2">
+        <div className="space-y-2">
             <Label htmlFor="pricePerKg">Price Per Kg (₹)</Label>
             <Input id="pricePerKg" type="number" value={pricePerKg} onChange={(e) => setPricePerKg(e.target.value)} />
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="countPerKg">Count Per Kg (Optional)</Label>
+            <Input id="countPerKg" type="number" value={countPerKg} onChange={(e) => setCountPerKg(e.target.value)} placeholder="e.g. 10" />
         </div>
       </div>
       

@@ -15,6 +15,7 @@ export default function SellPage() {
     // State for all form fields, lifted up from SellerForm
     const [productName, setProductName] = useState('');
     const [pricePerKg, setPricePerKg] = useState('');
+    const [countPerKg, setCountPerKg] = useState('');
     const [totalQuantityInTons, setTotalQuantityInTons] = useState('');
     const [boatDetails, setBoatDetails] = useState<FishListing['boatDetails'] | ''>('');
     const [portDetails, setPortDetails] = useState<FishListing['portDetails']>('Malpe Port');
@@ -43,6 +44,7 @@ export default function SellPage() {
                 formState={{
                     productName,
                     pricePerKg,
+                    countPerKg,
                     totalQuantityInTons,
                     boatDetails,
                     portDetails,
@@ -52,6 +54,7 @@ export default function SellPage() {
                 setFormState={{
                     setProductName,
                     setPricePerKg,
+                    setCountPerKg,
                     setTotalQuantityInTons,
                     setBoatDetails,
                     setPortDetails,
