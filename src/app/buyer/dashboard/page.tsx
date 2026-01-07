@@ -30,7 +30,7 @@ function ListingsSkeleton() {
   );
 }
 
-function FishListings({ portFilter, sellerFilter, showWithCountOnly }: { portFilter: string, sellerFilter: string, showWithCountOnly: boolean }) {
+function FishListings({ portFilter, sellerFilter, fishTypeFilter, showWithCountOnly }: { portFilter: string, sellerFilter: string, fishTypeFilter: string, showWithCountOnly: boolean }) {
   const [allListings, setAllListings] = useState<FishListing[]>([]);
   const [filteredListings, setFilteredListings] = useState<FishListing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,12 +56,16 @@ function FishListings({ portFilter, sellerFilter, showWithCountOnly }: { portFil
       listings = listings.filter(listing => listing.sellerId === sellerFilter);
     }
 
+    if (fishTypeFilter !== 'all') {
+      listings = listings.filter(listing => listing.productName === fishTypeFilter);
+    }
+
     if (showWithCountOnly) {
       listings = listings.filter(listing => listing.countPerKg !== undefined && listing.countPerKg !== null);
     }
 
     setFilteredListings(listings);
-  }, [portFilter, sellerFilter, showWithCountOnly, allListings]);
+  }, [portFilter, sellerFilter, fishTypeFilter, showWithCountOnly, allListings]);
 
 
   if (loading) {
@@ -87,9 +91,10 @@ export default function BuyerDashboard() {
   const router = useRouter();
   const [portFilter, setPortFilter] = useState('Malpe Port');
   const [sellerFilter, setSellerFilter] = useState('all');
+  const [fishTypeFilter, setFishTypeFilter] = useState('all');
   const [showWithCountOnly, setShowWithCountOnly] = useState(false);
 
-  // This state will hold all listings to derive sellers from
+  // This state will hold all listings to derive sellers and fish types from
   const [allListings, setAllListings] = useState<FishListing[]>([]);
   
   useEffect(() => {
@@ -114,10 +119,28 @@ export default function BuyerDashboard() {
     return Array.from(sellersMap.entries()).map(([id, name]) => ({ id, name }));
   }, [portFilter, allListings]);
 
-  // When port filter changes, reset seller filter
+  // Memoize the calculation of available fish types
+  const availableFishTypes = useMemo(() => {
+    let listingsForFish = allListings;
+    if (portFilter !== 'all') {
+        listingsForFish = allListings.filter(l => l.portDetails === portFilter);
+    }
+    
+    const typesSet = new Set<string>();
+    listingsForFish.forEach(listing => {
+        if (listing.productName) {
+            typesSet.add(listing.productName);
+        }
+    });
+
+    return Array.from(typesSet).sort();
+  }, [portFilter, allListings]);
+
+  // When port filter changes, reset other filters
   const handlePortChange = (value: string) => {
     setPortFilter(value);
     setSellerFilter('all');
+    setFishTypeFilter('all');
   }
 
   return (
@@ -150,6 +173,20 @@ export default function BuyerDashboard() {
                         </SelectContent>
                     </Select>
                 </div>
+                <div className="flex w-full items-center gap-2">
+                    <Label htmlFor="fish-filter" className="text-sm font-medium whitespace-nowrap">Fish Type:</Label>
+                    <Select value={fishTypeFilter} onValueChange={setFishTypeFilter} disabled={availableFishTypes.length === 0}>
+                        <SelectTrigger id="fish-filter" className="w-full">
+                            <SelectValue placeholder="All Fish" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Fish</SelectItem>
+                            {availableFishTypes.map(type => (
+                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
                  <div className="flex w-full items-center gap-2">
                     <Label htmlFor="seller-filter" className="text-sm font-medium">Seller:</Label>
                     <Select value={sellerFilter} onValueChange={setSellerFilter} disabled={availableSellers.length === 0}>
@@ -166,7 +203,12 @@ export default function BuyerDashboard() {
                 </div>
             </div>
         </div>
-        <FishListings portFilter={portFilter} sellerFilter={sellerFilter} showWithCountOnly={showWithCountOnly} />
+        <FishListings 
+            portFilter={portFilter} 
+            sellerFilter={sellerFilter} 
+            fishTypeFilter={fishTypeFilter}
+            showWithCountOnly={showWithCountOnly} 
+        />
     </main>
     </>
   );
