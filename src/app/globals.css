@@ -5,10 +5,7 @@
 @layer base {
   /* Prevent Next.js scroll restoration warnings and issues */
   html {
-    scroll-behavior: auto !important;
-    scroll-padding-top: 4rem; /* Matches header height (h-16) */
-    /* Ensure height is 100% to help with some scroll issues, but avoid fixed/sticky here */
-    height: 100%;
+    scroll-padding-top: 0;
   }
 
   :root {
