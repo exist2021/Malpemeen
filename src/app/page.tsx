@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { FishLogo } from '@/components/fish-logo';
 import { ArrowRight, Languages } from 'lucide-react';
 import { useUser, useUserRole } from '@/firebase';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useI18n } from '@/i18n/context';
 
 export default function WelcomePage() {
@@ -15,6 +15,11 @@ export default function WelcomePage() {
   const { user, isUserLoading } = useUser();
   const { role, isRoleLoading } = useUserRole();
   const { t, language, setLanguage } = useI18n();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!isUserLoading && !isRoleLoading && user) {
@@ -54,26 +59,37 @@ export default function WelcomePage() {
       )
   }
 
+  // Prevent hydration mismatch by only rendering the toggle after mount
+  const renderLanguageToggle = () => {
+    if (!mounted) return null;
+    return (
+        <div className="absolute top-6 right-4 z-50">
+            <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => {
+                console.log("Language toggle clicked");
+                setLanguage(language === 'en' ? 'kn' : 'en');
+            }}
+            className="flex items-center gap-2 shadow-sm active:scale-95 transition-transform"
+            >
+            <Languages className="h-4 w-4" />
+            {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
+            </Button>
+        </div>
+    );
+  };
+
   return (
     <main className="relative flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 bg-white overflow-x-hidden">
-      <div className="absolute top-4 right-4">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => setLanguage(language === 'en' ? 'kn' : 'en')}
-          className="flex items-center gap-2"
-        >
-          <Languages className="h-4 w-4" />
-          {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
-        </Button>
-      </div>
+      {renderLanguageToggle()}
 
-      <div className="text-center mb-8 sm:mb-10 relative z-10">
+      <div className="text-center mb-8 sm:mb-10 relative z-10 pt-12">
         <FishLogo className="h-20 w-20 sm:h-24 sm:w-24 text-primary mx-auto"/>
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-4 text-foreground">
           {t('welcome.title')}
         </h1>
-        <p className="mt-2 text-base text-muted-foreground max-w-md mx-auto">
+        <p className="mt-2 text-base text-muted-foreground max-w-md mx-auto px-4">
           {t('welcome.subtitle')}
         </p>
       </div>

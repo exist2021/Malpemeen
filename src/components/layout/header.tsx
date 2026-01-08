@@ -1,4 +1,3 @@
-
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -92,10 +91,12 @@ export function Header() {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => setLanguage(language === 'en' ? 'kn' : 'en')}
-                className="hidden sm:flex items-center gap-2"
+                className="flex items-center gap-2 px-2"
               >
                 <Languages className="h-4 w-4" />
-                {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
+                <span className="text-xs sm:text-sm font-medium">
+                    {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
+                </span>
               </Button>
               {isSellerLike && (
                 <Button variant="ghost" onClick={() => router.push('/seller/dashboard')} className="hidden sm:inline-flex">
@@ -112,7 +113,7 @@ export function Header() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>{t('header.my_account')}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="sm:hidden" onClick={() => setLanguage(language === 'en' ? 'kn' : 'en')}>
+                  <DropdownMenuItem className="flex sm:hidden" onClick={() => setLanguage(language === 'en' ? 'kn' : 'en')}>
                         <Languages className="mr-2 h-4 w-4" />
                         {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
                     </DropdownMenuItem>
@@ -211,20 +212,22 @@ export function Header() {
     }
 
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => setLanguage(language === 'en' ? 'kn' : 'en')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1 px-1.5"
             >
               <Languages className="h-4 w-4" />
-              {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
+              <span className="text-xs sm:text-sm font-medium">
+                  {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
+              </span>
             </Button>
-            <Button variant="ghost" onClick={() => router.push('/seller/login')}>
+            <Button variant="ghost" size="sm" onClick={() => router.push('/seller/login')} className="px-1.5 sm:px-3 text-xs sm:text-sm">
                 {t('header.sell_fish')}
             </Button>
-            <Button onClick={() => router.push('/buyer/login')}>
+            <Button size="sm" onClick={() => router.push('/buyer/login')} className="px-1.5 sm:px-3 text-xs sm:text-sm">
                 {t('header.buyer_login')}
             </Button>
         </div>
@@ -232,15 +235,15 @@ export function Header() {
   }
 
   return (
-    <header className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
+    <header className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <div className="container flex h-14 sm:h-16 items-center justify-between px-4">
         <div className="flex items-center gap-2">
-            <Link href={getHomeLink()} className="flex items-center space-x-2">
-              <FishLogo className="h-8 w-8 text-primary" />
-              <span className="font-bold">Malpe Meen</span>
+            <Link href={getHomeLink()} className="flex items-center space-x-1.5">
+              <FishLogo className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+              <span className="font-bold text-sm sm:text-base whitespace-nowrap">Malpe Meen</span>
             </Link>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           {renderUserActions()}
         </div>
       </div>
