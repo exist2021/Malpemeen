@@ -16,8 +16,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Phone as PhoneIcon, Loader2, User } from 'lucide-react';
+import { ArrowLeft, Phone as PhoneIcon, Loader2, User, Languages } from 'lucide-react';
 import { FishLogo } from '@/components/fish-logo';
+import { useI18n } from '@/i18n/context';
 
 export default function BuyerLoginPage() {
   const [name, setName] = useState('');
@@ -27,6 +28,7 @@ export default function BuyerLoginPage() {
   const { user, isUserLoading } = useUser();
   const { role, isRoleLoading } = useUserRole();
   const { toast } = useToast();
+  const { t, language, setLanguage } = useI18n();
 
   const [otp, setOtp] = useState('');
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
@@ -182,15 +184,30 @@ export default function BuyerLoginPage() {
         </div>
         <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-8 mx-auto relative">
             <div ref={recaptchaContainerRef}></div>
-            <Button variant="ghost" asChild className="absolute top-4 left-4">
-                <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>
-            </Button>
+            <div className="absolute top-4 left-4 flex gap-2">
+                <Button variant="ghost" asChild>
+                    <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> {t('back')}</Link>
+                </Button>
+            </div>
+            <div className="absolute top-4 right-4">
+                <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setLanguage(language === 'en' ? 'kn' : 'en')}
+                    className="flex items-center gap-2"
+                >
+                    <Languages className="h-4 w-4" />
+                    {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
+                </Button>
+            </div>
             <div className="w-full max-w-sm">
             <div className="text-center mb-8">
                 <FishLogo className="h-16 w-16 text-primary mx-auto"/>
-                <h2 className="text-3xl font-bold tracking-tight mt-4">{isNewUser ? "Create Buyer Account" : "Buyer Login"}</h2>
+                <h2 className="text-3xl font-bold tracking-tight mt-4">
+                    {isNewUser ? t('login.buyer.new_account') : t('login.buyer.title')}
+                </h2>
                 <p className="mt-2 text-muted-foreground">
-                    {isNewUser ? "Enter your name to finish signing up." : "Enter your phone number to log in or sign up."}
+                    {isNewUser ? t('login.buyer.name_desc') : t('login.buyer.phone_desc')}
                 </p>
             </div>
 
@@ -198,17 +215,17 @@ export default function BuyerLoginPage() {
                 <>
                 <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handlePhoneAuth(); }}>
                     <div className="space-y-2">
-                        <Label htmlFor="phone">Phone Number</Label>
+                        <Label htmlFor="phone">{t('login.phone_label')}</Label>
                         <div className="flex h-10 w-full items-center rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
                             <PhoneIcon className="h-5 w-5 text-muted-foreground" />
                             <span className="pl-2 pr-2 text-muted-foreground">+91</span>
-                            <Input id="phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"/>
+                            <Input id="phone" type="tel" placeholder={t('login.phone_placeholder')} value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"/>
                         </div>
-                        <p className="text-xs text-muted-foreground">Country code (+91) is automatically used.</p>
+                        <p className="text-xs text-muted-foreground">{t('login.phone_hint')}</p>
                     </div>
                     <Button type="submit" className="w-full h-12 text-base" disabled={isSendingOtp}>
                         {isSendingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        Send OTP
+                        {t('login.send_otp')}
                     </Button>
                 </form>
                 </>
@@ -217,14 +234,14 @@ export default function BuyerLoginPage() {
             {confirmationResult && !isNewUser && (
                 <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleVerifyOtpAndLogin(); }}>
                     <div className="space-y-2">
-                        <Label htmlFor="otp">Enter OTP</Label>
+                        <Label htmlFor="otp">{t('login.otp_label')}</Label>
                         <Input id="otp" type="text" placeholder="123456" value={otp} onChange={(e) => setOtp(e.target.value)} required />
                     </div>
                     <Button type="submit" className="w-full h-12 text-base" disabled={isVerifyingOtp}>
                         {isVerifyingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        Verify & Login
+                        {t('login.verify_otp')}
                     </Button>
-                    <Button variant="link" onClick={() => { setConfirmationResult(null); setOtp(''); }}>Back to phone number</Button>
+                    <Button variant="link" onClick={() => { setConfirmationResult(null); setOtp(''); }}>{t('login.back_to_phone')}</Button>
                 </form>
             )}
 
@@ -232,14 +249,14 @@ export default function BuyerLoginPage() {
                 <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleFinalizeSignUp(); }}>
                     
                     <div className="space-y-2">
-                        <Label htmlFor="signup-name">Your Name</Label>
+                        <Label htmlFor="signup-name">{t('login.buyer.name_label')}</Label>
                         <div className="relative">
                             <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input id="signup-name" type="text" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required className="pl-10"/>
+                            <Input id="signup-name" type="text" placeholder={t('login.buyer.name_placeholder')} value={name} onChange={(e) => setName(e.target.value)} required className="pl-10"/>
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="signup-phone">Phone Number</Label>
+                        <Label htmlFor="signup-phone">{t('login.phone_label')}</Label>
                         <div className="flex h-10 w-full items-center rounded-md border border-input bg-background px-3 text-sm ring-offset-background">
                             <PhoneIcon className="h-5 w-5 text-muted-foreground" />
                             <span className="pl-2 pr-2 text-muted-foreground">+91</span>
@@ -248,15 +265,15 @@ export default function BuyerLoginPage() {
                     </div>
                     <Button type="submit" className="w-full h-12 text-base" disabled={isSigningUp}>
                         {isSigningUp && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Complete Sign Up
+                        {t('login.complete_signup')}
                     </Button>
                 </form>
             )}
             
             <p className="mt-8 text-center text-sm text-muted-foreground">
-                Not a buyer?{' '}
+                {t('login.not_buyer')}{' '}
                 <Link href="/seller/login" className="font-semibold text-primary hover:underline">
-                Seller Login
+                {t('header.sell_fish')}
                 </Link>
             </p>
             </div>

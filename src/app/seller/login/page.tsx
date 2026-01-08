@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Phone as PhoneIcon, Loader2, User, Building, MapPin, Anchor, Copyright } from 'lucide-react';
+import { ArrowLeft, Phone as PhoneIcon, Loader2, User, Building, MapPin, Anchor, Languages } from 'lucide-react';
 import { FishLogo } from '@/components/fish-logo';
 import { Textarea } from '@/components/ui/textarea';
 import type { FishListing } from '@/app/types';
@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useI18n } from '@/i18n/context';
 
 export default function SellerLoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -41,6 +42,7 @@ export default function SellerLoginPage() {
   const { user, isUserLoading } = useUser();
   const { role, isRoleLoading } = useUserRole();
   const { toast } = useToast();
+  const { t, language, setLanguage } = useI18n();
 
   const [otp, setOtp] = useState('');
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
@@ -172,12 +174,12 @@ export default function SellerLoginPage() {
     }
   };
   
-  const currentTitle = isSignUp ? 'Create a Seller Account' : (confirmationResult ? 'Enter OTP' : 'Seller Login or Sign Up');
+  const currentTitle = isSignUp ? t('login.seller.new_account') : (confirmationResult ? t('login.otp_label') : t('login.seller.title'));
   const currentDescription = isSignUp 
-    ? 'Join our network to reach more buyers and grow your business.' 
+    ? t('login.seller.join') 
     : (confirmationResult 
-        ? `We've sent a code to +91 ${phone}.`
-        : 'Welcome! Enter your phone number to begin.');
+        ? t('login.seller.otp_sent').replace('{phone}', phone)
+        : t('login.seller.welcome'));
 
 
   return (
@@ -197,9 +199,22 @@ export default function SellerLoginPage() {
       <div className="flex flex-1 md:flex-row">
         <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-8 mx-auto relative">
             <div ref={recaptchaContainerRef}></div>
-            <Button variant="ghost" asChild className="absolute top-4 left-4">
-                <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>
-            </Button>
+            <div className="absolute top-4 left-4">
+                <Button variant="ghost" asChild>
+                    <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> {t('back')}</Link>
+                </Button>
+            </div>
+            <div className="absolute top-4 right-4">
+                <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setLanguage(language === 'en' ? 'kn' : 'en')}
+                    className="flex items-center gap-2"
+                >
+                    <Languages className="h-4 w-4" />
+                    {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
+                </Button>
+            </div>
             <div className="w-full max-w-sm">
             <div className="text-center mb-8">
                 <FishLogo className="h-16 w-16 text-primary mx-auto"/>
@@ -210,33 +225,33 @@ export default function SellerLoginPage() {
             {isSignUp ? (
                 <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSignUp(); }}>
                     <div className="space-y-2">
-                        <Label htmlFor="signup-contact-name">Contact Name</Label>
+                        <Label htmlFor="signup-contact-name">{t('login.seller.contact_name')}</Label>
                         <div className="relative">
                             <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input id="signup-contact-name" type="text" placeholder="John Doe" value={contactName} onChange={(e) => setContactName(e.target.value)} required className="pl-10"/>
+                            <Input id="signup-contact-name" type="text" placeholder={t('login.buyer.name_placeholder')} value={contactName} onChange={(e) => setContactName(e.target.value)} required className="pl-10"/>
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="signup-company-name">Company Name</Label>
+                        <Label htmlFor="signup-company-name">{t('login.seller.company_name')}</Label>
                         <div className="relative">
                             <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                             <Input id="signup-company-name" type="text" placeholder="Malpe Meen Pvt Ltd" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required className="pl-10"/>
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="signup-address">Address</Label>
+                        <Label htmlFor="signup-address">{t('login.seller.address')}</Label>
                         <div className="relative">
                             <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                            <Textarea id="signup-address" placeholder="Your business address" value={address} onChange={(e) => setAddress(e.target.value)} required className="pl-10"/>
+                            <Textarea id="signup-address" placeholder={t('login.seller.address_placeholder')} value={address} onChange={(e) => setAddress(e.target.value)} required className="pl-10"/>
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="portDetails">Primary Port</Label>
+                        <Label htmlFor="portDetails">{t('login.seller.port')}</Label>
                         <div className="relative">
                             <Anchor className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                             <Select value={portDetails} onValueChange={(value) => setPortDetails(value as any)} required>
                                 <SelectTrigger id="portDetails" className="pl-10">
-                                    <SelectValue placeholder="Select your main port" />
+                                    <SelectValue placeholder={t('login.seller.port_placeholder')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Malpe Port">Malpe Port</SelectItem>
@@ -254,7 +269,7 @@ export default function SellerLoginPage() {
                     </div>
                     <Button type="submit" className="w-full h-12 text-base" disabled={isSigningUp}>
                     {isSigningUp && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Complete Sign Up
+                    {t('login.complete_signup')}
                     </Button>
                 </form>
             ) : (
@@ -263,43 +278,43 @@ export default function SellerLoginPage() {
                     <>
                     <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handlePhoneAuth(); }}>
                         <div className="space-y-2">
-                        <Label htmlFor="phone">Phone Number</Label>
+                        <Label htmlFor="phone">{t('login.phone_label')}</Label>
                         <div className="flex h-10 w-full items-center rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
                             <PhoneIcon className="h-5 w-5 text-muted-foreground" />
                             <span className="pl-2 pr-2 text-muted-foreground">+91</span>
-                            <Input id="phone" type="tel" placeholder="9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"/>
+                            <Input id="phone" type="tel" placeholder={t('login.phone_placeholder')} value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full p-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"/>
                         </div>
-                        <p className="text-xs text-muted-foreground">Country code (+91) is automatically used.</p>
+                        <p className="text-xs text-muted-foreground">{t('login.phone_hint')}</p>
                         </div>
                         <Button type="submit" className="w-full h-12 text-base" disabled={isSendingOtp}>
                         {isSendingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        Send OTP
+                        {t('login.send_otp')}
                         </Button>
                     </form>
                      <p className="mt-4 text-center text-sm text-muted-foreground">
-                        New seller? This will start the sign up process.
+                        {t('login.seller.new_hint')}
                      </p>
                     </>
                     ) : (
                     <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleVerifyOtp(); }}>
                         <div className="space-y-2">
-                        <Label htmlFor="otp">Enter OTP</Label>
+                        <Label htmlFor="otp">{t('login.otp_label')}</Label>
                         <Input id="otp" type="text" placeholder="123456" value={otp} onChange={(e) => setOtp(e.target.value)} required />
                         </div>
                         <Button type="submit" className="w-full h-12 text-base" disabled={isVerifyingOtp}>
                         {isVerifyingOtp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        Verify OTP
+                        {t('login.verify_otp_simple')}
                         </Button>
-                        <Button variant="link" onClick={() => setConfirmationResult(null)}>Back</Button>
+                        <Button variant="link" onClick={() => setConfirmationResult(null)}>{t('back')}</Button>
                     </form>
                     )}
                 </>
             )}
             
             <p className="mt-4 text-center text-sm text-muted-foreground">
-                Not a seller?{' '}
+                {t('login.not_seller')}{' '}
                 <Link href="/buyer/login" className="font-semibold text-primary hover:underline">
-                Buyer Login
+                {t('header.buyer_login')}
                 </Link>
             </p>
             </div>

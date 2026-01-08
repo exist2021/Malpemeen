@@ -5,14 +5,16 @@ import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FishLogo } from '@/components/fish-logo';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Languages } from 'lucide-react';
 import { useUser, useUserRole } from '@/firebase';
 import { useEffect } from 'react';
+import { useI18n } from '@/i18n/context';
 
 export default function WelcomePage() {
   const router = useRouter();
   const { user, isUserLoading } = useUser();
   const { role, isRoleLoading } = useUserRole();
+  const { t, language, setLanguage } = useI18n();
 
   useEffect(() => {
     if (!isUserLoading && !isRoleLoading && user) {
@@ -28,15 +30,15 @@ export default function WelcomePage() {
 
   const userRoles = [
     {
-      title: "I'm a Buyer",
-      description: "Browse and buy the freshest catch directly from the source.",
-      buttonText: "Find Fish",
+      title: t('role.buyer.title'),
+      description: t('role.buyer.description'),
+      buttonText: t('role.buyer.button'),
       href: "/buyer/login",
     },
     {
-      title: "I'm a Seller",
-      description: "List your products and reach a wider market of buyers.",
-      buttonText: "Sell Fish",
+      title: t('role.seller.title'),
+      description: t('role.seller.description'),
+      buttonText: t('role.seller.button'),
       href: "/seller/login",
     },
   ];
@@ -46,7 +48,7 @@ export default function WelcomePage() {
           <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 bg-white">
                <FishLogo className="h-20 w-20 sm:h-24 sm:w-24 text-primary animate-pulse"/>
                <p className="mt-4 text-muted-foreground animate-pulse">
-                {user ? "Redirecting to your dashboard..." : "Loading..."}
+                {user ? t('redirecting') : t('loading')}
                </p>
           </div>
       )
@@ -54,13 +56,25 @@ export default function WelcomePage() {
 
   return (
     <main className="relative flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 bg-white overflow-x-hidden">
+      <div className="absolute top-4 right-4">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => setLanguage(language === 'en' ? 'kn' : 'en')}
+          className="flex items-center gap-2"
+        >
+          <Languages className="h-4 w-4" />
+          {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
+        </Button>
+      </div>
+
       <div className="text-center mb-8 sm:mb-10 relative z-10">
         <FishLogo className="h-20 w-20 sm:h-24 sm:w-24 text-primary mx-auto"/>
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-4 text-foreground">
-          Welcome to Malpe Meen
+          {t('welcome.title')}
         </h1>
         <p className="mt-2 text-base text-muted-foreground max-w-md mx-auto">
-          The digital marketplace connecting local fisheries with buyers. Choose your role to get started.
+          {t('welcome.subtitle')}
         </p>
       </div>
       

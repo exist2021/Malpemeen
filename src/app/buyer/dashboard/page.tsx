@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { useI18n } from '@/i18n/context';
 
 
 function ListingsSkeleton() {
@@ -34,6 +35,7 @@ function FishListings({ portFilter, sellerFilter, fishTypeFilter, showWithCountO
   const [allListings, setAllListings] = useState<FishListing[]>([]);
   const [filteredListings, setFilteredListings] = useState<FishListing[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useI18n();
 
   useEffect(() => {
     async function fetchListings() {
@@ -73,7 +75,7 @@ function FishListings({ portFilter, sellerFilter, fishTypeFilter, showWithCountO
   }
 
   if (!filteredListings || filteredListings.length === 0) {
-    return <p className="mt-8 text-center text-muted-foreground">No fish available for the selected filters. Check back later!</p>;
+    return <p className="mt-8 text-center text-muted-foreground">{t('buyer.dashboard.no_listings')}</p>;
   }
 
   return (
@@ -93,6 +95,7 @@ export default function BuyerDashboard() {
   const [sellerFilter, setSellerFilter] = useState('all');
   const [fishTypeFilter, setFishTypeFilter] = useState('all');
   const [showWithCountOnly, setShowWithCountOnly] = useState(false);
+  const { t } = useI18n();
 
   // This state will hold all listings to derive sellers and fish types from
   const [allListings, setAllListings] = useState<FishListing[]>([]);
@@ -148,7 +151,7 @@ export default function BuyerDashboard() {
     <Header />
     <main className="p-4 sm:p-6 lg:p-8">
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Available Listings</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('buyer.dashboard.title')}</h1>
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex items-center space-x-2 bg-muted/50 px-3 py-2 rounded-lg">
                     <Switch 
@@ -156,16 +159,16 @@ export default function BuyerDashboard() {
                         checked={showWithCountOnly} 
                         onCheckedChange={setShowWithCountOnly} 
                     />
-                    <Label htmlFor="count-filter" className="text-sm font-medium cursor-pointer">Show with Count/Kg only</Label>
+                    <Label htmlFor="count-filter" className="text-sm font-medium cursor-pointer">{t('buyer.dashboard.show_count')}</Label>
                 </div>
                 <div className="flex w-full items-center gap-2">
-                    <Label htmlFor="port-filter" className="text-sm font-medium">Port:</Label>
+                    <Label htmlFor="port-filter" className="text-sm font-medium">{t('buyer.dashboard.port')}</Label>
                     <Select value={portFilter} onValueChange={handlePortChange}>
                         <SelectTrigger id="port-filter" className="w-full">
-                            <SelectValue placeholder="Select a port" />
+                            <SelectValue placeholder={t('buyer.dashboard.select_port')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Ports</SelectItem>
+                            <SelectItem value="all">{t('buyer.dashboard.all_ports')}</SelectItem>
                             <SelectItem value="Malpe Port">Malpe Port</SelectItem>
                             <SelectItem value="Mangalore Port">Mangalore Port</SelectItem>
                             <SelectItem value="Kochi Port">Kochi Port</SelectItem>
@@ -174,13 +177,13 @@ export default function BuyerDashboard() {
                     </Select>
                 </div>
                 <div className="flex w-full items-center gap-2">
-                    <Label htmlFor="fish-filter" className="text-sm font-medium whitespace-nowrap">Fish Type:</Label>
+                    <Label htmlFor="fish-filter" className="text-sm font-medium whitespace-nowrap">{t('buyer.dashboard.fish_type')}</Label>
                     <Select value={fishTypeFilter} onValueChange={setFishTypeFilter} disabled={availableFishTypes.length === 0}>
                         <SelectTrigger id="fish-filter" className="w-full">
-                            <SelectValue placeholder="All Fish" />
+                            <SelectValue placeholder={t('buyer.dashboard.all_fish')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Fish</SelectItem>
+                            <SelectItem value="all">{t('buyer.dashboard.all_fish')}</SelectItem>
                             {availableFishTypes.map(type => (
                                 <SelectItem key={type} value={type}>{type}</SelectItem>
                             ))}
@@ -188,13 +191,13 @@ export default function BuyerDashboard() {
                     </Select>
                 </div>
                  <div className="flex w-full items-center gap-2">
-                    <Label htmlFor="seller-filter" className="text-sm font-medium">Seller:</Label>
+                    <Label htmlFor="seller-filter" className="text-sm font-medium">{t('buyer.dashboard.seller')}</Label>
                     <Select value={sellerFilter} onValueChange={setSellerFilter} disabled={availableSellers.length === 0}>
                         <SelectTrigger id="seller-filter" className="w-full">
-                            <SelectValue placeholder="Select a seller" />
+                            <SelectValue placeholder={t('buyer.dashboard.select_seller')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Sellers</SelectItem>
+                            <SelectItem value="all">{t('buyer.dashboard.all_sellers')}</SelectItem>
                             {availableSellers.map(seller => (
                                 <SelectItem key={seller.id} value={seller.id}>{seller.name}</SelectItem>
                             ))}
