@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User as UserIcon, Settings, LogOut, LayoutDashboard, HelpCircle, Mail, Phone, Info, Building, Languages } from 'lucide-react';
+import { User as UserIcon, Settings, LogOut, HelpCircle, Mail, Phone, Info, Building, Languages } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import {
   Dialog,
@@ -32,7 +32,7 @@ import { useI18n } from '@/i18n/context';
 export function Header() {
   const router = useRouter();
   const { user, isUserLoading } = useUser();
-  const { role } = useUserRole();
+  const { role, isRoleLoading } = useUserRole();
   const { profile: sellerProfile, isLoading: isSellerProfileLoading } = useSellerProfile();
   const { profile: buyerProfile, isLoading: isBuyerProfileLoading } = useBuyerProfile();
   const auth = useAuth();
@@ -51,23 +51,26 @@ export function Header() {
   const getHomeLink = () => {
     if (!user) return "/";
     if (role === 'buyer') return "/buyer/dashboard";
-    // Admins are treated as sellers for navigation
     if (role === 'seller' || role === 'admin') return "/seller/dashboard";
     return "/";
   }
 
   const renderUserActions = () => {
-    if (isUserLoading) {
+    if (isUserLoading || isRoleLoading) {
       return <Skeleton className="h-10 w-24 rounded-md" />;
     }
     
     if (user) {
-        let triggerContent;
-        const isLoading = isSellerProfileLoading || isBuyerProfileLoading;
         const isSellerLike = role === 'seller' || role === 'admin';
-        const profileName = isSellerLike ? (sellerProfile?.contactName || sellerProfile?.companyName) : (role === 'buyer' ? buyerProfile?.name : (buyerProfile?.name || 'User'));
+        const isBuyer = role === 'buyer';
+        
+        // Prioritize Company Name for Sellers/Admins, fall back to Contact Name, then 'Seller'
+        let profileName = isSellerLike 
+            ? (sellerProfile?.companyName || sellerProfile?.contactName || 'Seller') 
+            : (isBuyer ? (buyerProfile?.name || 'Buyer') : 'User');
 
-        if (isLoading) {
+        let triggerContent;
+        if (isSellerProfileLoading || isBuyerProfileLoading) {
             triggerContent = <Skeleton className="h-9 w-9 rounded-full" />;
         } else if (isSellerLike && sellerProfile?.logoUrl) {
             triggerContent = (
@@ -98,16 +101,11 @@ export function Header() {
                     {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
                 </span>
               </Button>
-              {isSellerLike && (
-                <Button variant="ghost" onClick={() => router.push('/seller/dashboard')} className="hidden sm:inline-flex">
-                  {t('header.dashboard')}
-                </Button>
-              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2 p-1 sm:p-2">
                     {triggerContent}
-                    <span className="font-medium hidden sm:inline-block max-w-[100px] truncate">{profileName || t('header.account')}</span>
+                    <span className="font-medium hidden sm:inline-block max-w-[100px] truncate">{profileName}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -117,51 +115,46 @@ export function Header() {
                         <Languages className="mr-2 h-4 w-4" />
                         {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
                     </DropdownMenuItem>
-                   {isSellerLike && (
-                    <DropdownMenuItem onClick={() => router.push('/seller/dashboard')}>
-                        <LayoutDashboard className="mr-2 h-4 w-4" />
-                        {t('header.dashboard')}
-                    </DropdownMenuItem>
-                    )}
                   
-                    {/* Always allow account settings access if a buyer profile exists or if role is buyer or admin */}
-                    <Dialog open={isBuyerDialogOpen} onOpenChange={setBuyerDialogOpen}>
-                        <DialogTrigger asChild>
-                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                <Settings className="mr-2 h-4 w-4" />
-                                {t('header.account_settings')}
-                            </DropdownMenuItem>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[400px]">
-                            <DialogHeader>
-                            <DialogTitle>{t('header.my_account')}</DialogTitle>
-                            <DialogDescription>
-                                {t('account.description')}
-                            </DialogDescription>
-                            </DialogHeader>
-                            <BuyerAccountForm onSave={() => setBuyerDialogOpen(false)} />
-                        </DialogContent>
-                    </Dialog>
+                    {/* Settings: Buyers see Account Settings. Sellers/Admins see Seller Settings. */}
+                    {isBuyer ? (
+                        <Dialog open={isBuyerDialogOpen} onOpenChange={setBuyerDialogOpen}>
+                            <DialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    {t('header.account_settings')}
+                                </DropdownMenuItem>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[400px]">
+                                <DialogHeader>
+                                <DialogTitle>{t('header.my_account')}</DialogTitle>
+                                <DialogDescription>
+                                    {t('account.description')}
+                                </DialogDescription>
+                                </DialogHeader>
+                                <BuyerAccountForm onSave={() => setBuyerDialogOpen(false)} />
+                            </DialogContent>
+                        </Dialog>
+                    ) : isSellerLike ? (
+                        <Dialog open={isSellerDialogOpen} onOpenChange={setSellerDialogOpen}>
+                            <DialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    {t('header.seller_settings')}
+                                </DropdownMenuItem>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[400px]">
+                                <DialogHeader>
+                                <DialogTitle>{t('seller.details')}</DialogTitle>
+                                <DialogDescription>
+                                    {t('seller.description')}
+                                </DialogDescription>
+                                </DialogHeader>
+                                <SellerAccountForm onSave={() => setSellerDialogOpen(false)}/>
+                            </DialogContent>
+                        </Dialog>
+                    ) : null}
                   
-                  {isSellerLike && (
-                    <Dialog open={isSellerDialogOpen} onOpenChange={setSellerDialogOpen}>
-                        <DialogTrigger asChild>
-                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                <Settings className="mr-2 h-4 w-4" />
-                                {t('header.seller_settings')}
-                            </DropdownMenuItem>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[400px]">
-                            <DialogHeader>
-                            <DialogTitle>{t('seller.details')}</DialogTitle>
-                            <DialogDescription>
-                                {t('seller.description')}
-                            </DialogDescription>
-                            </DialogHeader>
-                            <SellerAccountForm onSave={() => setSellerDialogOpen(false)}/>
-                        </DialogContent>
-                    </Dialog>
-                  )}
                   <Dialog>
                       <DialogTrigger asChild>
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { useI18n } from '@/i18n/context';
 
 
 interface SellerFormProps {
@@ -60,6 +61,7 @@ const FISH_NAMES = [
 
 export function SellerForm({ listing, formState, setFormState }: SellerFormProps) {
   const { toast } = useToast();
+  const { t } = useI18n();
   const {
     productName, pricePerKg, countPerKg, totalQuantityInTons, boatDetails, portDetails, mediaUrls, videoUrl
   } = formState;
@@ -226,10 +228,10 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
         <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="productName">Product Name</Label>
+            <Label htmlFor="productName">{t('sell.product_name')}</Label>
             <Select value={productName} onValueChange={(value) => setProductName(value)} required>
               <SelectTrigger id="productName">
-                <SelectValue placeholder="Select fish name" />
+                <SelectValue placeholder={t('sell.select_fish')} />
               </SelectTrigger>
               <SelectContent>
                 {FISH_NAMES.map(fish => (
@@ -240,9 +242,9 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         </div>
         
         <div className="space-y-2">
-            <Label htmlFor="portDetails">Port</Label>
+            <Label htmlFor="portDetails">{t('sell.port')}</Label>
             <Select value={portDetails} onValueChange={(value) => setPortDetails(value as any)} required>
-              <SelectTrigger id="portDetails"><SelectValue placeholder="Select a port" /></SelectTrigger>
+              <SelectTrigger id="portDetails"><SelectValue placeholder={t('sell.select_port')} /></SelectTrigger>
               <SelectContent>
                 {["Malpe Port", "Mangalore Port", "Kochi Port", "Hyderabad Port"].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
               </SelectContent>
@@ -250,30 +252,30 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
         </div>
 
         <div className="space-y-2">
-            <Label htmlFor="boatDetails">Boat Details</Label>
+            <Label htmlFor="boatDetails">{t('sell.boat_details')}</Label>
             <Select value={boatDetails} onValueChange={(value) => setBoatDetails(value as any)} required>
-              <SelectTrigger id="boatDetails"><SelectValue placeholder="Select a boat type" /></SelectTrigger>
+              <SelectTrigger id="boatDetails"><SelectValue placeholder={t('sell.select_boat')} /></SelectTrigger>
               <SelectContent>
                 {["Ashok Leyland", "Persian Boat", "370-Boat"].map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
               </SelectContent>
             </Select>
         </div>
         <div className="space-y-2">
-            <Label htmlFor="totalQuantityInTons">Quantity (Tons)</Label>
+            <Label htmlFor="totalQuantityInTons">{t('sell.quantity')}</Label>
             <Input id="totalQuantityInTons" type="number" value={totalQuantityInTons} onChange={(e) => setTotalQuantityInTons(e.target.value)} />
         </div>
         <div className="space-y-2">
-            <Label htmlFor="pricePerKg">Price Per Kg (₹)</Label>
+            <Label htmlFor="pricePerKg">{t('sell.price')}</Label>
             <Input id="pricePerKg" type="number" value={pricePerKg} onChange={(e) => setPricePerKg(e.target.value)} />
         </div>
         <div className="space-y-2">
-            <Label htmlFor="countPerKg">Count Per Kg (Optional)</Label>
+            <Label htmlFor="countPerKg">{t('sell.count')}</Label>
             <Input id="countPerKg" type="number" value={countPerKg} onChange={(e) => setCountPerKg(e.target.value)} placeholder="e.g. 10" />
         </div>
       </div>
       
       <div className="space-y-4">
-        <Label>Photos & Video</Label>
+        <Label>{t('sell.media')}</Label>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {mediaUrls.map((url, index) => (
                 <div key={index} className="relative aspect-square">
@@ -289,13 +291,13 @@ export function SellerForm({ listing, formState, setFormState }: SellerFormProps
             )}
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-2">
-          <Button type="button" variant="outline" onClick={() => photoInputRef.current?.click()} className="w-full h-12"><Camera className="mr-2 h-4 w-4" /> Photo</Button>
-          <Button type="button" variant="outline" onClick={() => videoInputRef.current?.click()} className="w-full h-12"><Video className="mr-2 h-4 w-4" /> Video</Button>
+          <Button type="button" variant="outline" onClick={() => photoInputRef.current?.click()} className="w-full h-12"><Camera className="mr-2 h-4 w-4" /> {t('sell.photo')}</Button>
+          <Button type="button" variant="outline" onClick={() => videoInputRef.current?.click()} className="w-full h-12"><Video className="mr-2 h-4 w-4" /> {t('sell.video')}</Button>
         </div>
       </div>
 
       <Button type="submit" disabled={isPending || isUploading} className="w-full h-14 text-xl font-bold">
-        {isUploading ? <><Loader2 className="animate-spin mr-2" /> Saving Listing...</> : (isEditMode ? 'Update Listing' : 'List My Catch')}
+        {isUploading ? <><Loader2 className="animate-spin mr-2" /> {t('sell.saving')}</> : (isEditMode ? t('sell.update') : t('sell.submit'))}
       </Button>
     </form>
   );
