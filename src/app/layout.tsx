@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
        <head>
-        <link rel="icon" href="https://tse2.mm.bing.net/th/id/OIP.Z9Udy9KlJcw4DbHwtLGTowHaHa?rs=1&pid=ImgDetMain&o=7&rm=3" />
+        <link rel="icon" href="https://tse2.mm.bing.net/th/id/OIP.Z9Udy9KlCjCj4DbHwtLGTowHaHa?rs=1&pid=ImgDetMain&o=7&rm=3" />
       </head>
       <body
         className={cn(
@@ -33,6 +33,22 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const originalScrollIntoView = Element.prototype.scrollIntoView;
+                Element.prototype.scrollIntoView = function(options) {
+                  if (options && typeof options === 'object' && options.behavior === 'smooth') {
+                    originalScrollIntoView.call(this, { ...options, behavior: 'instant' });
+                  } else {
+                    originalScrollIntoView.apply(this, arguments);
+                  }
+                };
+              })();
+            `,
+          }}
+        />
         <I18nProvider>
           <FirebaseClientProvider>
             {children}

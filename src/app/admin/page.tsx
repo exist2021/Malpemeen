@@ -14,7 +14,7 @@ import { formatToIST } from '@/lib/utils';
 import { Header } from '@/components/layout/header';
 
 export default function AdminDashboard() {
-  const { role, isRoleLoading } = useUserRole();
+  const { role, isRoleLoading, isAdmin } = useUserRole();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const [listings, setListings] = useState<FishListing[]>([]);
@@ -24,7 +24,7 @@ export default function AdminDashboard() {
     if (!isUserLoading && !isRoleLoading) {
       if (!user) {
         router.push('/');
-      } else if (role !== 'admin') {
+      } else if (!isAdmin) {
         router.push('/'); // Redirect unauthorized users
       } else {
         // Fetch listings if admin
@@ -35,7 +35,7 @@ export default function AdminDashboard() {
         });
       }
     }
-  }, [user, role, isUserLoading, isRoleLoading, router]);
+  }, [user, isAdmin, isUserLoading, isRoleLoading, router]);
 
   if (isUserLoading || isRoleLoading) {
     return (
@@ -46,7 +46,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (role !== 'admin') {
+  if (!isAdmin) {
     return null; // Don't render anything while redirecting
   }
 

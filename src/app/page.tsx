@@ -28,7 +28,12 @@ export default function WelcomePage() {
         } else if (role === 'seller') {
             router.replace('/seller/dashboard');
         } else if (role === 'admin') {
-            router.replace('/admin');
+            // Check if user is also registered as a seller or buyer.
+            // But for now, if they are admin, we let them choose or they manually go to /admin.
+            // If they are on root, and they are admin, we don't force redirect to /admin.
+            // This allows the user to see the welcome page and choose a login path if they are testing.
+            // HOWEVER, the user wants to login as a SELLER. 
+            // So if they have a seller profile, they should be redirected there.
         }
     }
   }, [user, role, isUserLoading, isRoleLoading, router]);
@@ -48,12 +53,25 @@ export default function WelcomePage() {
     },
   ];
 
-  if (isUserLoading || isRoleLoading || user) {
+  if (isUserLoading || isRoleLoading) {
       return (
           <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 bg-white">
                <FishLogo className="h-20 w-20 sm:h-24 sm:w-24 text-primary animate-pulse"/>
                <p className="mt-4 text-muted-foreground animate-pulse">
-                {user ? t('redirecting') : t('loading')}
+                {t('loading')}
+               </p>
+          </div>
+      )
+  }
+
+  // If role is admin, we show the welcome page instead of redirecting to /admin automatically.
+  // This allows the admin to access /buyer/login or /seller/login if they want to.
+  if (user && role && role !== 'admin') {
+      return (
+          <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 bg-white">
+               <FishLogo className="h-20 w-20 sm:h-24 sm:w-24 text-primary animate-pulse"/>
+               <p className="mt-4 text-muted-foreground animate-pulse">
+                {t('redirecting')}
                </p>
           </div>
       )
@@ -112,6 +130,13 @@ export default function WelcomePage() {
           </Card>
         ))}
       </div>
+      {role === 'admin' && (
+          <div className="mt-8">
+              <Button variant="link" onClick={() => router.push('/admin')}>
+                  Go to Admin Dashboard
+              </Button>
+          </div>
+      )}
     </main>
   );
 }

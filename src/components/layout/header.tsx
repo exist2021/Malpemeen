@@ -227,9 +227,10 @@ export function Header() {
     );
   }
 
+  // Changed from sticky/fixed to normal relative positioning to avoid scroll conflicts
   return (
-    <header className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container flex h-14 sm:h-16 items-center justify-between px-4">
+    <header className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
+      <div className="container flex h-14 sm:h-16 items-center justify-between px-4 mx-auto">
         <div className="flex items-center gap-2">
             <Link href={getHomeLink()} className="flex items-center space-x-1.5">
               <FishLogo className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />

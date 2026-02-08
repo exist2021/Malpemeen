@@ -59,6 +59,7 @@ export type UserRole = 'seller' | 'buyer' | 'admin' | null;
 export interface UserRoleHookResult {
     role: UserRole;
     isRoleLoading: boolean;
+    isAdmin: boolean; // Added to check if user has admin privileges regardless of their current primary role
 }
 
 export interface BuyerProfileResult {
@@ -216,6 +217,7 @@ export const useUserRole = (): UserRoleHookResult => {
     const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
     const [role, setRole] = useState<UserRole>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const [isRoleLoading, setIsRoleLoading] = useState(true);
 
     useEffect(() => {
@@ -225,6 +227,7 @@ export const useUserRole = (): UserRoleHookResult => {
         }
         if (!user) {
             setRole(null);
+            setIsAdmin(false);
             setIsRoleLoading(false);
             return;
         }
@@ -232,12 +235,9 @@ export const useUserRole = (): UserRoleHookResult => {
         const checkRoles = async () => {
             setIsRoleLoading(true);
 
-            // Hardcoded Admin Check
-            if (user.phoneNumber === '+919892334681') {
-                setRole('admin');
-                setIsRoleLoading(false);
-                return;
-            }
+            // Set isAdmin based on phone number
+            const userIsAdmin = user.phoneNumber === '+919892334681';
+            setIsAdmin(userIsAdmin);
 
             const sellerRef = doc(firestore, 'sellers', user.uid);
             const sellerSnap = await getDoc(sellerRef);
@@ -255,6 +255,12 @@ export const useUserRole = (): UserRoleHookResult => {
                 return;
             }
 
+            if (userIsAdmin) {
+                setRole('admin');
+                setIsRoleLoading(false);
+                return;
+            }
+
             setRole(null);
             setIsRoleLoading(false);
         };
@@ -262,7 +268,7 @@ export const useUserRole = (): UserRoleHookResult => {
         checkRoles();
     }, [user, isUserLoading, firestore]);
 
-    return { role, isRoleLoading };
+    return { role, isRoleLoading, isAdmin };
 };
 
 export const useBuyerProfile = (): BuyerProfileResult => {

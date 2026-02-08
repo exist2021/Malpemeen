@@ -1,0 +1,11 @@
+Index: node_modules/next/dist/client/router.js
+===================================================================
+--- node_modules/next/dist/client/router.js
++++ node_modules/next/dist/client/router.js
+@@ -100,6 +100,7 @@
+             if (element) {
++                if (window.getComputedStyle(element).position === "sticky" || window.getComputedStyle(element).position === "fixed") return;
+                 const { top  } = element.getBoundingClientRect();
+                 window.scrollTo(0, top + window.scrollY);
+             }
+
