@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useUser, useSellerProfile } from '@/firebase';
+import { useUser, useSellerProfile, useUserRole } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -185,6 +185,7 @@ function DashboardSkeleton() {
 
 export default function SellerDashboard() {
   const { user, isUserLoading } = useUser();
+  const { role, isRoleLoading } = useUserRole();
   const { profile: seller, isLoading: isSellerLoading } = useSellerProfile();
   const router = useRouter();
   const [listings, setListings] = useState<FishListing[]>([]);
@@ -194,11 +195,22 @@ export default function SellerDashboard() {
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/seller/login');
+    } else if (!isUserLoading && user && !isRoleLoading && role !== 'seller') {
+        // If logged in but not a seller, redirect to appropriate page
+        if (role === 'buyer') {
+            router.push('/buyer/dashboard');
+        } else if (role === 'admin') {
+            router.push('/admin');
+        } else {
+            // User has no role yet, maybe they should be a seller? 
+            // Or redirect to home/login
+            router.push('/seller/login');
+        }
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, role, isRoleLoading, router]);
 
   useEffect(() => {
-    if (user) {
+    if (user && role === 'seller') {
         setIsListingsLoading(true);
         const fetchListings = async () => {
             const data = await getSellerFishListings(user.uid);
@@ -207,15 +219,20 @@ export default function SellerDashboard() {
         }
         fetchListings();
     }
-  }, [user]);
+  }, [user, role]);
 
-  if (isUserLoading || isSellerLoading || isListingsLoading) {
+  if (isUserLoading || isRoleLoading || isSellerLoading || isListingsLoading) {
     return (
       <>
         <Header />
         <DashboardSkeleton />
       </>
     );
+  }
+
+  // Double check role after loading
+  if (role !== 'seller') {
+      return null;
   }
 
   const totalValue = listings.reduce((acc, listing) => acc + ((listing.pricePerKg || 0) * (listing.totalQuantityInTons || 0) * 1000), 0);

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useUser } from '@/firebase';
+import { useUser, useUserRole } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useMemo } from 'react';
 import type { FishListing } from '@/app/types';
@@ -90,6 +90,7 @@ function FishListings({ portFilter, sellerFilter, fishTypeFilter, showWithCountO
 
 export default function BuyerDashboard() {
   const { user, isUserLoading } = useUser();
+  const { role, isRoleLoading } = useUserRole();
   const router = useRouter();
   const [portFilter, setPortFilter] = useState('Malpe Port');
   const [sellerFilter, setSellerFilter] = useState('all');
@@ -101,9 +102,26 @@ export default function BuyerDashboard() {
   const [allListings, setAllListings] = useState<FishListing[]>([]);
   
   useEffect(() => {
+    if (!isUserLoading && !user) {
+        router.push('/buyer/login');
+    } else if (!isUserLoading && user && !isRoleLoading && role !== 'buyer') {
+        // If logged in but not a buyer, redirect to appropriate page
+        if (role === 'seller') {
+            router.push('/seller/dashboard');
+        } else if (role === 'admin') {
+            router.push('/admin');
+        } else {
+             router.push('/buyer/login');
+        }
+    }
+  }, [user, isUserLoading, role, isRoleLoading, router]);
+
+  useEffect(() => {
     // We only need to fetch this once for the filter logic
-    getFishListings().then(setAllListings);
-  }, []);
+    if (user && role === 'buyer') {
+        getFishListings().then(setAllListings);
+    }
+  }, [user, role]);
 
   // Memoize the calculation of available sellers
   const availableSellers = useMemo(() => {
@@ -144,6 +162,21 @@ export default function BuyerDashboard() {
     setPortFilter(value);
     setSellerFilter('all');
     setFishTypeFilter('all');
+  }
+
+  if (isUserLoading || isRoleLoading) {
+      return (
+          <>
+            <Header />
+            <main className="p-4 sm:p-6 lg:p-8">
+                <ListingsSkeleton />
+            </main>
+          </>
+      )
+  }
+
+  if (role !== 'buyer') {
+      return null;
   }
 
   return (
